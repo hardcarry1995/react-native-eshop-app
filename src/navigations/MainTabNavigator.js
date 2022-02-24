@@ -1,8 +1,12 @@
 import React from 'react';
-import { Platform } from 'react-native';
+import { Platform, Image, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import Menu from "../components/Meun";
+import { textHeader, font_style } from '../components/styles';
+import HeaderBackLeft from '../components/HeaderBackLeft';
+
 import TabBar from "./BottomTabBar";
 // HomeStack Screens
 import HomeScreen from "../screens/HomeScreen";
@@ -22,13 +26,36 @@ import WishListScreen from '../screens/WishListScreen';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-const screenOptions = { headerShown: false, gestureEnabled: false };
-
+const screenOptions = ({ navigation }) => ({
+  headerBackground: () => (
+    <View style={{ flex: 1, backgroundColor: '#fff' }} />
+  ),
+  headerStyle: textHeader.header_style,
+  headerTitle: () => (
+    <Image
+      source={require('../assets/img/LoginIcon.png')}
+      style={{ width: 100, height: 45, resizeMode: 'contain' }}
+    />
+  ),
+  headerLeft: () => <Menu navigationProps={navigation} />,
+})
 // Define HomeStack
 const HomeStack = () => (
   <Stack.Navigator screenOptions={screenOptions}>
     <Stack.Screen name="Home" component={HomeScreen} />
-    <Stack.Screen name="Filter" component={Filter} />
+    <Stack.Screen
+      name="Filter"
+      component={Filter}
+      options={({ navigation }) => ({
+        headerStyle: textHeader.header_style,
+        headerRight: () => (
+          <Image
+            style={{ height: 22, width: 25, padding: 5, resizeMode: 'center', alignSelf: 'flex-end' }}
+            source={require('../assets/share.png')}
+          />
+        ),
+        headerLeft: () => <HeaderBackLeft navigationProps={navigation} />,
+      })} />
   </Stack.Navigator>
 )
 
@@ -68,7 +95,7 @@ const WishStack = () => (
 const TabBarNavigator = () => (
   <Tab.Navigator
     tabBar={props => <TabBar {...props} />}
-    screenOptions={screenOptions}
+    screenOptions={{ headerShown: false, gestureEnabled: false }}
   >
     <Tab.Screen name="HomeStack" component={HomeStack} />
     <Tab.Screen name="ProductStack" component={ProductStack} />

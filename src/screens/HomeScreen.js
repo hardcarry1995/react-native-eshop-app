@@ -1,37 +1,19 @@
 import React, { Component } from 'react';
-import {
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  FlatList,
-  TextInput,
-  ActivityIndicator,
-  ToastAndroid,
-  Linking,
-} from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import { StyleSheet, Text, View, FlatList, ActivityIndicator, ToastAndroid, Linking } from 'react-native';
 import NetInfo from "@react-native-community/netinfo";
 import AsyncStorage from '@react-native-community/async-storage';
 import RNPickerSelect from 'react-native-picker-select';
 import { connect } from 'react-redux';
-import { bearerToken, imagePrefix } from '../constants/utils';
+import { bearerToken } from '../constants/utils';
 import client from '../constants/client';
-import {
-  SPECIAL_PRODUCT,
-  CREATE_FAVOURITES_PRODUCT,
-  ADD_TO_CART,
-  GET_PRODUCT,
-  GUEST_LOGIN,
-  ADD_TO_CART_NULL
-} from '../constants/queries';
+import { SPECIAL_PRODUCT, CREATE_FAVOURITES_PRODUCT, ADD_TO_CART, GET_PRODUCT, GUEST_LOGIN, ADD_TO_CART_NULL } from '../constants/queries';
 import SpecialCard from '../components/SpecialProduct';
 import SQLite from 'react-native-sqlite-storage';
-import { GetRating } from '../components/GetRating';
 import moment from 'moment';
 import DeepLinking from 'react-native-deep-linking';
 import setGet from '../utils/setGet';
+import ProductCard from '../components/ProductCard';
+import ProductSearchInput from '../components/ProductSearchInput';
 
 class HomeScreen extends Component {
 
@@ -41,26 +23,17 @@ class HomeScreen extends Component {
     this.state = {
       size: 10,
       specialSize: 10,
-      email: '',
-      password: '',
       data: [],
       isproductID: '',
       special_data: [],
       loading: false,
       userInfo: {},
       cartLoading: false,
-      vdata: [],
       textnew: [],
       dataEMP: [],
       SQLiteProduct: [],
-      queryText: '',
-      search: '',
       specialData: [],
-      scan: false,
-      ScanResult: false,
-      result: null,
       rating: "2",
-      response: {},
       maxRating: [1, 2, 3, 4, 5],
       isListEnd: false,
       loginToken: '',
@@ -79,6 +52,7 @@ class HomeScreen extends Component {
         'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png',
 
     };
+    this.linkingUrlSub = null;
   }
 
   ExecuteQuery = (sql, params = []) => new Promise((resolve, reject) => {
@@ -97,7 +71,7 @@ class HomeScreen extends Component {
     DeepLinking.addScheme('https://sandbox.payfast.co.za/');
     DeepLinking.addScheme(scheme1);
 
-    Linking.addEventListener('url', this.handleUrl);
+    this.linkingUrlSub = Linking.addEventListener('url', this.handleUrl);
     DeepLinking.addRoute('eng/process?merchant_id=10001460&merchant_key=0j4uaurpqk87v&return_url=https%3a%2f%2fwww.LawyersEzyFind.co.za%2fLCPayFastReturn.html&cancel_url=https%3a%2f%2fwww.LawyersEzyFind.co.za%2fLCPayFastCancel.html&notify_url=http%3a%2f%2fmobileapiv2.ezyfind.co.za%2fapi%2fUser%2fNotify%3f&m_payment_id=13216&amount=1151.70&item_name=Company+33&item_description=Purchased+EzyFindMobileApi.Model.MstPackage+Package&subscription_type=1&recurring_amount=1151.70&frequency=4&cycles=0', (response) => {
       this.setState({ response });
     });
@@ -124,7 +98,9 @@ class HomeScreen extends Component {
   }
 
   componentWillUnmount() {
-    Linking.removeEventListener('url', this.handleUrl);
+    if (this.linkingUrlSub) {
+      this.linkingUrlSub.remove();
+    }
   }
 
   handleUrl = ({ url }) => {
@@ -173,9 +149,7 @@ class HomeScreen extends Component {
       if (token == '' || token == null) {
         this.getQuestToken();
       } else {
-        // this.CreateTable();
         this.fetchToken();
-        // this.SelectQuery();
         setInterval(() => {
           this.checkConnectivity();
         }, 5000);
@@ -187,7 +161,6 @@ class HomeScreen extends Component {
   async checkConnectivity() {
     NetInfo.fetch().then(state => {
       if (state.isConnected == false) {
-        // this.SelectQuery();
         AsyncStorage.setItem('setInternet', 'set');
         ToastAndroid.show('No internet connection', ToastAndroid.SHORT);
       }
@@ -271,7 +244,7 @@ class HomeScreen extends Component {
         console.log("ERROR: " + error);
       }
     );
-    let product = await this.ExecuteQuery("CREATE TABLE IF NOT EXISTS ezyFindProductDetail (activeText VARCHAR(16), categoryID INTEGER, categoryName VARCHAR(16),unitCost VARCHAR(16),description TEXT,documentName VARCHAR(225),documentPath VARCHAR(225),isActive VARCHAR(16),productID INTEGER,productImage VARCHAR(225),productName VARCHAR(225), productNumber VARCHAR(225))", []);
+    await this.ExecuteQuery("CREATE TABLE IF NOT EXISTS ezyFindProductDetail (activeText VARCHAR(16), categoryID INTEGER, categoryName VARCHAR(16),unitCost VARCHAR(16),description TEXT,documentName VARCHAR(225),documentPath VARCHAR(225),isActive VARCHAR(16),productID INTEGER,productImage VARCHAR(225),productName VARCHAR(225), productNumber VARCHAR(225))", []);
 
   }
   async SelectQuery() {
@@ -289,13 +262,10 @@ class HomeScreen extends Component {
     });
 
     this.setState({ data: newArrayList });
-    // console.log('newArrayList',newArrayList)
   }
 
   handleSearch = (text) => {
-    this.setState({
-      textnew: text,
-    });
+    this.setState({ textnew: text });
     let vdata = this.state.dataEMP.filter(i =>
       i.productName.toLowerCase().includes(text.toLowerCase()))
     this.setState({ data: vdata });
@@ -338,12 +308,10 @@ class HomeScreen extends Component {
 
   }
   fetchProducts(token) {
-    // if (!this.loading && !this.isListEnd) {
     this.setState({ loading: true });
     client
       .query({
         query: GET_PRODUCT,
-        // fetchPolicy: 'no-cache',
         variables: {
           size: this.state.size,
         },
@@ -354,11 +322,8 @@ class HomeScreen extends Component {
         },
       })
       .then(result => {
-        // this.setState({ loading: false });
         if (result.data.getPrdProductList.result.length > 0) {
-          // this.setState({ size: this.state.size + 10 })
           this.setState({ data: result.data.getPrdProductList.result });
-          // this.setState({ data: [...this.state.data, ...result.data.getPrdProductList.result] });
           this.setState({ dataEMP: result.data.getPrdProductList.result });
           this.addCounrty(result.data.getPrdProductList.result);
           this.setState({ loading: false });
@@ -374,7 +339,6 @@ class HomeScreen extends Component {
       .catch(err => {
         this.setState({ loading: false });
       });
-    // }
   }
 
   updateUser = user => {
@@ -384,7 +348,7 @@ class HomeScreen extends Component {
       }),
       () => {
         if (this.state.user == 'Buy') {
-          this.props.navigation.navigate('Matches')
+          this.props.navigation.navigate('ProductStack')
         } if (this.state.user == 'Bid') {
           this.props.navigation.navigate('SettingsScreen')
         } if (this.state.user == 'Hire') {
@@ -412,7 +376,6 @@ class HomeScreen extends Component {
         })
         .then(result => {
           if (result.data.getPrdProductList.result.length > 0) {
-            // this.setState({ size: this.state.size + 10 })
             this.setState({ data: result.data.getPrdProductList.result });
 
           } else {
@@ -445,12 +408,10 @@ class HomeScreen extends Component {
         },
       })
       .then(result => {
-        // this.fetchProducts();
         if (result.data.getMstSpecialList.success) {
           this.setState({ special_data: result.data.getMstSpecialList.result });
           this.setState({ specialData: result.data.getMstSpecialList.result });
         } else {
-          console.log(result.data.getMstSpecialList.message);
         }
       })
       .catch(err => {
@@ -473,7 +434,6 @@ class HomeScreen extends Component {
           context: {
             headers: {
               Authorization: `Bearer ${this.props.state.userToken}`,
-              // 'Content-Length': 0,
             },
           },
         })
@@ -483,7 +443,6 @@ class HomeScreen extends Component {
           }
         })
         .catch(err => {
-          // this.setState({ cartLoading: false });
           console.log(err);
         });
     }
@@ -493,7 +452,6 @@ class HomeScreen extends Component {
     this.setState({ isCartLoading: true })
     this.setState({ isproductID: id })
     if (IsLogin !== 'true') {
-      // this.props.navigation.navigate('Auth');
       var userIdData = null;
       this.setState({ cartLoading: true });
       client
@@ -515,7 +473,7 @@ class HomeScreen extends Component {
           if (result.data.postPrdShoppingCartOptimized.success) {
             ToastAndroid.show('Product added to cart', ToastAndroid.SHORT);
             this.setState({ isCartLoading: false })
-            this.props.navigation.navigate('Workout')
+            this.props.navigation.navigate('CartStack')
           }
         })
         .catch(err => {
@@ -537,7 +495,6 @@ class HomeScreen extends Component {
           context: {
             headers: {
               Authorization: `Bearer ${this.props.state.userToken}`,
-              // 'Content-Length': 0,
             },
           },
         })
@@ -546,7 +503,7 @@ class HomeScreen extends Component {
           if (result.data.postPrdShoppingCartOptimized.success) {
             ToastAndroid.show('Product added to cart', ToastAndroid.SHORT);
             this.setState({ isCartLoading: false })
-            this.props.navigation.navigate('Workout')
+            this.props.navigation.navigate('CartStack')
           }
         })
         .catch(err => {
@@ -554,163 +511,22 @@ class HomeScreen extends Component {
           console.log(err);
         });
     }
-
-    // }
   }
   renderItem = ({ item, index }) => (
-    <View style={{ flex: 1, backgroundColor: '#fff', padding: 10 }}>
-      <TouchableOpacity
-        activeOpacity={0.9}
-        onPress={() => {
-          this.props.navigation.navigate('Filter', { data: item }); ``
-        }}
-        style={{ marginBottom: 10 }}>
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: '#FFF',
-            borderRadius: 15,
-            elevation: 5,
-          }}>
-          <View style={{ alignSelf: 'center', flex: 1 }}>
-            {/* <Image
-              style={{ height: 100, width: 100, padding: 5, marginVertical: 5 }}
-              source={{
-                uri: `${imagePrefix}${item.productImage}`,
-              }}
-            /> */}
-            <Image
-              style={{
-                height: 100,
-                width: 100,
-                padding: 5,
-                marginVertical: 5,
-              }}
-              source={item.productImage
-                ?
-                { uri: `${imagePrefix}${item.productImage}` }
-                :
-                require('../assets/NoImage.jpeg')}
-            />
-          </View>
-          <View
-            style={{
-              flex: 1,
-              borderColor: '#eeeeee',
-              borderRadius: 15,
-              borderWidth: 1,
-            }}>
-            <View style={{ flexDirection: 'column', marginLeft: 10, margin: 10 }}>
-              <Text numberOfLines={1} style={{ color: '#000', fontSize: 16, fontWeight: 'bold' }}>
-                {/* {item.productName.substr(0, 30)}... */}
-                {item.productName}
-              </Text>
-              <GetRating companyId={item.productID} onprogress={(Rating) => { this.setState({ rating: Rating }); }} />
-              <View style={{ flexDirection: "row", padding: 1, paddingBottom: 5, }}>
-                {this.state.maxRating.map((item, key) => {
-                  return (
-                    <TouchableOpacity
-                      activeOpacity={0.7}
-                      key={item}
-                    >
-                      <Image
-                        style={styles.starImageStyle}
-                        source={
-                          item <= item.ratingScore
-                            ? { uri: this.state.starImageFilled }
-                            : { uri: this.state.starImageCorner }
-                        }
-                      />
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-
-              <Text
-                style={{
-                  fontSize: 10,
-                  color: '#9f1d20',
-                  fontWeight: 'bold',
-                  marginTop: -17,
-                  alignSelf: 'flex-end',
-                }}>
-                R{item.unitCost}
-              </Text>
-              <Text numberOfLines={2} style={{ color: '#BBB' }}>
-                {item.description}
-              </Text>
-            </View>
-            <View
-              style={{
-                justifyContent: 'space-around',
-                flexDirection: 'row',
-                padding: 5,
-              }}>
-              <TouchableOpacity
-                onPress={() => {
-                  this.addToFavourites(item.productID)
-                }}>
-                <Image
-                  style={{ height: 25, width: 25, tintColor: '#bbb' }}
-                  source={require('../assets/heart.png')}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  this.addToCart(item.productID)
-                }}>
-                {this.state.isCartLoading && this.state.isproductID == item.productID ? (
-                  <ActivityIndicator color="black" />
-                ) : (
-                  <Image
-                    style={{ height: 25, width: 25, tintColor: '#DB3236' }}
-                    source={require('../assets/shopping.png')}
-                  />
-                )}
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </TouchableOpacity>
-    </View>
+    <ProductCard
+      navigation={this.props.navigation}
+      item={item}
+      key={index}
+      addToFavourites={(value) => this.addToFavourites(value)}
+      addToCart={(value) => this.addToCart(value)}
+    />
   );
 
   render() {
-
     return (
       <View style={styles.container}>
         <View style={{ paddingBottom: 30, flex: 1 }}>
-          <View style={{ height: 80, alignItems: 'center', justifyContent: 'center', }}>
-            <View style={styles.SectionStyle}>
-              <Image
-                source={require('../assets/search.png')}
-                style={styles.ImageStyle}
-              />
-              <TextInput
-                style={{ flex: 1 }}
-                placeholder="Search Products"
-                underlineColorAndroid="transparent"
-                onChangeText={queryText => this.handleSearch(queryText)}
-              />
-              <TouchableOpacity
-                onPress={() => {
-                  this.props.navigation.navigate('ChatItem');
-                }}
-              >
-                <Image
-                  source={require('../assets/Group28.png')}
-                  style={{
-                    padding: 10,
-                    margin: 15,
-                    height: 20,
-                    width: 20,
-                    resizeMode: 'stretch',
-                    alignItems: 'center',
-                  }}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
+          <ProductSearchInput onChangeText={(value) => this.handleSearch(value)} onPressFilterIcon={() => this.props.navigation.navigate('CategoryStack')} />
           <RNPickerSelect
             value={this.state.user}
             onValueChange={this.updateUser}
@@ -725,8 +541,6 @@ class HomeScreen extends Component {
           <FlatList
             ListEmptyComponent={this.EmptyListMessage('data')}
             numColumns={2}
-            // onEndReached={this.fetchProducts()}
-            // onEndReachedThreshold={0.5}
             ListFooterComponent={() => {
               return (
                 this.state.loading ? (
@@ -737,21 +551,9 @@ class HomeScreen extends Component {
             ListHeaderComponent={() => {
               return (
                 <View style={{ padding: 5, flex: 1 }}>
-                  <TouchableOpacity
-                    onPress={() => {
-                      // this.onShare()
-                    }}>
-                    <Text
-                      style={{ fontSize: 20, color: '#DB3236', marginLeft: 27 }}>
-                      SPECIAL PRODUCTS
-                    </Text>
-                  </TouchableOpacity>
+                  <Text style={styles.sectionLabel}> SPECIAL PRODUCTS </Text>
                   <SpecialCard allData={this.state.special_data} navigation={this.props.navigation} />
-
-                  <Text
-                    style={{ fontSize: 20, color: '#DB3236', marginLeft: 27 }}>
-                    ALL PRODUCTS
-                  </Text>
+                  <Text style={styles.sectionLabel}> ALL PRODUCTS </Text>
                 </View>
               );
             }}
@@ -808,27 +610,8 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     textAlign: 'center',
   },
-  SectionStyle: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderWidth: 2,
-    borderColor: 'lightgray',
-    height: '55%',
-    borderRadius: 10,
-    margin: 15,
-  },
 
-  ImageStyle: {
-    padding: 10,
-    margin: 5,
-    height: 20,
-    width: 20,
-    resizeMode: 'stretch',
-    alignItems: 'center',
 
-  },
   starImageStyle: {
     width: 12,
     height: 12,
@@ -846,6 +629,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'red',
     fontSize: 18
+  },
+  sectionLabel: {
+    fontSize: 20,
+    color: '#DB3236',
+    marginLeft: 27
   }
 
 });

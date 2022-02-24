@@ -11,6 +11,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import moment from 'moment';
 
 export default class Filter extends React.Component {
+
   constructor(props) {
     super(props);
     this.state = {
@@ -21,6 +22,8 @@ export default class Filter extends React.Component {
       multiSliderValue: [10, 30],
     };
   }
+
+
   async addToFavourites(item) {
     let IsLogin = await AsyncStorage.getItem('IsLogin');
     if (IsLogin !== 'true') {
@@ -123,7 +126,7 @@ export default class Filter extends React.Component {
 
   render() {
     const { navigation } = this.props;
-    const data = navigation.getParam('data');
+    const data = this.props.route.params.data;
     const imagePath = `${imagePrefix}${data.imagePath || data.productImage}`;
     return (
       <ScrollView style={{ flex: 1, backgroundColor: '#fff' }}>
