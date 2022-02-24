@@ -1,37 +1,15 @@
 import * as React from 'react';
-import { Text, View, Image, TouchableOpacity, Keyboard, SafeAreaView } from 'react-native';
-import Colors from '../constants/colors';
+import { Text, View, Image, TouchableOpacity, Keyboard, SafeAreaView, StyleSheet } from 'react-native';
 import { Avatar } from 'react-native-elements';
+import { ifIphoneX } from 'react-native-iphone-x-helper'
+import Colors from '../constants/colors';
+
 const Tab = ({ title, activeImage, unactiveImage, onPress, isFocused, isShowBadge, badge_value }) => {
   return (
     <TouchableOpacity style={{ flex: 1 }} onPress={onPress}>
       <View style={{ alignItems: 'center' }}>
-        <Image
-          style={
-            isFocused
-              ? {
-                width: 24,
-                height: 24,
-                tintColor: '#fff',
-              }
-              : {
-                width: 24,
-                height: 24,
-              }
-          }
-          resizeMode="contain"
-          source={isFocused ? activeImage : unactiveImage}
-        />
-        <Text
-          numberOfLines={1}
-          style={{
-            fontSize: 12,
-            textAlign: 'center',
-            marginTop: 5,
-            color: isFocused ? '#fff' : '#9F1D20',
-          }}>
-          {title}
-        </Text>
+        <Image source={isFocused ? activeImage : unactiveImage} style={isFocused ? styles.activeTabImage : styles.inActiveTabImage} resizeMode="contain" />
+        <Text style={isFocused ? styles.activeTitle : styles.inActiveTitle}>{title}</Text>
         {isShowBadge && (
           <View style={{ position: 'absolute', top: -5 }}>
             <Avatar
@@ -51,74 +29,25 @@ const Tab = ({ title, activeImage, unactiveImage, onPress, isFocused, isShowBadg
 
 //large tab bar icon
 
-const Tablarge = ({
-  title,
-  activeImage,
-  unactiveImage,
-  onPress,
-  isFocused,
-  isShowBadge,
-  badge_value,
-  color,
-}) => {
+const Tablarge = ({ title, activeImage, unactiveImage, onPress, isFocused }) => {
   return (
-    <TouchableOpacity activeOpacity={0.8} style={{ flex: 1 }} onPress={onPress}>
-      <View
-        style={{
-          alignItems: 'center',
-          elevation: 3,
-          marginTop: -10,
-          width: 70,
-          height: 70,
-          marginBottom: 50,
-          shadowOpacity: 0.8,
-          backgroundColor: '#fff',
-          borderRadius: 35,
-          shadowRadius: 2,
-        }}>
-        <Image
-          style={
-            isFocused
-              ? {
-                width: 55,
-                height: 55,
-                marginTop: 10,
-              }
-              : {
-                width: 55,
-                height: 55,
-                marginTop: 10,
-              }
-          }
-          resizeMode="contain"
-          source={isFocused ? activeImage : unactiveImage}
-        />
-        <Text
-          numberOfLines={1}
-          style={{
-            fontSize: 12,
-            textAlign: 'center',
-            marginTop: -5,
-            color: isFocused ? Colors.primaryColor : '#BBBFBE',
-          }}>
-          {title}
-        </Text>
+    <TouchableOpacity activeOpacity={0.8} onPress={onPress}>
+      <View style={styles.largeButtonContainer}>
+        <Image style={styles.larginButtonImage} resizeMode="contain" source={isFocused ? activeImage : unactiveImage} />
       </View>
     </TouchableOpacity>
   );
 };
 
 class TabBar extends React.Component {
+
   constructor(props) {
     super(props);
     this.state = {
       isVisible: true,
     };
   }
-
-
   componentDidMount() {
-    console.log("asdfasdfasdfasdf", this.props.state.routeNames);
     this.keyboardWillShowSub = Keyboard.addListener(
       'keyboardDidShow',
       this.keyboardWillShow,
@@ -152,23 +81,7 @@ class TabBar extends React.Component {
     return this.state.isVisible ? (
       <View style={{}}>
         <View
-          style={{
-            height: 70,
-            backgroundColor: '#DB3236',
-            paddingLeft: 10,
-            paddingRight: 10,
-            flexDirection: 'row',
-            justifyContent: 'space-around',
-            alignItems: 'center',
-            shadowOffset: {
-              width: 0,
-              height: -3,
-            },
-            shadowRadius: 5,
-            shadowOpacity: 0.5,
-            shadowColor: '#ccc',
-            elevation: 10,
-          }}>
+          style={styles.tabBarContainer}>
           {this.props.state.routes.map((route, index) => {
             if (route.name === 'HomeStack') {
               return (
@@ -230,16 +143,77 @@ class TabBar extends React.Component {
                     navigation.navigate(route.name);
                   }}
                   isFocused={navigationState.index == index}
-                  color="#1DE62A"
                 />
               );
             }
           })}
         </View>
-        <SafeAreaView />
       </View>
     ) : null;
   }
 }
+
+const styles = StyleSheet.create({
+  tabBarContainer: {
+    ...ifIphoneX({
+      height: 90,
+      paddingBottom: 20
+    }, {
+      height: 70,
+    }),
+    backgroundColor: '#DB3236',
+    paddingLeft: 10,
+    paddingRight: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    shadowOffset: {
+      width: 0,
+      height: -3,
+    },
+    shadowRadius: 5,
+    shadowOpacity: 0.5,
+    shadowColor: '#ccc',
+    elevation: 10,
+  },
+  largeButtonContainer: {
+    alignItems: 'center',
+    elevation: 3,
+    marginTop: -10,
+    width: 70,
+    height: 70,
+    marginBottom: 50,
+    shadowOpacity: 0.8,
+    backgroundColor: '#fff',
+    borderRadius: 35,
+    shadowRadius: 2,
+  },
+  larginButtonImage: {
+    width: 55,
+    height: 55,
+    marginTop: 10,
+  },
+  activeTabImage: {
+    width: 24,
+    height: 24,
+    tintColor: '#fff',
+  },
+  inActiveTabImage: {
+    width: 24,
+    height: 24,
+  },
+  activeTitle: {
+    fontSize: 12,
+    textAlign: 'center',
+    marginTop: 5,
+    color: '#fff'
+  },
+  inActiveTitle: {
+    fontSize: 12,
+    textAlign: 'center',
+    marginTop: 5,
+    color: '#9F1D20',
+  }
+})
 
 export default TabBar;

@@ -139,7 +139,45 @@ class DrawerContent extends Component {
         key={screen + title + image}
         onPress={this.navigateToScreen(screen)}
         activeOpacity={0.6}>
-
+        <View transparent style={{ height: 46, marginTop: 2, marginBottom: 2 }}>
+          {screen === this.state.selectedRoute ? (
+            <View style={{ borderLeftColor: '#fff' }}>
+              <CardItem style={{ borderLeftColor: '#fff', backgroundColor: '#FE5665' }} transparent>
+                <Text
+                  style={[
+                    {
+                      color: '#fff',
+                      marginStart: 8,
+                      fontFamily: fontFamily.regular,
+                    },
+                    styles.font_applied,
+                  ]}>
+                  {title}
+                </Text>
+              </CardItem>
+            </View>
+          ) : (
+            <View style={{ backgroundColor: 'transparent' }}>
+              <CardItem style={{ backgroundColor: 'transparent' }} transparent>
+                <Image
+                  style={{ height: 25, width: 25, resizeMode: 'center' }}
+                  source={image}
+                />
+                <Text
+                  style={[
+                    {
+                      color: '#232323',
+                      marginStart: 8,
+                      fontFamily: fontFamily.regular,
+                    },
+                    styles.font_applied,
+                  ]}>
+                  {title}
+                </Text>
+              </CardItem>
+            </View>
+          )}
+        </View>
       </TouchableOpacity>
     ));
   }
@@ -148,7 +186,151 @@ class DrawerContent extends Component {
     return (
       <View style={[styles.containerStyle]}>
         <View style={styles.avartaContainer} />
-
+        <View style={{ paddingTop: 32 }}>
+          <Card style={{ flex: 0, backgroundColor: 'transparent', marginLeft: 54 }} transparent>
+            <CardItem style={{ backgroundColor: 'transparent' }} transparent>
+              <Left>
+                <Image
+                  source={
+                    this.state.user_image
+                      ? { uri: this.state.user_image }
+                      : require('../assets/menu/User.png')
+                  }
+                  style={styles.img_view}
+                />
+                <Body>
+                  <Text style={[{ color: '#fff' }, styles.font_applied]}>
+                    {this.state.user_name}
+                  </Text>
+                  <Text
+                    note
+                    style={[{ color: '#fff', padding: 4, }, styles.font_applied]}>
+                    {this.state.user_email}
+                  </Text>
+                </Body>
+              </Left>
+            </CardItem>
+          </Card>
+          {this.state.IsLoginData == 'false' &&
+            <View>
+              <TouchableOpacity
+                onPress={this.navigateToScreen(Constant.login)}
+                activeOpacity={0.6}>
+                <Text style={styles.signupText}>Tap to Sign In/Sign Up Now</Text>
+              </TouchableOpacity>
+            </View>
+          }
+        </View>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {this.state.IsLoginData == 'true' &&
+            <View>
+              <TouchableOpacity
+                key={'Constant.edit_profile' + 'Constant.edit_profile' + 'cont.edit_profile'}
+                onPress={this.navigateToScreen(Constant.edit_profile)}
+                activeOpacity={0.6}>
+                <View style={{ backgroundColor: 'transparent' }}>
+                  <CardItem style={{ backgroundColor: 'transparent' }} transparent>
+                    <Image
+                      style={{ height: 25, width: 25, resizeMode: 'center' }}
+                      source={require('../assets/menu/User.png')}
+                    />
+                    <Text
+                      style={[
+                        {
+                          color: '#232323',
+                          marginStart: 8,
+                          fontFamily: fontFamily.regular,
+                        },
+                        styles.font_applied,
+                      ]}>
+                      Profile
+                    </Text>
+                  </CardItem>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                key={'Constant.my_request' + 'Constant.my_request' + 'cont.my_request'}
+                onPress={this.navigateToScreen(Constant.my_request)}
+                activeOpacity={0.6}>
+                <View style={{ backgroundColor: 'transparent', paddingBottom: 1 }}>
+                  <CardItem style={{ backgroundColor: 'transparent' }} transparent>
+                    <Image
+                      style={{ height: 25, width: 25, resizeMode: 'center' }}
+                      source={require('../assets/menu/clip.png')}
+                    />
+                    <Text
+                      style={[
+                        {
+                          color: '#232323',
+                          marginStart: 8,
+                          fontFamily: fontFamily.regular,
+                        },
+                        styles.font_applied,
+                      ]}>
+                      My Request
+                    </Text>
+                    {/* <Image style={{height:20, width:20}} source={require('../assets/menu/Hire.png')}/> */}
+                  </CardItem>
+                </View>
+              </TouchableOpacity>
+              {this.state.setuserRole == 'Main Business User' &&
+                <TouchableOpacity
+                  key={'Constant.incoming_request' + 'Constant.incoming_request' + 'cont.incoming_request'}
+                  onPress={this.navigateToScreen(Constant.incoming_request)}
+                  activeOpacity={0.6}>
+                  <View style={{ backgroundColor: 'transparent', paddingBottom: 1 }}>
+                    <CardItem style={{ backgroundColor: 'transparent' }} transparent>
+                      <Image
+                        style={{ height: 25, width: 25, resizeMode: 'center' }}
+                        source={require('../assets/menu/clip.png')}
+                      />
+                      <Text
+                        style={[
+                          {
+                            color: '#232323',
+                            marginStart: 8,
+                            fontFamily: fontFamily.regular,
+                          },
+                          styles.font_applied,
+                        ]}>
+                        Incoming Requests
+                      </Text>
+                      {/* <Image style={{height:20, width:20}} source={require('../assets/menu/Hire.png')}/> */}
+                    </CardItem>
+                  </View>
+                </TouchableOpacity>
+              }
+            </View>
+          }
+          <View>{this.renderChannelButtons()}</View>
+          {this.state.IsLoginData == 'true' &&
+            <TouchableOpacity
+              key={'Constant.logout' + 'Logout' + '../assets/menu/logout.png'}
+              onPress={this.navigateToScreen(Constant.logout)}
+              activeOpacity={0.6}>
+              <View style={{ backgroundColor: 'transparent', paddingBottom: 20 }}>
+                <CardItem style={{ backgroundColor: 'transparent' }} transparent>
+                  <Image
+                    style={{ height: 25, width: 25, resizeMode: 'center' }}
+                    source={require('../assets/menu/logout.png')}
+                  />
+                  <Text
+                    style={[
+                      {
+                        color: '#232323',
+                        marginStart: 8,
+                        fontFamily: fontFamily.regular,
+                      },
+                      styles.font_applied,
+                    ]}>
+                    Logout
+                  </Text>
+                  {/* <Image style={{height:20, width:20}} source={require('../assets/menu/Hire.png')}/> */}
+                </CardItem>
+              </View>
+            </TouchableOpacity>
+          }
+        </ScrollView>
       </View>
     );
   }

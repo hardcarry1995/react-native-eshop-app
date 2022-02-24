@@ -64,7 +64,10 @@ const WishStack = () => (
 
 // Define TabBar
 const TabBarNavigator = () => (
-  <Tab.Navigator tabBar={props => <TabBar {...props} />} >
+  <Tab.Navigator
+    tabBar={props => <TabBar {...props} />}
+    screenOptions={screenOptions}
+  >
     <Tab.Screen name="HomeStack" component={HomeStack} />
     <Tab.Screen name="ProductStack" component={ProductStack} />
     <Tab.Screen name="CategoryStack" component={CategoryStack} />
