@@ -6,6 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import TabBar from "./BottomTabBar";
 // HomeStack Screens
 import HomeScreen from "../screens/HomeScreen";
+import Filter from "../screens/Filter";
 // ProductStack screens
 import ProductScreen from "../screens/ProductScreen";
 
@@ -27,6 +28,7 @@ const screenOptions = { headerShown: false, gestureEnabled: false };
 const HomeStack = () => (
   <Stack.Navigator screenOptions={screenOptions}>
     <Stack.Screen name="Home" component={HomeScreen} />
+    <Stack.Screen name="Filter" component={Filter} />
   </Stack.Navigator>
 )
 

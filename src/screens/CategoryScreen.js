@@ -1,5 +1,4 @@
 // This is same as Chat.js from old files
-
 import React, { Component } from 'react';
 import { View, Text } from 'react-native';
 

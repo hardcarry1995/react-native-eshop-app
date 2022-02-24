@@ -1,6 +1,6 @@
 // This is Matches screen from old files
 import React, { Component } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, TextInput } from 'react-native';
 
 class ProductScreen extends Component {
   constructor(props) {
@@ -13,6 +13,7 @@ class ProductScreen extends Component {
     return (
       <View>
         <Text> ProductScreen </Text>
+        <TextInput />
       </View>
     );
   }
