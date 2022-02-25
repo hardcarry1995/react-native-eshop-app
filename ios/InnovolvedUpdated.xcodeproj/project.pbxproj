@@ -55,6 +55,7 @@
 		17F1C85477DD811A365C404E /* Pods-InnovolvedUpdated-InnovolvedUpdatedTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InnovolvedUpdated-InnovolvedUpdatedTests.debug.xcconfig"; path = "Target Support Files/Pods-InnovolvedUpdated-InnovolvedUpdatedTests/Pods-InnovolvedUpdated-InnovolvedUpdatedTests.debug.xcconfig"; sourceTree = "<group>"; };
 		1BBBEDE6883C49958F76E864 /* FuturaPTBook.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FuturaPTBook.otf; path = ../assets/fonts/FuturaPTBook.otf; sourceTree = "<group>"; };
 		2206FD8327C70EA800B9028F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "InnovolvedUpdated/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		226DB48727C8A0DE00C6361F /* InnovolvedUpdated.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = InnovolvedUpdated.entitlements; path = InnovolvedUpdated/InnovolvedUpdated.entitlements; sourceTree = "<group>"; };
 		22C6D587ABDC48B7BE9A50C7 /* Entypo.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Entypo.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Entypo.ttf"; sourceTree = "<group>"; };
 		246640EE327B4D98BD9719C9 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
 		2DD9F0B6C3844E7F993C881D /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
@@ -137,6 +138,7 @@
 		13B07FAE1A68108700A75B9A /* InnovolvedUpdated */ = {
 			isa = PBXGroup;
 			children = (
+				226DB48727C8A0DE00C6361F /* InnovolvedUpdated.entitlements */,
 				2206FD8327C70EA800B9028F /* GoogleService-Info.plist */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
@@ -600,23 +602,26 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = InnovolvedUpdated/InnovolvedUpdated.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = TT5588X6TM;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = InnovolvedUpdated/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 0.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = inno.ezyfind2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.inno.ezyfind;
 				PRODUCT_NAME = InnovolvedUpdated;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -627,21 +632,24 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = InnovolvedUpdated/InnovolvedUpdated.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = TT5588X6TM;
 				INFOPLIST_FILE = InnovolvedUpdated/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 0.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = inno.ezyfind2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.inno.ezyfind;
 				PRODUCT_NAME = InnovolvedUpdated;
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
