@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">InnovolvedUpdated</string>
+    <string name="app_name">Ezy Find</string>
+    <string name="facebook_app_id">635396299882798</string>
+    <string name="fb_login_protocol_scheme">fb635396299882798</string>
 </resources>

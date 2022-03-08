@@ -338,6 +338,11 @@ PODS:
     - abseil/base/base_internal
     - abseil/base/config
     - abseil/meta/type_traits
+  - AppAuth (1.4.0):
+    - AppAuth/Core (= 1.4.0)
+    - AppAuth/ExternalUserAgent (= 1.4.0)
+  - AppAuth/Core (1.4.0)
+  - AppAuth/ExternalUserAgent (1.4.0)
   - boost (1.76.0)
   - BoringSSL-GRPC (0.0.7):
     - BoringSSL-GRPC/Implementation (= 0.0.7)
@@ -493,6 +498,10 @@ PODS:
     - GoogleUtilities/Environment (~> 7.2)
     - nanopb (~> 2.30908.0)
     - PromisesObjC (< 3.0, >= 1.2)
+  - GoogleSignIn (6.1.0):
+    - AppAuth (~> 1.4)
+    - GTMAppAuth (~> 1.0)
+    - GTMSessionFetcher/Core (~> 1.1)
   - GoogleUtilities/AppDelegateSwizzler (7.7.0):
     - GoogleUtilities/Environment
     - GoogleUtilities/Logger
@@ -534,6 +543,9 @@ PODS:
     - BoringSSL-GRPC (= 0.0.7)
     - gRPC-Core/Interface (= 1.28.2)
   - gRPC-Core/Interface (1.28.2)
+  - GTMAppAuth (1.2.2):
+    - AppAuth/Core (~> 1.4)
+    - GTMSessionFetcher/Core (~> 1.5)
   - GTMSessionFetcher/Core (1.7.0)
   - leveldb-library (1.22.1)
   - libevent (2.1.12)
@@ -543,6 +555,22 @@ PODS:
   - nanopb/decode (2.30908.0)
   - nanopb/encode (2.30908.0)
   - OpenSSL-Universal (1.1.180)
+  - Permission-Camera (3.3.0):
+    - RNPermissions
+  - Permission-LocationAccuracy (3.3.0):
+    - RNPermissions
+  - Permission-LocationAlways (3.3.0):
+    - RNPermissions
+  - Permission-LocationWhenInUse (3.3.0):
+    - RNPermissions
+  - Permission-MediaLibrary (3.3.0):
+    - RNPermissions
+  - Permission-Notifications (3.3.0):
+    - RNPermissions
+  - Permission-PhotoLibrary (3.3.0):
+    - RNPermissions
+  - Permission-PhotoLibraryAddOnly (3.3.0):
+    - RNPermissions
   - PromisesObjC (2.0.0)
   - RCT-Folly (2021.06.28.00-v2):
     - boost
@@ -742,19 +770,35 @@ PODS:
   - React-jsinspector (0.67.3)
   - React-logger (0.67.3):
     - glog
-  - react-native-fbsdk-next (7.3.0):
+  - react-native-camera (4.2.1):
     - React-Core
-    - react-native-fbsdk-next/Core (= 7.3.0)
-    - react-native-fbsdk-next/Login (= 7.3.0)
-    - react-native-fbsdk-next/Share (= 7.3.0)
-  - react-native-fbsdk-next/Core (7.3.0):
+    - react-native-camera/RCT (= 4.2.1)
+    - react-native-camera/RN (= 4.2.1)
+  - react-native-camera/RCT (4.2.1):
+    - React-Core
+  - react-native-camera/RN (4.2.1):
+    - React-Core
+  - react-native-document-picker (8.0.0):
+    - React-Core
+  - react-native-fbsdk-next (7.3.2):
+    - React-Core
+    - react-native-fbsdk-next/Core (= 7.3.2)
+    - react-native-fbsdk-next/Login (= 7.3.2)
+    - react-native-fbsdk-next/Share (= 7.3.2)
+  - react-native-fbsdk-next/Core (7.3.2):
     - FBSDKCoreKit (~> 12.3.2)
     - React-Core
-  - react-native-fbsdk-next/Login (7.3.0):
+  - react-native-fbsdk-next/Login (7.3.2):
     - FBSDKLoginKit (~> 12.3.2)
     - React-Core
-  - react-native-fbsdk-next/Share (7.3.0):
+  - react-native-fbsdk-next/Share (7.3.2):
     - FBSDKShareKit (~> 12.3.2)
+    - React-Core
+  - react-native-geolocation (2.0.2):
+    - React
+  - react-native-image-picker (4.7.3):
+    - React-Core
+  - react-native-maps (0.30.1):
     - React-Core
   - react-native-netinfo (8.0.0):
     - React-Core
@@ -767,6 +811,8 @@ PODS:
   - react-native-splash-screen (3.3.0):
     - React-Core
   - react-native-sqlite-storage (6.0.1):
+    - React-Core
+  - react-native-webview (11.17.2):
     - React-Core
   - React-perflogger (0.67.3)
   - React-RCTActionSheet (0.67.3):
@@ -833,6 +879,8 @@ PODS:
     - React-jsi (= 0.67.3)
     - React-logger (= 0.67.3)
     - React-perflogger (= 0.67.3)
+  - rn-fetch-blob (0.12.0):
+    - React-Core
   - RNCAsyncStorage (1.12.1):
     - React-Core
   - RNCPicker (1.16.8):
@@ -857,6 +905,20 @@ PODS:
     - React-Core
     - RNFBApp
   - RNGestureHandler (2.2.0):
+    - React-Core
+  - RNGoogleSignin (7.1.0):
+    - GoogleSignIn (~> 6.1.0)
+    - React-Core
+  - RNImageCropPicker (0.37.3):
+    - React-Core
+    - React-RCTImage
+    - RNImageCropPicker/QBImagePickerController (= 0.37.3)
+    - TOCropViewController
+  - RNImageCropPicker/QBImagePickerController (0.37.3):
+    - React-Core
+    - React-RCTImage
+    - TOCropViewController
+  - RNPermissions (3.3.0):
     - React-Core
   - RNReanimated (2.4.1):
     - DoubleConversion
@@ -893,6 +955,7 @@ PODS:
     - React
   - RNVectorIcons (9.1.0):
     - React-Core
+  - TOCropViewController (2.6.1)
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
     - Yoga (~> 1.14)
@@ -925,6 +988,14 @@ DEPENDENCIES:
   - FlipperKit/SKIOSNetworkPlugin (= 0.99.0)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - OpenSSL-Universal (= 1.1.180)
+  - Permission-Camera (from `../node_modules/react-native-permissions/ios/Camera`)
+  - Permission-LocationAccuracy (from `../node_modules/react-native-permissions/ios/LocationAccuracy`)
+  - Permission-LocationAlways (from `../node_modules/react-native-permissions/ios/LocationAlways`)
+  - Permission-LocationWhenInUse (from `../node_modules/react-native-permissions/ios/LocationWhenInUse`)
+  - Permission-MediaLibrary (from `../node_modules/react-native-permissions/ios/MediaLibrary`)
+  - Permission-Notifications (from `../node_modules/react-native-permissions/ios/Notifications`)
+  - Permission-PhotoLibrary (from `../node_modules/react-native-permissions/ios/PhotoLibrary`)
+  - Permission-PhotoLibraryAddOnly (from `../node_modules/react-native-permissions/ios/PhotoLibraryAddOnly`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../node_modules/react-native/Libraries/TypeSafety`)
@@ -939,11 +1010,17 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
+  - react-native-camera (from `../node_modules/react-native-camera`)
+  - react-native-document-picker (from `../node_modules/react-native-document-picker`)
   - react-native-fbsdk-next (from `../node_modules/react-native-fbsdk-next`)
+  - "react-native-geolocation (from `../node_modules/@react-native-community/geolocation`)"
+  - react-native-image-picker (from `../node_modules/react-native-image-picker`)
+  - react-native-maps (from `../node_modules/react-native-maps`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
   - react-native-sqlite-storage (from `../node_modules/react-native-sqlite-storage`)
+  - react-native-webview (from `../node_modules/react-native-webview`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
@@ -956,6 +1033,7 @@ DEPENDENCIES:
   - React-RCTVibration (from `../node_modules/react-native/Libraries/Vibration`)
   - React-runtimeexecutor (from `../node_modules/react-native/ReactCommon/runtimeexecutor`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - rn-fetch-blob (from `../node_modules/rn-fetch-blob`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-community/async-storage`)"
   - "RNCPicker (from `../node_modules/@react-native-picker/picker`)"
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
@@ -964,6 +1042,9 @@ DEPENDENCIES:
   - "RNFBFirestore (from `../node_modules/@react-native-firebase/firestore`)"
   - "RNFBMessaging (from `../node_modules/@react-native-firebase/messaging`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
+  - "RNGoogleSignin (from `../node_modules/@react-native-google-signin/google-signin`)"
+  - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
+  - RNPermissions (from `../node_modules/react-native-permissions`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSVG (from `../node_modules/react-native-svg`)
@@ -973,6 +1054,7 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - abseil
+    - AppAuth
     - BoringSSL-GRPC
     - CocoaAsyncSocket
     - FBAEMKit
@@ -999,15 +1081,18 @@ SPEC REPOS:
     - FlipperKit
     - fmt
     - GoogleDataTransport
+    - GoogleSignIn
     - GoogleUtilities
     - "gRPC-C++"
     - gRPC-Core
+    - GTMAppAuth
     - GTMSessionFetcher
     - leveldb-library
     - libevent
     - nanopb
     - OpenSSL-Universal
     - PromisesObjC
+    - TOCropViewController
     - YogaKit
 
 EXTERNAL SOURCES:
@@ -1021,6 +1106,22 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/React/FBReactNativeSpec"
   glog:
     :podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
+  Permission-Camera:
+    :path: "../node_modules/react-native-permissions/ios/Camera"
+  Permission-LocationAccuracy:
+    :path: "../node_modules/react-native-permissions/ios/LocationAccuracy"
+  Permission-LocationAlways:
+    :path: "../node_modules/react-native-permissions/ios/LocationAlways"
+  Permission-LocationWhenInUse:
+    :path: "../node_modules/react-native-permissions/ios/LocationWhenInUse"
+  Permission-MediaLibrary:
+    :path: "../node_modules/react-native-permissions/ios/MediaLibrary"
+  Permission-Notifications:
+    :path: "../node_modules/react-native-permissions/ios/Notifications"
+  Permission-PhotoLibrary:
+    :path: "../node_modules/react-native-permissions/ios/PhotoLibrary"
+  Permission-PhotoLibraryAddOnly:
+    :path: "../node_modules/react-native-permissions/ios/PhotoLibraryAddOnly"
   RCT-Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTRequired:
@@ -1045,8 +1146,18 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   React-logger:
     :path: "../node_modules/react-native/ReactCommon/logger"
+  react-native-camera:
+    :path: "../node_modules/react-native-camera"
+  react-native-document-picker:
+    :path: "../node_modules/react-native-document-picker"
   react-native-fbsdk-next:
     :path: "../node_modules/react-native-fbsdk-next"
+  react-native-geolocation:
+    :path: "../node_modules/@react-native-community/geolocation"
+  react-native-image-picker:
+    :path: "../node_modules/react-native-image-picker"
+  react-native-maps:
+    :path: "../node_modules/react-native-maps"
   react-native-netinfo:
     :path: "../node_modules/@react-native-community/netinfo"
   react-native-safe-area-context:
@@ -1055,6 +1166,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-splash-screen"
   react-native-sqlite-storage:
     :path: "../node_modules/react-native-sqlite-storage"
+  react-native-webview:
+    :path: "../node_modules/react-native-webview"
   React-perflogger:
     :path: "../node_modules/react-native/ReactCommon/reactperflogger"
   React-RCTActionSheet:
@@ -1079,6 +1192,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/runtimeexecutor"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  rn-fetch-blob:
+    :path: "../node_modules/rn-fetch-blob"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-community/async-storage"
   RNCPicker:
@@ -1095,6 +1210,12 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-firebase/messaging"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
+  RNGoogleSignin:
+    :path: "../node_modules/@react-native-google-signin/google-signin"
+  RNImageCropPicker:
+    :path: "../node_modules/react-native-image-crop-picker"
+  RNPermissions:
+    :path: "../node_modules/react-native-permissions"
   RNReanimated:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
@@ -1108,6 +1229,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   abseil: 6c8eb7892aefa08d929b39f9bb108e5367e3228f
+  AppAuth: 31bcec809a638d7bd2f86ea8a52bd45f6e81e7c7
   boost: a7c83b31436843459a1961bfd74b96033dc77234
   BoringSSL-GRPC: 8edf627ee524575e2f8d19d56f068b448eea3879
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
@@ -1139,14 +1261,24 @@ SPEC CHECKSUMS:
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 85ecdd10ee8d8ec362ef519a6a45ff9aa27b2e85
   GoogleDataTransport: 629c20a4d363167143f30ea78320d5a7eb8bd940
+  GoogleSignIn: c90b5bec45e780f54c6a8e1e3c182a86e3dda69d
   GoogleUtilities: e0913149f6b0625b553d70dae12b49fc62914fd1
   "gRPC-C++": 13d8ccef97d5c3c441b7e3c529ef28ebee86fad2
   gRPC-Core: 4afa11bfbedf7cdecd04de535a9e046893404ed5
+  GTMAppAuth: ad5c2b70b9a8689e1a04033c9369c4915bfcbe89
   GTMSessionFetcher: 43748f93435c2aa068b1cbe39655aaf600652e91
   leveldb-library: 50c7b45cbd7bf543c81a468fe557a16ae3db8729
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
   OpenSSL-Universal: 1aa4f6a6ee7256b83db99ec1ccdaa80d10f9af9b
+  Permission-Camera: 597646618d1edcc055a3f660844c2ee6de8e0596
+  Permission-LocationAccuracy: 2dd707dcda613cd1f997ba3430d8451bbf628b59
+  Permission-LocationAlways: dc302c06bead91cc4e0076c21393d0b8573caa6a
+  Permission-LocationWhenInUse: 9be81f411058a40ef6616825062fc74cec660cc9
+  Permission-MediaLibrary: 4acaae8adc5986d9d110f75315108a1acd74e5dd
+  Permission-Notifications: ae00347c7a9efdfaa1a0138e59e37c8f0f3ede0b
+  Permission-PhotoLibrary: 33911b5522ee5978fcabe25d604756135325d067
+  Permission-PhotoLibraryAddOnly: 4d5e8e4b193221641dedcc9d640375f9429e87b0
   PromisesObjC: 68159ce6952d93e17b2dfe273b8c40907db5ba58
   RCT-Folly: 803a9cfd78114b2ec0f140cfa6fa2a6bafb2d685
   RCTRequired: 3c77b683474faf23920fbefc71c4e13af21470c0
@@ -1160,11 +1292,17 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 15ea57ead631a11fad57634ff69f78e797113a39
   React-jsinspector: 1e1e03345cf6d47779e2061d679d0a87d9ae73d8
   React-logger: 1e10789cb84f99288479ba5f20822ce43ced6ffe
-  react-native-fbsdk-next: d5e5b109375495ea36380372d031af3245cee607
+  react-native-camera: 3eae183c1d111103963f3dd913b65d01aef8110f
+  react-native-document-picker: 429972f7ece4463aa5bcdd789622b3a674a3c5d1
+  react-native-fbsdk-next: 5d8803a1a933e0522a0ecb86eb4f750397e0ca54
+  react-native-geolocation: c956aeb136625c23e0dce0467664af2c437888c9
+  react-native-image-picker: 4e6008ad8c2321622affa2c85432a5ebd02d480c
+  react-native-maps: d752b0dd0e1951d815b1336332835aab6b4a836f
   react-native-netinfo: ba4ea50d836c60580c59079233c400753fe5bcb6
   react-native-safe-area-context: eec048ba481a7ec7b1bf9d7b7a78fb1103f4806d
   react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457
   react-native-sqlite-storage: f6d515e1c446d1e6d026aa5352908a25d4de3261
+  react-native-webview: 380c1a03ec94b7ed764dac8db1e7c9952d08c93a
   React-perflogger: 93d3f142d6d9a46e635f09ba0518027215a41098
   React-RCTActionSheet: 87327c3722203cc79cf79d02fb83e7332aeedd18
   React-RCTAnimation: 009c87c018d50e0b38692699405ebe631ff4872d
@@ -1177,6 +1315,7 @@ SPEC CHECKSUMS:
   React-RCTVibration: d0361f15ea978958fab7ffb6960f475b5063d83f
   React-runtimeexecutor: af1946623656f9c5fd64ca6f36f3863516193446
   ReactCommon: 650e33cde4fb7d36781cd3143f5276da0abb2f96
+  rn-fetch-blob: f065bb7ab7fb48dd002629f8bdcb0336602d3cba
   RNCAsyncStorage: b03032fdbdb725bea0bd9e5ec5a7272865ae7398
   RNCPicker: 0991c56da7815c0cf946d6f63cf920b25296e5f6
   RNFBApp: 06c8447270d295edc431bccd55970d8711a07a42
@@ -1185,13 +1324,17 @@ SPEC CHECKSUMS:
   RNFBFirestore: 7e4fe3b009a193d2f2fb0a19d1d6ab06355d4a09
   RNFBMessaging: 8e3575bb0303b43a852bf5decbe99c3272035048
   RNGestureHandler: bf572f552ea324acd5b5464b8d30755b2d8c1de6
+  RNGoogleSignin: 233fdfa02522216c19bf02a1e6c60b60a75ffb4c
+  RNImageCropPicker: 44e2807bc410741f35d4c45b6586aedfe3da39d2
+  RNPermissions: bcd846e8f5a7f39e921cc7ca7172e2de0e698b6f
   RNReanimated: 32c91e28f5780937b8efc07ddde1bab8d373fe0b
   RNScreens: 2559f98b0835103cbef3b26ba77fa61d4bb37ae7
   RNSVG: 551acb6562324b1d52a4e0758f7ca0ec234e278f
   RNVectorIcons: 7923e585eaeb139b9f4531d25a125a1500162a0b
+  TOCropViewController: edfd4f25713d56905ad1e0b9f5be3fbe0f59c863
   Yoga: 90dcd029e45d8a7c1ff059e8b3c6612ff409061a
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: af9b6ecdcd063d33b922e99a1ee48ff0e758d21c
+PODFILE CHECKSUM: 1955cf3ae38808c0c872fa8fa4fa29269b8c0a6a
 
 COCOAPODS: 1.11.2

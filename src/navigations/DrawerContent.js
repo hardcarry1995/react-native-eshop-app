@@ -60,27 +60,22 @@ class DrawerContent extends Component {
     this.props.navigation.closeDrawer();
     switch (route) {
       case Constant.logout:
-        console.log('logout');
         this.handleSignOut();
         break;
 
       case Constant.change_password:
-        console.log('change password');
-        this.props.navigation.navigate(Constant.change_password);
+        this.props.navigation.navigate({ name: "AuthStack", screen: 'ResetPassword' });
         break;
 
       case Constant.near_by:
-        console.log('change password');
-        this.props.navigation.navigate('Matches');
+        this.props.navigation.navigate("ProductStack");
         break;
 
       case Constant.feed:
-        console.log('change password');
         this.props.navigation.navigate('FeedStack');
         break;
 
       case Constant.share_app:
-        console.log('share app');
         this.setState({ selectedRoute: Constant.feed_sidemenu });
         this.props.navigation.navigate('Feed');
         this._ShareApp();
@@ -97,6 +92,7 @@ class DrawerContent extends Component {
         break;
 
       default:
+        this.props.navigation.navigate(route);
         // const navigate = NavigationActions.navigate({
         //   routeName: route,
         // });
@@ -214,7 +210,7 @@ class DrawerContent extends Component {
           {this.state.IsLoginData == 'false' &&
             <View>
               <TouchableOpacity
-                onPress={this.navigateToScreen(Constant.login)}
+                onPress={this.navigateToScreen("AuthStack")}
                 activeOpacity={0.6}>
                 <Text style={styles.signupText}>Tap to Sign In/Sign Up Now</Text>
               </TouchableOpacity>

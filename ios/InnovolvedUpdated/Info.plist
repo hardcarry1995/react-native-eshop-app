@@ -20,6 +20,19 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb635396299882798</string>
+			</array>
+		</dict>
+	</array>
+	<key>FacebookAppID</key>
+	<string>635396299882798</string>
+	<key>FacebookDisplayName</key>
+	<string>EzyFind</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>

@@ -1,0 +1,24 @@
+diff --git a/node_modules/react-native-simple-twitter/package.json b/node_modules/react-native-simple-twitter/package.json
+index b3ebc66..a754f7c 100644
+--- a/node_modules/react-native-simple-twitter/package.json
++++ b/node_modules/react-native-simple-twitter/package.json
+@@ -24,8 +24,7 @@
+   },
+   "homepage": "https://github.com/watanabeyu/react-native-simple-twitter",
+   "dependencies": {
+-    "crypto-js": "^3.1.9-1",
+-    "react-native-webview": "^8.0.1"
++    "crypto-js": "^3.1.9-1"
+   },
+   "devDependencies": {
+     "@babel/core": "^7.7.5",
+@@ -50,9 +49,6 @@
+     "ts-jest": "^24.2.0",
+     "typescript": "^3.7.3"
+   },
+-  "peerDependencies": {
+-    "react-native-webview": "^7.4.3"
+-  },
+   "jest": {
+     "preset": "react-native",
+     "moduleFileExtensions": [

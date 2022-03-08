@@ -139,9 +139,7 @@ export default class Filter extends React.Component {
               />
             </View>
 
-            <Text
-              style={{ fontSize: 22, fontWeight: 'bold', marginTop: 10 }}
-              numberOfLines={1}>
+            <Text style={{ fontSize: 22, fontWeight: 'bold', marginTop: 10 }} numberOfLines={1}>
               {data.productName || data.specialName}
             </Text>
             <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#316EE6' }}>

@@ -1,0 +1,68 @@
+diff --git a/node_modules/react-native-linkedin/lib/assets/linkedin.png b/node_modules/react-native-linkedin/lib/assets/linkedin.png
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/react-native-linkedin/lib/index.js b/node_modules/react-native-linkedin/lib/index.js
+index ae6fd22..a1dcd36 100644
+--- a/node_modules/react-native-linkedin/lib/index.js
++++ b/node_modules/react-native-linkedin/lib/index.js
+@@ -1,5 +1,5 @@
+ import React from 'react';
+-import { TouchableOpacity, View, ViewPropTypes, Text, Modal, StyleSheet, Image, } from 'react-native';
++import { TouchableOpacity, View, ViewPropTypes,ImageProps, Text, Modal, StyleSheet, Image, } from 'react-native';
+ import { WebView } from 'react-native-webview';
+ import PropTypes from 'prop-types';
+ import { pipe, evolve, propSatisfies, applySpec, propOr, add } from 'ramda';
+@@ -152,12 +152,12 @@ export default class LinkedInModal extends React.Component {
+             }, 3000);
+         });
+         this.renderButton = () => {
+-            const { renderButton, linkText } = this.props;
++            const { renderButton, linkText, linkImage=require('./assets/x-white.png') } = this.props;
+             if (renderButton) {
+                 return renderButton();
+             }
+             return (React.createElement(TouchableOpacity, { accessibilityComponentType: 'button', accessibilityTraits: ['button'], onPress: this.open },
+-                React.createElement(Text, null, linkText)));
++            React.createElement(Image, { source: linkImage, resizeMode: "contain", style: {width: 33, height: 33} })));
+         };
+         this.renderClose = () => {
+             const { renderClose } = this.props;
+@@ -214,12 +214,13 @@ LinkedInModal.propTypes = {
+     wrapperStyle: ViewPropTypes.style,
+     closeStyle: ViewPropTypes.style,
+     animationType: PropTypes.string,
+-    shouldGetAccessToken: PropTypes.bool,
++    shouldGetAccessToken: PropTypes.bool
+ };
+ LinkedInModal.defaultProps = {
+     onError: logError,
+     permissions: ['r_liteprofile', 'r_emailaddress'],
+     linkText: 'Login with LinkedIn',
++    linkImage: '',
+     animationType: 'fade',
+     containerStyle: StyleSheet.create({}),
+     wrapperStyle: StyleSheet.create({}),
+diff --git a/node_modules/react-native-linkedin/package.json b/node_modules/react-native-linkedin/package.json
+index 789b855..1380bde 100644
+--- a/node_modules/react-native-linkedin/package.json
++++ b/node_modules/react-native-linkedin/package.json
+@@ -31,8 +31,7 @@
+   "dependencies": {
+     "query-string": "6.8.3",
+     "ramda": "0.26.1",
+-    "uuid": "3.3.3",
+-    "react-native-webview": "7.0.5"
++    "uuid": "3.3.3"
+   },
+   "devDependencies": {
+     "@types/jest": "24.0.17",
+@@ -56,8 +55,7 @@
+   },
+   "peerDependencies": {
+     "react": "*",
+-    "react-native": "*",
+-    "react-native-webview": "*"
++    "react-native": "*"
+   },
+   "jest": {
+     "preset": "react-native",

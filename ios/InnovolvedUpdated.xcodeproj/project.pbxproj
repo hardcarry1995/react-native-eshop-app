@@ -14,6 +14,7 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		20C29B51009C25C1C7B5E4E0 /* libPods-InnovolvedUpdated-InnovolvedUpdatedTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 678757D26E73F86D3692D087 /* libPods-InnovolvedUpdated-InnovolvedUpdatedTests.a */; };
 		2206FD8427C70EA800B9028F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2206FD8327C70EA800B9028F /* GoogleService-Info.plist */; };
+		2257DA8D27D5966200AF3401 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2257DA8C27D5966200AF3401 /* File.swift */; };
 		33D0E33F24FF4883B3793DDC /* tt0142m_1.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 94657839BBE8481E84B1DA77 /* tt0142m_1.ttf */; };
 		3827B7FB2D4A40F9A4BC18E4 /* tt0140m_1.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 91FC0C2848254FC68D15D3B5 /* tt0140m_1.ttf */; };
 		5145474CE2584405AF8CB6E6 /* FutuLt.ttf in Resources */ = {isa = PBXBuildFile; fileRef = EF0E708DCE7A4B3EA230239E /* FutuLt.ttf */; };
@@ -55,6 +56,8 @@
 		17F1C85477DD811A365C404E /* Pods-InnovolvedUpdated-InnovolvedUpdatedTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InnovolvedUpdated-InnovolvedUpdatedTests.debug.xcconfig"; path = "Target Support Files/Pods-InnovolvedUpdated-InnovolvedUpdatedTests/Pods-InnovolvedUpdated-InnovolvedUpdatedTests.debug.xcconfig"; sourceTree = "<group>"; };
 		1BBBEDE6883C49958F76E864 /* FuturaPTBook.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FuturaPTBook.otf; path = ../assets/fonts/FuturaPTBook.otf; sourceTree = "<group>"; };
 		2206FD8327C70EA800B9028F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "InnovolvedUpdated/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		2257DA8B27D5966200AF3401 /* InnovolvedUpdated-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "InnovolvedUpdated-Bridging-Header.h"; sourceTree = "<group>"; };
+		2257DA8C27D5966200AF3401 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
 		226DB48727C8A0DE00C6361F /* InnovolvedUpdated.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = InnovolvedUpdated.entitlements; path = InnovolvedUpdated/InnovolvedUpdated.entitlements; sourceTree = "<group>"; };
 		22C6D587ABDC48B7BE9A50C7 /* Entypo.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Entypo.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Entypo.ttf"; sourceTree = "<group>"; };
 		246640EE327B4D98BD9719C9 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
@@ -146,6 +149,8 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				2257DA8C27D5966200AF3401 /* File.swift */,
+				2257DA8B27D5966200AF3401 /* InnovolvedUpdated-Bridging-Header.h */,
 			);
 			name = InnovolvedUpdated;
 			sourceTree = "<group>";
@@ -287,7 +292,7 @@
 						TestTargetID = 13B07F861A680F5B00A75B9A;
 					};
 					13B07F861A680F5B00A75B9A = {
-						LastSwiftMigration = 1120;
+						LastSwiftMigration = 1320;
 					};
 				};
 			};
@@ -530,6 +535,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
+				2257DA8D27D5966200AF3401 /* File.swift in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -549,6 +555,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 17F1C85477DD811A365C404E /* Pods-InnovolvedUpdated-InnovolvedUpdatedTests.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -576,6 +583,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 14DDD9EBD898019D7764BDD2 /* Pods-InnovolvedUpdated-InnovolvedUpdatedTests.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = InnovolvedUpdatedTests/Info.plist;
@@ -619,6 +627,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.inno.ezyfind;
 				PRODUCT_NAME = InnovolvedUpdated;
+				SWIFT_OBJC_BRIDGING_HEADER = "InnovolvedUpdated-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -648,6 +657,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.inno.ezyfind;
 				PRODUCT_NAME = InnovolvedUpdated;
+				SWIFT_OBJC_BRIDGING_HEADER = "InnovolvedUpdated-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";

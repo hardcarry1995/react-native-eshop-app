@@ -1,6 +1,5 @@
 import React from 'react';
 import { Platform, Image, View } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Menu from "../components/Meun";
@@ -18,7 +17,7 @@ import ProductScreen from "../screens/ProductScreen";
 import CategoryScreen from "../screens/CategoryScreen";
 
 // CartItem Stack Screens 
-import MyCartScreen from '../screens/MyCartScreen';
+import MyCartScreen from '../screens/CartScreens/MyCartScreen';
 
 // WishList Stack Screens
 import WishListScreen from '../screens/WishListScreen';
