@@ -37,6 +37,7 @@
     "react-native-btr": "^2.1.2",
     "react-native-camera": "^4.2.1",
     "react-native-check-box": "^2.1.7",
+    "react-native-countdown-component": "^2.7.1",
     "react-native-datepicker": "^1.7.2",
     "react-native-deep-linking": "^2.2.0",
     "react-native-document-picker": "^8.0.0",
