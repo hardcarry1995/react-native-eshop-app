@@ -13,7 +13,11 @@ import ChangePasswordStack from "./ChangePasswordStack";
 import SettingStack from "./SettingStack";
 import MyReviews from "../screens/MyReviews";
 import CatalogueStack from "./CatalogueStack";
-
+import AboutUs from "../screens/AboutUs";
+import IncomingRequest from "../screens/IncomingRequest";
+import MyRequestStack from "./MyRequestStack";
+import FaqStack from "./FaqStack";
+import WorkInProgress from "../screens/WorkInProgress";
 
 const Drawer = createDrawerNavigator();
 
@@ -34,6 +38,11 @@ const AppNavigator = () => (
       <Drawer.Screen name={Constants.settings} component={SettingStack} />
       <Drawer.Screen name={Constants.my_Reviews} component={MyReviews} />
       <Drawer.Screen name={Constants.contact_us} component={CatalogueStack} />
+      <Drawer.Screen name={Constants.about_us} component={AboutUs} />
+      <Drawer.Screen name={Constants.incoming_request} component={IncomingRequest} />
+      <Drawer.Screen name={Constants.my_request_stack} component={MyRequestStack} />
+      <Drawer.Screen name={Constants.faq} component={FaqStack} />
+      <Drawer.Screen name={Constants.logout} component={WorkInProgress} />
 
     </Drawer.Navigator>
   </NavigationContainer>
