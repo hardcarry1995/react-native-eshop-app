@@ -6,6 +6,7 @@ import RNPickerSelect from 'react-native-picker-select';
 import { connect } from 'react-redux';
 import { bearerToken } from '../constants/utils';
 import client from '../constants/client';
+import Constants from "../constants/constant";
 import { SPECIAL_PRODUCT, CREATE_FAVOURITES_PRODUCT, ADD_TO_CART, GET_PRODUCT, GUEST_LOGIN, ADD_TO_CART_NULL } from '../constants/queries';
 import SpecialCard from '../components/SpecialProduct';
 import SQLite from 'react-native-sqlite-storage';
@@ -350,9 +351,9 @@ class HomeScreen extends Component {
         if (this.state.user == 'Buy') {
           this.props.navigation.navigate('ProductStack')
         } if (this.state.user == 'Bid') {
-          this.props.navigation.navigate('SettingsScreen')
+          this.props.navigation.navigate(Constants.settings)
         } if (this.state.user == 'Hire') {
-          this.props.navigation.navigate('PrivacyPolicy')
+          this.props.navigation.navigate(Constants.privacy_policy)
         }
       },
     );

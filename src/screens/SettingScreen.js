@@ -11,16 +11,23 @@ import {
   FlatList,
   ToastAndroid,
   ScrollView,
+  Alert
 } from 'react-native';
 import CountDown from 'react-native-countdown-component';
-import { Picker } from '@react-native-picker/picker';
 import { imagePrefix } from '../constants/utils';
 import { GetRating } from '../components/GetRating';
 import AsyncStorage from '@react-native-community/async-storage';
 import { GET_BID_ALL_PRODUCT, BID_ON_PRODUCT, CREATE_FAVOURITES_PRODUCT } from '../constants/queries';
 import client from '../constants/client';
+import Constants from "../constants/constant";
 import Moment from 'moment';
-import { Alert } from 'react-native';
+import RNPickerSelect from 'react-native-picker-select';
+
+const filterItems = [
+  { label: 'Purchase', value: 'Buy' },
+  { label: 'Bid', value: 'Bid' },
+  { label: 'Hire', value: 'Hire' },
+]
 
 export default class SettingsScreen extends React.Component {
 
@@ -166,13 +173,12 @@ export default class SettingsScreen extends React.Component {
         user: user,
       }),
       () => {
-        console.log('check user', this.state.user);
         if (this.state.user == 'Buy') {
-          this.props.navigation.navigate('Matches')
+          this.props.navigation.navigate('ProductStack')
         } if (this.state.user == 'Bid') {
-          this.props.navigation.navigate('SettingsScreen')
+          this.props.navigation.navigate(Constants.settings)
         } if (this.state.user == 'Hire') {
-          this.props.navigation.navigate('PrivacyPolicy')
+          this.props.navigation.navigate(Constants.privacy_policy)
         }
       },
     );
@@ -488,20 +494,14 @@ export default class SettingsScreen extends React.Component {
 
   render() {
     return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: '#fff',
-        }}>
+      <View style={{ flex: 1, backgroundColor: '#fff' }}>
         <StatusBar
           translucent
           backgroundColor="transparent"
           barStyle="dark-content"
         />
-
         <ScrollView style={{ padding: 5, flex: 1 }}>
           <View style={styles.textinput}>
-            {/* <Icon style={styles.searchIcon} name="ios-search" size={20} color="#000"/> */}
             <Image
               source={require('../assets/search.png')}
               resizeMode="contain"
@@ -518,23 +518,13 @@ export default class SettingsScreen extends React.Component {
               underlineColorAndroid="transparent"
             />
           </View>
-          <View
-            style={{
-              borderRadius: 5,
-              borderColor: '#DCDCDC',
-              borderWidth: 2,
-              height: 50,
-              width: 103,
-              left: 18,
-            }}>
-            <Picker
-              selectedValue={this.state.user}
+          <View>
+            <RNPickerSelect
+              value={this.state.user}
               onValueChange={this.updateUser}
-              style={{ color: 'red', height: 40, width: 100 }}>
-              <Picker.Item label="Purchase" value="Buy" />
-              <Picker.Item label="Bid" value="Bid" />
-              <Picker.Item label="Hire" value="Hire" />
-            </Picker>
+              items={filterItems}
+              textInputProps={styles.pickerContainer}
+            />
           </View>
           <View
             style={{
@@ -557,7 +547,6 @@ export default class SettingsScreen extends React.Component {
                   ) : null
                 )
               }}
-            // ListEmptyComponent={this.ListEmpty}
             />
           </View>
         </ScrollView>
@@ -698,5 +687,17 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     marginRight: 2
+  },
+  pickerContainer: {
+    borderRadius: 5,
+    borderColor: '#DCDCDC',
+    borderWidth: 2,
+    height: 50,
+    width: 140,
+    left: 15,
+    bottom: 10,
+    textAlign: 'center',
+    color: 'red',
+    fontSize: 18
   },
 });

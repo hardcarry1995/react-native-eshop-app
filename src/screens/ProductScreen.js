@@ -3,6 +3,7 @@ import { Image, Platform, StyleSheet, Text, TouchableOpacity, Dimensions, View, 
 import AsyncStorage from '@react-native-community/async-storage';
 import client from '../constants/client';
 import ProductCard from '../components/ProductCard';
+import Constants from "../constants/constant";
 import { CREATE_FAVOURITES_PRODUCT, GET_SALE_TYPE, GET_PRODUCT_PURCHASE, ADD_TO_CART_NULL, ADD_TO_CART } from '../constants/queries';
 import moment from 'moment';
 import RNPickerSelect from 'react-native-picker-select';
@@ -200,13 +201,12 @@ export default class ProductScreen extends React.PureComponent {
         user: user,
       }),
       () => {
-        console.log('check user', this.state.user);
         if (this.state.user == 'Buy') {
           this.props.navigation.navigate('ProductStack')
         } if (this.state.user == 'Bid') {
-          this.props.navigation.navigate('SettingsScreen')
+          this.props.navigation.navigate(Constants.settings)
         } if (this.state.user == 'Hire') {
-          this.props.navigation.navigate('PrivacyPolicy')
+          this.props.navigation.navigate(Constants.privacy_policy)
         }
       },
     );

@@ -20,10 +20,17 @@ import { GetRating } from '../../components/GetRating';
 import AsyncStorage from '@react-native-community/async-storage';
 import { HIRE_THE_PRODUCT, GET_ALL_HIRE_PRODUCT, CREATE_FAVOURITES_PRODUCT, HIRE_THE_PRODUCT_NULL } from '../../constants/queries';
 import client from '../../constants/client';
+import Constants from "../../constants/constant";
 import Moment from 'moment';
 import { Alert } from 'react-native';
 import { Icon } from 'native-base';
+import RNPickerSelect from 'react-native-picker-select';
 
+const filterItems = [
+  { label: 'Purchase', value: 'Buy' },
+  { label: 'Bid', value: 'Bid' },
+  { label: 'Hire', value: 'Hire' },
+]
 export default class PrivacyPolicy extends React.Component {
   constructor(props) {
     super(props);
@@ -245,13 +252,12 @@ export default class PrivacyPolicy extends React.Component {
         user: user,
       }),
       () => {
-        console.log('check user', this.state.user);
         if (this.state.user == 'Buy') {
-          this.props.navigation.navigate('Matches')
+          this.props.navigation.navigate('ProductStack')
         } if (this.state.user == 'Bid') {
-          this.props.navigation.navigate('SettingsScreen')
+          this.props.navigation.navigate(Constants.settings)
         } if (this.state.user == 'Hire') {
-          this.props.navigation.navigate('PrivacyPolicy')
+          this.props.navigation.navigate(Constants.privacy_policy)
         }
       },
     );
@@ -432,23 +438,13 @@ export default class PrivacyPolicy extends React.Component {
               underlineColorAndroid="transparent"
             />
           </View>
-          <View
-            style={{
-              borderRadius: 5,
-              borderColor: '#DCDCDC',
-              borderWidth: 2,
-              height: 50,
-              width: 103,
-              left: 18,
-            }}>
-            <Picker
-              selectedValue={this.state.user}
+          <View>
+            <RNPickerSelect
+              value={this.state.user}
               onValueChange={this.updateUser}
-              style={{ color: 'red', height: 40, width: 100 }}>
-              <Picker.Item label="Purchase" value="Buy" />
-              <Picker.Item label="Bid" value="Bid" />
-              <Picker.Item label="Hire" value="Hire" />
-            </Picker>
+              items={filterItems}
+              textInputProps={styles.pickerContainer}
+            />
           </View>
           <View
             style={{
@@ -790,5 +786,17 @@ const styles = StyleSheet.create({
     top: 0,
     right: 10,
     bottom: 0
-  }
+  },
+  pickerContainer: {
+    borderRadius: 5,
+    borderColor: '#DCDCDC',
+    borderWidth: 2,
+    height: 50,
+    width: 140,
+    left: 15,
+    bottom: 10,
+    textAlign: 'center',
+    color: 'red',
+    fontSize: 18
+  },
 });
