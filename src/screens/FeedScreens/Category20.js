@@ -22,7 +22,7 @@ Geocoder.init("AIzaSyCNjKB84RyfVRuvuU8sCcQT6uWB_wVY03s") //rescue
 // Geocoder.init("AIzaSyAvukcrpCKkgUIErLyg-4VOv23KMj_3o3c")
 
 
-const Map20 = ({ navigation }) => {
+const Map20 = ({ navigation, route }) => {
   const [switchValue, setSwitchValue] = useState(false);
   const [province, setProvince] = useState([]);
   const [selectProvince, setSelectProvince] = useState('');
@@ -40,16 +40,14 @@ const Map20 = ({ navigation }) => {
   const [username, setQuery] = useState('');
   const [initialRegion, setinitialRegion] = useState([]);
   const [mapRegion, setMapReson] = useState([]);
-  const categoryId = navigation.getParam('categoryId');
-  const subCategoryId = navigation.getParam('subCategoryId');
-  const subCategoryName = navigation.getParam('subCategoryName');
-  const title = navigation.getParam('title', '');
-  const desc = navigation.getParam('desc', '');
-  const startdate = navigation.getParam('startdate', '');
-  const mapSpecialUpload = navigation.getParam('mapSpecialUpload', []);
+  const categoryId = route.params.categoryId;
+  const subCategoryId = route.params.subCategoryId;
+  const subCategoryName = route.params.subCategoryName;
+  const title = route.params.title ?? '';
+  const desc = route.params.desc ?? '';
+  const startdate = route.params.startdate ?? '';
+  const mapSpecialUpload = route.params.mapSpecialUpload ?? [];
   const mapRef = useRef(null);
-  // initialRegion
-  // let categoryId = navigation.getParam('categoryId');
 
   const toggleSwitch = value => {
     setSwitchValue(value);

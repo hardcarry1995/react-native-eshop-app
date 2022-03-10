@@ -25,9 +25,9 @@ export default class EditFeed extends React.Component {
     super(props);
     this.state = {
       user_image: '',
-      feed_content: this.props.navigation.getParam('content'),
-      user_image: this.props.navigation.getParam('ImageUlr'),
-      id: this.props.navigation.getParam('id'),
+      feed_content: this.props.route.params.content,
+      user_image: this.props.route.params.ImageUlr,
+      id: this.props.route.params.id,
     };
   }
   addFeed = async () => {

@@ -18,8 +18,8 @@ import AsyncStorage from '@react-native-community/async-storage';
 import client from '../../constants/client';
 import { GetRating } from '../../components/GetRating';
 
-const Catalogue36 = ({ navigation }) => {
-  const detailData = navigation.getParam('detail');
+const Catalogue36 = ({ navigation, route }) => {
+  const detailData = route.params.detail;
   const dateDMY = Moment(detailData.startDate).format('DD-MMM-YYYY');
   const [magazinData, setMagazine] = useState([]);
   const [rating, setRating] = useState('2');

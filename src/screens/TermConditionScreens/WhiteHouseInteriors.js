@@ -1,33 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  Alert,
-  ToastAndroid,
-  FlatList,
-  SafeAreaView,
-  ScrollView,
-} from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Alert, ToastAndroid, FlatList, SafeAreaView, ScrollView } from 'react-native';
 import moment from 'moment';
+import AsyncStorage from '@react-native-community/async-storage';
 import { imagePrefix } from '../../constants/utils';
 import { ADD_CUSTOMER_ENQUIRY, GET_MAGAZINES_LIST, GET_SPECIAL_LIST_BY_COMPANY } from '../../constants/queries'
 import client from '../../constants/client';
-import AsyncStorage from '@react-native-community/async-storage';
 import { GetRating } from '../../components/GetRating';
 
-const WhiteHouse = ({ navigation }) => {
-
+const WhiteHouse = ({ navigation, route }) => {
   const [rating, setRating] = useState("2");
   const [maxRating, setMaxRating] = useState([1, 2, 3, 4, 5]);
   const [magazine, setMagazine] = useState([]);
   const [specialdata, setSpecial] = useState([]);
-  const data = navigation.getParam('detail');
+  const data = route.params.detail;
   const datego = moment(data.joinDate).format('DD MMM YYYY');
-  console.log('data>>>>>>>>>>>>', data.companyId);
-  // console.log('data>>>>>>>>>>>>',data);
 
   const starImageFilled =
     'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png';
@@ -40,12 +26,9 @@ const WhiteHouse = ({ navigation }) => {
 
   const fetchToken = async () => {
     let token = await AsyncStorage.getItem('userToken');
-    // console.log('token', token);
     fetchProducts(token);
     fetchSpecial(token);
   }
-
-
 
   const EmptyListMessage = (item) => {
     return (
@@ -62,19 +45,15 @@ const WhiteHouse = ({ navigation }) => {
     );
   };
   const fetchProducts = async (token) => {
-    console.log('fetchProducts', token);
     let variablesData = {
       id: data.companyId,
     }
-    console.log('variablesData', variablesData);
-
     client
       .query({
         query: GET_SPECIAL_LIST_BY_COMPANY,
         context: {
           headers: {
             Authorization: `Bearer ${token}`,
-            // 'Content-Length': 0,
           },
         },
         variables: {
@@ -83,7 +62,6 @@ const WhiteHouse = ({ navigation }) => {
       })
 
       .then(async result => {
-        console.log("GET_SPECIAL_LIST_BY_COMPANY", result);
         setSpecial(result.data.getMstSpecialList.result)
       })
       .catch(err => {
@@ -91,14 +69,12 @@ const WhiteHouse = ({ navigation }) => {
       });
   }
   const fetchSpecial = async (token) => {
-
     client
       .query({
         query: GET_MAGAZINES_LIST,
         context: {
           headers: {
             Authorization: `Bearer ${token}`,
-            // 'Content-Length': 0,
           },
         },
         variables: {
@@ -107,7 +83,6 @@ const WhiteHouse = ({ navigation }) => {
       })
 
       .then(async result => {
-        console.log("GET_MAGAZINES_LIST", result.data.getMagazinesList.result);
         setMagazine(result.data.getMagazinesList.result)
       })
       .catch(err => {
@@ -115,17 +90,14 @@ const WhiteHouse = ({ navigation }) => {
       });
   }
 
-  // async nagotiatePrice(item) {
   const nagotiatePrice = async (item) => {
     let token = await AsyncStorage.getItem('userToken');
-    console.log('item', item)
     client
       .mutate({
         mutation: ADD_CUSTOMER_ENQUIRY,
         context: {
           headers: {
             Authorization: `Bearer ${token}`,
-            // 'Content-Length': 0,
           },
         },
         variables: {
@@ -135,7 +107,6 @@ const WhiteHouse = ({ navigation }) => {
         },
       })
       .then(result => {
-        console.log(' ADD_CUSTOMER_ENQUIRY ADD_CUSTOMER_ENQUIRY', result);
         if (result.data.addCustomerEnquiry.success) {
           Alert.alert('Success', result.data.addCustomerEnquiry.message)
         } else {
@@ -151,80 +122,20 @@ const WhiteHouse = ({ navigation }) => {
 
   }
 
-  // const fetchToken = async () => {
-  //   let token = await AsyncStorage.getItem('userToken');
-  //   // console.log('token', token);
-  //   fetchProducts(token);
-  // }
-  // const fetchProducts = async (token) => {
-  //   // this.setState({loading: true});
-  //   console.log('fetchProducts', token);
-  //   client
-  //     .query({
-  //       query: GET_RATING,
-  //       fetchPolicy: 'no-cache',
-  //       context: {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //           'Content-Length': 0,
-  //         },
-  //         variables: {
-  //           id: data.companyId,
-  //         },
-  //       },
-  //     })
-
-
-
-  //     .then(async result => {
-  //       // this.fetchSpecialProduct(token);
-  //       // this.setState({loading: false});
-  //       console.log("rating", result.data.getMstRatingScoreList);
-  //       if (result.data.getMstRatingScoreList.success) {
-  //         // this.setState({ data: result.data.getBusinessList.result });
-  //         setRating(result.data.getMstRatingScoreList);
-  //       } else {
-  //         ToastAndroid.show(
-  //           result.data.getBusinessList.message,
-  //           ToastAndroid.SHORT,
-  //         );
-  //       }
-  //     })
-  //     .catch(err => {
-  //       // this.setState({loading: false});
-  //       console.log(err);
-  //     });
-  // }
   const renderItemSpecial = ({ item, index }) => (
     <View key={index}>
-      <TouchableOpacity
-        activeOpacity={0.9}
-        onPress={() => {
-          navigation.push('Special', { detail: item });
-        }}>
+      <TouchableOpacity activeOpacity={0.9}
+        onPress={() => { navigation.navigation('Special', { detail: item }); }}>
         <View style={styles.mainGet}>
           <View style={{ width: "22%", justifyContent: "center" }}>
             <Image
               style={styles.image}
-              source={item.logoPath
-                ?
-                { uri: `${imagePrefix}${item.logoPath}` }
-                :
-                require('../../assets/NoImage.jpeg')}
+              source={item.logoPath ? { uri: `${imagePrefix}${item.logoPath}` } : require('../../assets/NoImage.jpeg')}
             />
           </View>
 
-          <View
-            style={{
-              width: "0.5%",
-              backgroundColor: '#D0D0D0',
-              height: "80%",
-              alignSelf: "center"
-            }}
-          />
-
+          <View style={{ width: "0.5%", backgroundColor: '#D0D0D0', height: "80%", alignSelf: "center" }} />
           <View style={{ width: "77%" }}>
-
             <Text style={styles.text} numberOfLines={1}>
               {item.specialName}
             </Text>
@@ -232,37 +143,20 @@ const WhiteHouse = ({ navigation }) => {
             <View style={{ flexDirection: "row", margin: 10 }}>
               {maxRating.map((item, key) => {
                 return (
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    key={key}
-                  >
+                  <TouchableOpacity activeOpacity={0.7} key={key} >
                     <Image
                       style={styles.starImageStyleNew}
-                      source={
-                        item <= rating
-                          ? { uri: starImageFilled }
-                          : { uri: starImageCorner }
-                      }
+                      source={item <= rating ? { uri: starImageFilled } : { uri: starImageCorner }}
                     />
                   </TouchableOpacity>
                 );
               })}
             </View>
 
-            <Text
-              style={{
-                color: '#A8A8A8',
-                fontSize: 11,
-                marginLeft: 10
-              }}>
+            <Text style={{ color: '#A8A8A8', fontSize: 11, marginLeft: 10 }}>
               {moment(item.startDate).format('DD-MMM-YYYY')}
             </Text>
-            <Text numberOfLines={1}
-              style={{
-                color: '#323232',
-                fontSize: 11,
-                marginLeft: 10
-              }}>
+            <Text numberOfLines={1} style={{ color: '#323232', fontSize: 11, marginLeft: 10 }}>
               {item.specialDescription}
             </Text>
           </View>
@@ -273,34 +167,16 @@ const WhiteHouse = ({ navigation }) => {
 
   const renderItem = ({ item, index }) => (
     <View key={index}>
-      <TouchableOpacity
-        activeOpacity={0.9}
-        onPress={() => {
-          navigation.push('Catalogue36', { detail: item });
-        }}>
+      <TouchableOpacity activeOpacity={0.9} onPress={() => { navigation.navigate('Catalogue36', { detail: item }); }}>
         <View style={styles.mainGet}>
           <View style={{ width: "22%", justifyContent: "center" }}>
             <Image
               style={styles.image}
-              source={item.logoPath
-                ?
-                { uri: `${imagePrefix}${item.logoPath}` }
-                :
-                require('../../assets/NoImage.jpeg')}
+              source={item.logoPath ? { uri: `${imagePrefix}${item.logoPath}` } : require('../../assets/NoImage.jpeg')}
             />
           </View>
-
-          <View
-            style={{
-              width: "0.5%",
-              backgroundColor: '#D0D0D0',
-              height: "80%",
-              alignSelf: "center"
-            }}
-          />
-
+          <View style={{ width: "0.5%", backgroundColor: '#D0D0D0', height: "80%", alignSelf: "center" }} />
           <View style={{ width: "77%" }}>
-
             <Text style={styles.text} numberOfLines={1}>
               {item.magazineName}
             </Text>
@@ -308,17 +184,10 @@ const WhiteHouse = ({ navigation }) => {
             <View style={{ flexDirection: "row", margin: 10 }}>
               {maxRating.map((item, key) => {
                 return (
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    key={key}
-                  >
+                  <TouchableOpacity activeOpacity={0.7} key={key}>
                     <Image
                       style={styles.starImageStyleNew}
-                      source={
-                        item <= rating
-                          ? { uri: starImageFilled }
-                          : { uri: starImageCorner }
-                      }
+                      source={item <= rating ? { uri: starImageFilled } : { uri: starImageCorner }}
                     />
                   </TouchableOpacity>
                 );
@@ -348,20 +217,13 @@ const WhiteHouse = ({ navigation }) => {
   );
 
   return (
-
     <SafeAreaView>
       <ScrollView>
         <View>
-          <View>
-            <Image
-              style={styles.image1}
-              source={data.logoPath
-                ?
-                { uri: `${imagePrefix}${data.logoPath}` }
-                :
-                require('../../assets/NoImage.jpeg')}
-            />
-          </View>
+          <Image
+            style={styles.image1}
+            source={data.logoPath ? { uri: `${imagePrefix}${data.logoPath}` } : require('../../assets/NoImage.jpeg')}
+          />
           <View style={{}}>
             <View style={styles.main}>
               <View>
@@ -375,40 +237,16 @@ const WhiteHouse = ({ navigation }) => {
                   style={{ marginLeft: 80, marginTop: -20, color: '#C9C9C9' }}>
                   {data.compStreetAddress} {data.compCityName} {data.compCountryName}
                 </Text>
-                <Text
-                  style={{
-                    color: '#232323',
-                    marginLeft: 15,
-                    fontSize: 15,
-                    marginTop: 20,
-                  }}>
+                <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15, marginTop: 20 }}>
                   Registered Date
                 </Text>
-                <Text
-                  style={{
-                    color: '#C9C9C9',
-                    marginLeft: 130,
-                    fontSize: 15,
-                    marginTop: -20,
-                  }}>
+                <Text style={{ color: '#C9C9C9', marginLeft: 130, fontSize: 15, marginTop: -20 }}>
                   {datego}
                 </Text>
-                <Text
-                  style={{
-                    color: '#232323',
-                    marginLeft: 15,
-                    fontSize: 15,
-                    marginTop: 18,
-                  }}>
+                <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15, marginTop: 18 }}>
                   Status
                 </Text>
-                <Text
-                  style={{
-                    color: '#2CD826',
-                    marginLeft: 75,
-                    fontSize: 15,
-                    marginTop: -20,
-                  }}>
+                <Text style={{ color: '#2CD826', marginLeft: 75, fontSize: 15, marginTop: -20 }}>
                   {data.companyStatus}
                 </Text>
               </View>
@@ -428,67 +266,34 @@ const WhiteHouse = ({ navigation }) => {
                   style={{ marginLeft: 80, marginTop: -20, color: '#C9C9C9' }}>
                   {data.compPhone}
                 </Text>
-                <Text
-                  style={{
-                    color: '#232323',
-                    marginLeft: 15,
-                    fontSize: 15,
-                    marginTop: 20,
-                  }}>
+                <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15, marginTop: 20 }}>
                   Fax
                 </Text>
-                <Text
-                  style={{
-                    color: '#232323',
-                    marginLeft: 15,
-                    fontSize: 15,
-                    marginTop: 18,
-                  }}>
+                <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15, marginTop: 18 }}>
                   Website
                 </Text>
                 <Text
                   style={{ marginLeft: 80, marginTop: -20, color: '#C9C9C9' }}>
                   {data.compWebSite}
                 </Text>
-                <Text
-                  style={{
-                    color: '#232323',
-                    marginLeft: 15,
-                    fontSize: 15,
-                    marginTop: 18,
-                  }}>
+                <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15, marginTop: 18 }}>
                   Email
                 </Text>
                 <Text
                   style={{ marginLeft: 80, marginTop: -20, color: '#C9C9C9' }}>
                   {data.compEmailId}
                 </Text>
-                <Text
-                  style={{
-                    color: '#232323',
-                    marginLeft: 15,
-                    fontSize: 15,
-                    marginTop: 18,
-                  }}>
+                <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15, marginTop: 18 }}>
                   Helpline Number
                 </Text>
                 <Text
                   style={{ marginLeft: 150, marginTop: -20, color: '#C9C9C9' }}>
                   {data.compHelpDeskNumber}
                 </Text>
-                <Text
-                  style={{
-                    color: '#232323',
-                    marginLeft: 15,
-                    fontSize: 15,
-                    marginTop: 18,
-                  }}>
+                <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15, marginTop: 18 }}>
                   Help Desk
                 </Text>
-                <TouchableOpacity
-                  onPress={() => {
-                    nagotiatePrice(data);
-                  }}
+                <TouchableOpacity onPress={() => { nagotiatePrice(data); }}
                   style={{
                     height: 35,
                     width: 130,
@@ -497,13 +302,7 @@ const WhiteHouse = ({ navigation }) => {
                     marginTop: 25,
                     borderRadius: 5,
                   }}>
-                  <Text
-                    style={{
-                      alignSelf: 'center',
-                      marginTop: 8,
-                      color: '#FFFFFF',
-                      fontSize: 15,
-                    }}>
+                  <Text style={{ alignSelf: 'center', marginTop: 8, color: '#FFFFFF', fontSize: 15, }}>
                     Contact Now
                   </Text>
                 </TouchableOpacity>
@@ -514,27 +313,13 @@ const WhiteHouse = ({ navigation }) => {
           <View style={{}}>
             <View style={styles.main3}>
               <View>
-                <Text
-                  style={{
-                    color: '#9F1D20',
-                    fontSize: 21,
-                    alignSelf: 'center',
-                    marginTop: 10
-                  }}>
+                <Text style={{ color: '#9F1D20', fontSize: 21, alignSelf: 'center', marginTop: 10 }}>
                   Rating
                 </Text>
-                {/* {console.log(">>>>>>>>>>>>KKKKKKKJxcfghjk",data)} */}
                 <GetRating companyId={data.companyId} onprogress={(Rating) => { setRating(Rating); }} />
-                <Text
-                  style={{
-                    color: '#CFCFCF',
-                    fontSize: 35,
-                    alignSelf: 'center',
-                    opacity: 0.5,
-                  }}>
+                <Text style={{ color: '#CFCFCF', fontSize: 35, alignSelf: 'center', opacity: 0.5, }}>
                   {rating}
                 </Text>
-
                 <View style={{ flexDirection: "row", justifyContent: "center", marginTop: 5 }}>
                   {maxRating.map((item, key) => {
                     return (
@@ -544,11 +329,7 @@ const WhiteHouse = ({ navigation }) => {
                       >
                         <Image
                           style={styles.starImageStyle}
-                          source={
-                            item <= rating
-                              ? { uri: starImageFilled }
-                              : { uri: starImageCorner }
-                          }
+                          source={item <= rating ? { uri: starImageFilled } : { uri: starImageCorner }}
                         />
                       </TouchableOpacity>
                     );
@@ -567,13 +348,7 @@ const WhiteHouse = ({ navigation }) => {
                   onPress={() => {
                     navigation.navigate('RateandReview', { detail: data, type: 2 });
                   }}>
-                  <Text
-                    style={{
-                      alignSelf: 'center',
-                      marginTop: 8,
-                      color: '#FFFFFF',
-                      fontSize: 15,
-                    }}>
+                  <Text style={{ alignSelf: 'center', marginTop: 8, color: '#FFFFFF', fontSize: 15 }}>
                     Give Rating
                   </Text>
                 </TouchableOpacity>
@@ -587,16 +362,6 @@ const WhiteHouse = ({ navigation }) => {
                 <Text style={{ color: '#9F1D20', fontSize: 21, padding: 15 }}>
                   Specials
                 </Text>
-                {/* <Text
-                  style={{
-                    color: '#232323',
-                    fontSize: 18,
-                    padding: 15,
-                    marginTop: -20,
-                    opacity: 0.7,
-                  }}>
-                  No specials found
-                </Text> */}
                 <FlatList
                   ListEmptyComponent={EmptyListMessage('No special found')}
                   data={specialdata}
@@ -613,16 +378,6 @@ const WhiteHouse = ({ navigation }) => {
                 <Text style={{ color: '#9F1D20', fontSize: 21, padding: 15 }}>
                   Magazines
                 </Text>
-                {/* <Text
-                  style={{
-                    color: '#232323',
-                    fontSize: 18,
-                    padding: 15,
-                    marginTop: -20,
-                    opacity: 0.7,
-                  }}>
-                  No magazines found
-                </Text> */}
                 <FlatList
                   ListEmptyComponent={EmptyListMessage('No magazine found')}
                   data={magazine}

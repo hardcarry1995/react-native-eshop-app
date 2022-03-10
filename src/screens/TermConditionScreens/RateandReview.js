@@ -13,17 +13,16 @@ import {
 import { GIVE_BUSINESS_RATING } from '../../constants/queries';
 import client from '../../constants/client';
 import AsyncStorage from '@react-native-community/async-storage';
-import { bearerToken } from '../../constants/utils';
 import { Alert } from 'react-native';
 
-const RateandReview = ({ navigation }) => {
+const RateandReview = ({ navigation, route }) => {
   const [userdata, setDataUser] = useState('');
   const [userdataInfo, setDataUserInfo] = useState([]);
   const [rating, setRating] = useState("");
   const [name_address, setname_address] = useState('');
   const [maxRating, setMaxRating] = useState([1, 2, 3, 4, 5]);
-  const data = navigation.getParam('detail');
-  const type = navigation.getParam('type');
+  const data = route.params.detail;
+  const type = route.params.type;
 
   const starImageFilled =
     'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png';
@@ -41,34 +40,25 @@ const RateandReview = ({ navigation }) => {
     const more_info = JSON.parse(info);
     setDataUser(token)
     setDataUserInfo(more_info);
-    console.log('info>>>>>>>>>>', bearerToken);
-    console.log('data>>>>>>>>>>>>>>>>>>>>>>>>', data, type);
-    // this.setState({
-    //   userInfo: info,
-    // });
   }
   const getDataUsingPost = () => {
-    // this.setState({loading: true});
     let id = 0
     let companyIdGo = 0
     let specialIdGo = 0
     let eflyerIdGo = 0
     if (type === 1) {
-      console.log('result-----------', data.companyIds, type);
       id = data.specialID
       companyIdGo = data.companyIds
       specialIdGo = data.specialID
       eflyerIdGo = 0
     }
     if (type === 2) {
-      console.log('result-----------', data.companyId, type);
       id = data.companyId
       companyIdGo = data.companyId
       specialIdGo = 0
       eflyerIdGo = 0
     }
     if (type === 3) {
-      console.log('result-----------', data.eflyerId, type);
       id = data.eflyerId
       companyIdGo = data.companyId
       specialIdGo = 0

@@ -23,8 +23,8 @@ export default class FeedDetails extends React.Component {
     super(props);
     this.state = {
       visible: true,
-      url: this.props.navigation.getParam('ImageUlr'),
-      id: this.props.navigation.getParam('id'),
+      url: this.props.route.params.ImageUlr,
+      id: this.props.route.params.id,
       data: [
         {
           name: 'David',

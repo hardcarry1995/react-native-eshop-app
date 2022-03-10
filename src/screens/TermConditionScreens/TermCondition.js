@@ -1,22 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-  Image,
-  TouchableOpacity,
-  TextInput,
-  SafeAreaView,
-  ScrollView,
-  FlatList
-} from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Image, TouchableOpacity, TextInput, SafeAreaView, ScrollView, FlatList } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
+import Moment from 'moment';
 import { imagePrefix } from '../../constants/utils';
 import { GET_BUSINESS } from '../../constants/queries';
-import AsyncStorage from '@react-native-community/async-storage';
 import client from '../../constants/client';
 import { GetRating } from '../../components/GetRating';
-import Moment from 'moment';
 
 const TermCondition = ({ navigation }) => {
   const [data, setData] = useState([])
@@ -32,7 +21,6 @@ const TermCondition = ({ navigation }) => {
   const [userToken, setUserToken] = useState('');
   const [userInfo, setUserInfo] = useState([]);
 
-  // console.log('endDistance',loadMoreNext);
   const starImageFilled =
     'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png';
   const starImageCorner =
@@ -47,8 +35,6 @@ const TermCondition = ({ navigation }) => {
       i.companyName.toLowerCase().includes(text.toLowerCase()))
     setData(vdata);
     setLoadMoreNext(false);
-    // setEndDistance(300)
-    //  this.setState({ onEndReachedLength: 10 });
   };
   const getrequestItem = async () => {
     let resultdata = await AsyncStorage.getItem('userInfo');
@@ -58,7 +44,6 @@ const TermCondition = ({ navigation }) => {
     setUserInfo(jsondata)
     getrequestItemtt(token)
   }
-  // const dateDMY = Moment(data.itemRequestDate).format('DD-MM-YYYY');
   const getrequestItemtt = (token) => {
     if (loadMoreNext) {
       setLoading(true);
@@ -68,7 +53,6 @@ const TermCondition = ({ navigation }) => {
           context: {
             headers: {
               Authorization: `Bearer ${token}`,
-              // 'Content-Length': 0,
             },
           },
           variables: {
@@ -77,11 +61,9 @@ const TermCondition = ({ navigation }) => {
           },
         })
         .then(async result => {
-          console.log('result>>>>>>>>>............', result.data.getBusinessList.result)
           if (result.data.getBusinessList.success) {
             setData(result.data.getBusinessList.result)
             setDataSave(result.data.getBusinessList.result)
-            // setOffset(offset + 10);
             setLoading(false);
           } else {
             setIsListEnd(true);
@@ -104,7 +86,6 @@ const TermCondition = ({ navigation }) => {
           context: {
             headers: {
               Authorization: `Bearer ${userToken}`,
-              // 'Content-Length': 0,
             },
           },
           variables: {
@@ -113,7 +94,6 @@ const TermCondition = ({ navigation }) => {
           },
         })
         .then(async result => {
-          console.log('result>>>>>>>>>............', result.data.getBusinessList.result)
           if (result.data.getBusinessList.success) {
             setData(result.data.getBusinessList.result)
             setDataSave(result.data.getBusinessList.result)
@@ -132,56 +112,27 @@ const TermCondition = ({ navigation }) => {
 
   const renderFooter = () => {
     return (
-      // Footer View with Loader
       <View style={styles.footer}>
-        {loading ? (
-          <ActivityIndicator
-            color="black"
-            style={{ margin: 15 }} />
-        ) : null}
+        {loading ? <ActivityIndicator color="black" style={{ margin: 15 }} /> : null}
       </View>
     );
   };
 
 
   const renderItem = ({ item, index }) => (
-    console.log('item----------------------------------------------------------------------------------------------------', item),
     <View key={index}>
       <TouchableOpacity
         activeOpacity={0.9}
-        onPress={() => {
-          navigation.push('WhiteHouseInteriors', {
-            detail: item
-          });
-        }}>
+        onPress={() => { navigation.navigate('WhiteHouseInteriors', { detail: item }); }}>
         <View style={styles.main}>
           <View style={{ width: "22%", justifyContent: "center" }}>
-
-            {/* <Image
-              style={styles.image}
-              source={require('../assets/S32.png')}
-            /> */}
             <Image
               style={styles.image}
-              source={item.logoPath
-                ?
-                { uri: `${imagePrefix}${item.logoPath}` }
-                :
-                require('../../assets/NoImage.jpeg')}
+              source={item.logoPath ? { uri: `${imagePrefix}${item.logoPath}` } : require('../../assets/NoImage.jpeg')}
             />
           </View>
-
-          <View
-            style={{
-              width: "0.5%",
-              backgroundColor: '#D0D0D0',
-              height: "80%",
-              alignSelf: "center"
-            }}
-          />
-
+          <View style={{ width: "0.5%", backgroundColor: '#D0D0D0', height: "80%", alignSelf: "center" }} />
           <View style={{ width: "77%" }}>
-
             <Text style={styles.text} numberOfLines={1}>
               {item.companyName}
             </Text>
@@ -189,36 +140,20 @@ const TermCondition = ({ navigation }) => {
             <View style={{ flexDirection: "row", margin: 10 }}>
               {maxRating.map((item, key) => {
                 return (
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    key={key}>
+                  <TouchableOpacity activeOpacity={0.7} key={key}>
                     <Image
                       style={styles.starImageStyle}
-                      source={
-                        item <= rating
-                          ? { uri: starImageFilled }
-                          : { uri: starImageCorner }
-                      }
+                      source={item <= rating ? { uri: starImageFilled } : { uri: starImageCorner }}
                     />
                   </TouchableOpacity>
                 );
               })}
             </View>
 
-            <Text
-              style={{
-                color: '#A8A8A8',
-                fontSize: 11,
-                marginLeft: 10
-              }}>
+            <Text style={{ color: '#A8A8A8', fontSize: 11, marginLeft: 10 }}>
               {Moment(item.joinDate).format('DD-MMM-YYYY')}
             </Text>
-            <Text
-              style={{
-                color: '#323232',
-                fontSize: 11,
-                marginLeft: 10
-              }}>
+            <Text style={{ color: '#323232', fontSize: 11, marginLeft: 10 }}>
               {item.compCityName}
             </Text>
           </View>
@@ -226,8 +161,6 @@ const TermCondition = ({ navigation }) => {
       </TouchableOpacity>
     </View>
   );
-
-
   return (
     <SafeAreaView>
       <ScrollView>

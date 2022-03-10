@@ -25,7 +25,7 @@ export default class FeedComments extends React.Component {
     super(props);
     this.state = {
       visible: false,
-      id: this.props.navigation.getParam('id'),
+      id: this.props.route.params.id,
       comment: '',
       replycomment: '',
       Like: false,

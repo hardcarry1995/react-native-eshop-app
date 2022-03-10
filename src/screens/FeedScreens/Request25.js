@@ -6,10 +6,9 @@ import { GET_RESPONSE_ITEMS } from '../../constants/queries';
 import AsyncStorage from '@react-native-community/async-storage';
 import client from '../../constants/client';
 
-const Request25 = ({ navigation }) => {
+const Request25 = ({ navigation, route }) => {
 
-  const data = navigation.getParam('data');
-  { console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>data____", data) }
+  const data = route.params.data;
 
   const dateDMY = Moment(data.itemRequestDate).format('DD-MMM-YYYY');
   { console.log('dateDMY', imagePrefix) }

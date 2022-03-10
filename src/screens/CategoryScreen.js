@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, Text, Image, SafeAreaView, TextInput, ToastAndroid, ActivityIndicator, ScrollView, TouchableOpacity, Dimensions, Platform, PixelRatio } from 'react-native';
 import Colors from '../constants/colors';
-import { font_style } from '../components/styles';
 import { MAIN_CATEGORY, SUB_CATEGORY } from '../constants/queries';
 import client from '../constants/client';
 import AsyncStorage from '@react-native-community/async-storage';
 import { imagePrefix } from '../constants/utils';
+import Constants from "../constants/constant"
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -122,11 +122,12 @@ export default class CategoryScreen extends Component {
   }
 
   _onPressSubCategory = (item) => {
-    this.props.navigation.goBack()
-    this.props.navigation.push('HomeWithParam', {
-      categoryId: this.state.categoryId,
-      subCategoryId: item.categoryId,
-      subCategoryName: item.categoryName
+    this.props.navigation.navigate({
+      name: 'HomeWithParam', params: {
+        categoryId: this.state.categoryId,
+        subCategoryId: item.categoryId,
+        subCategoryName: item.categoryName
+      }
     });
   }
 

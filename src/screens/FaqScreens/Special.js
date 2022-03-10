@@ -56,8 +56,8 @@ export default class Special extends React.Component {
     this.fetchCompanyName(token);
   }
   async fetchProducts(token) {
-    const { navigation } = this.props;
-    const data = navigation.getParam('data');
+    const { navigation, route } = this.props;
+    const data = route.params.data;
     // console.log('GET_SPECIAL_BY_ID>>>>>>>', data)
     client
       .query({
@@ -175,8 +175,8 @@ export default class Special extends React.Component {
   }
 
   async fetchCompanyName(token) {
-    const { navigation } = this.props;
-    const data = navigation.getParam('data');
+    const { navigation, route } = this.props;
+    const data = route.params.data;
     this.setState({ specialData: data })
     // console.log('GET_COMPANY_NAME>>>>>>>', data)
     client
@@ -304,9 +304,9 @@ export default class Special extends React.Component {
 
 
   render() {
-    const { navigation } = this.props;
+    const { navigation, route } = this.props;
 
-    const data = navigation.getParam('data');
+    const data = route.params.data;
 
     // { console.log(">>>>>>>data____", data) }
     return (

@@ -15,15 +15,13 @@ import { GET_RESPONSE_ITEMS } from '../../constants/queries';
 import AsyncStorage from '@react-native-community/async-storage';
 import client from '../../constants/client';
 
-const Request25 = ({ navigation }) => {
-  const data = navigation.getParam('data');
+const Request25 = ({ navigation, route }) => {
+  const data = route.params.data;
   const dateDMY = Moment(data.itemRequestDate).format('DD-MMM-YYYY');
-  { console.log('dateDMY', imagePrefix) }
   const [vehicleData, setVehicleData] = useState([]);
   const [name_address, setname_address] = useState('');
   useEffect(() => {
     getRequestItem();
-    // setAllPDF(setPDF);
   });
   const getRequestItem = async () => {
     let IsLogin = await AsyncStorage.getItem('IsLogin');

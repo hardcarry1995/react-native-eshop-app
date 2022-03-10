@@ -72,7 +72,7 @@ class DrawerContent extends Component {
         break;
 
       case Constant.feed:
-        this.props.navigation.navigate(Constant.feed);
+        this.props.navigation.navigate(Constant.feed, { screen: "ChatItem" });
         break;
 
       case Constant.share_app:

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View, FlatList, TextInput, ActivityIndicator, ToastAndroid } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import { connect } from 'react-redux';
 import AsyncStorage from '@react-native-community/async-storage';
 import { imagePrefix } from '../../constants/utils';
@@ -11,7 +10,13 @@ import NetInfo from "@react-native-community/netinfo";
 import SQLite from 'react-native-sqlite-storage';
 import { GetRating } from '../../components/GetRating';
 import moment from 'moment';
+import RNPickerSelect from 'react-native-picker-select';
 
+const filterItems = [
+  { label: 'Purchase', value: 'Buy' },
+  { label: 'Bid', value: 'Bid' },
+  { label: 'Hire', value: 'Hire' },
+]
 
 class HomeScreenCat extends React.PureComponent {
 
@@ -20,9 +25,6 @@ class HomeScreenCat extends React.PureComponent {
     SQLite.DEBUG = true;
     this.state = {
       size: 10,
-      specialSize: 10,
-      email: '',
-      password: '',
       data: [],
       special_data: [],
       loading: false,
@@ -35,23 +37,20 @@ class HomeScreenCat extends React.PureComponent {
       queryText: '',
       search: '',
       specialData: [],
-      scan: false,
-      ScanResult: false,
       result: null,
       rating: "2",
       maxRating: [1, 2, 3, 4, 5],
       isListEnd: false,
       loginToken: '',
       user: '',
-      subcategoryId: this.props.navigation.getParam('categoryId'),
-      categoryId: this.props.navigation.getParam('subCategoryId'),
+      subcategoryId: this.props.route.params.categoryId,
+      categoryId: this.props.route.params.subCategoryId,
       starImageFilled:
         'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png',
       starImageCorner:
         'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png',
     };
   }
-
 
   ExecuteQuery = (sql, params = []) => new Promise((resolve, reject) => {
     var db = SQLite.openDatabase({ name: "testdatabase.db", createFromLocation: "~testdatabase.db" });
@@ -60,22 +59,16 @@ class HomeScreenCat extends React.PureComponent {
         resolve(results);
       },
         (error) => {
-          console.log('error>>>>>>>>>>>>>>', error);
         });
     });
   });
 
   componentDidMount() {
     this.checkLogin();
-    console.log('categoryId', this.state.subcategoryId);
-    console.log('subcategoryId', this.state.categoryId);
-    // this.fetchProducts();
-    // this.fetchSpecialProduct();
   }
 
   async checkLogin() {
     let token = await AsyncStorage.getItem('userToken');
-    // console.log('token', token);
     let IsLogin = await AsyncStorage.getItem('IsLogin');
     if (IsLogin === 'true') {
       this.CreateTable();
@@ -96,12 +89,9 @@ class HomeScreenCat extends React.PureComponent {
     }
   }
 
-
-
   async checkConnectivity() {
     NetInfo.fetch().then(state => {
       if (state.isConnected == false) {
-        // this.SelectQuery();
         AsyncStorage.setItem('setInternet', 'set');
         ToastAndroid.show('No internet connection', ToastAndroid.SHORT);
       }
@@ -114,13 +104,11 @@ class HomeScreenCat extends React.PureComponent {
         query: GUEST_LOGIN,
         context: {
           headers: {
-            // Authorization: `Bearer ${token}`,
             'Content-Length': 0,
           },
         },
       })
       .then(async result => {
-        // console.log(result.data.guestLogin.result.value);
         await AsyncStorage.setItem('userToken', result.data.guestLogin.result.value);
         this.CreateTable();
         this.fetchToken();
@@ -133,11 +121,11 @@ class HomeScreenCat extends React.PureComponent {
         console.log(err);
       });
   }
+
   async addCounrty(deta) {
     let countryData = deta;
     let countryQuery = "INSERT INTO ezyProductDetailNewAdd( activeText , categoryID , categoryName  ,description ,documentName ,documentPath,isActive ,productID ,productImage ,productName, productNumber) VALUES";
     for (let i = 0; i < countryData.length; ++i) {
-      let dataid = i + 1;
       let escapedSample = countryData[i].description.replace(/\'/g, "")
       countryQuery = countryQuery + "('"
         + countryData[i].activeText //user_id
@@ -172,20 +160,19 @@ class HomeScreenCat extends React.PureComponent {
   }
   // Create Table
   async CreateTable() {
-    global.db = SQLite.openDatabase(
-      {
-        name: 'testdatabase.db',
-        location: 'default',
-        createFromLocation: '~testdatabase.db',
-      },
+    global.db = SQLite.openDatabase({
+      name: 'testdatabase.db',
+      location: 'default',
+      createFromLocation: '~testdatabase.db',
+    },
       () => { },
       error => {
         console.log("ERROR: " + error);
       }
     );
-    let product = await this.ExecuteQuery("CREATE TABLE IF NOT EXISTS ezyProductDetailNewAdd (activeText VARCHAR(16), categoryID INTEGER, categoryName VARCHAR(16),unitCost VARCHAR(16),description TEXT,documentName VARCHAR(225),documentPath VARCHAR(225),isActive VARCHAR(16),productID INTEGER,productImage VARCHAR(225),productName VARCHAR(225), productNumber VARCHAR(225))", []);
-
+    await this.ExecuteQuery("CREATE TABLE IF NOT EXISTS ezyProductDetailNewAdd (activeText VARCHAR(16), categoryID INTEGER, categoryName VARCHAR(16),unitCost VARCHAR(16),description TEXT,documentName VARCHAR(225),documentPath VARCHAR(225),isActive VARCHAR(16),productID INTEGER,productImage VARCHAR(225),productName VARCHAR(225), productNumber VARCHAR(225))", []);
   }
+
   async SelectQuery() {
     let selectQuery1 = await this.ExecuteQuery("SELECT * FROM ezyProductDetailNewAdd", []);
     var rows1 = selectQuery1.rows;
@@ -202,10 +189,9 @@ class HomeScreenCat extends React.PureComponent {
 
     this.setState({ data: newArrayList });
   }
+
   handleSearch = (text) => {
-    this.setState({
-      textnew: text,
-    });
+    this.setState({ textnew: text });
     let vdata = this.state.dataEMP.filter(i =>
       i.productName.toLowerCase().includes(text.toLowerCase()))
     this.setState({ data: vdata });
@@ -236,7 +222,6 @@ class HomeScreenCat extends React.PureComponent {
   async fetchToken() {
     let token = await AsyncStorage.getItem('userToken');
     let userInfo = await AsyncStorage.getItem('userInfo');
-    console.log('data check', userInfo)
     this.setState({
       userInfo: JSON.parse(userInfo),
     });
@@ -251,11 +236,9 @@ class HomeScreenCat extends React.PureComponent {
   fetchProducts(token) {
     if (!this.loading && !this.isListEnd) {
       this.setState({ loading: true });
-      console.log('this.state.categoryId', this.state.categoryId)
       client
         .query({
           query: GET_PRODUCT_BY_CATEGORY_HOME,
-          // fetchPolicy: 'no-cache',
           variables: {
             size: this.state.size,
             catId: this.state.categoryId,
@@ -267,14 +250,8 @@ class HomeScreenCat extends React.PureComponent {
           },
         })
         .then(result => {
-          // this.setState({ loading: false });
-          console.log(result.data.getPrdProductList.result);
           if (result.data.getPrdProductList.result.length > 0) {
-            // this.setState({ size: this.state.size + 10 })
-            // console.log(this.state.size)
             this.setState({ data: result.data.getPrdProductList.result });
-            // this.setState({ data: [...this.state.data, ...result.data.getPrdProductList.result] });
-            // console.log(result.data.getPrdProductList.result)
             this.setState({ dataEMP: result.data.getPrdProductList.result });
             this.addCounrty(result.data.getPrdProductList.result);
             this.setState({ loading: false });
@@ -289,7 +266,6 @@ class HomeScreenCat extends React.PureComponent {
         })
         .catch(err => {
           this.setState({ loading: false });
-          console.log('error>>>>>>', err);
         });
     }
   }
@@ -331,7 +307,6 @@ class HomeScreenCat extends React.PureComponent {
         })
         .then(result => {
           if (result.data.getPrdProductList.result.length > 0) {
-            // this.setState({ size: this.state.size + 10 })
             console.log('gg', result)
             this.setState({ data: result.data.getPrdProductList.result });
 
@@ -355,7 +330,6 @@ class HomeScreenCat extends React.PureComponent {
     client
       .query({
         query: SPECIAL_PRODUCT,
-        // fetchPolicy: 'no-cache',
         variables: {
           size: 10,
         },
@@ -366,10 +340,7 @@ class HomeScreenCat extends React.PureComponent {
         },
       })
       .then(result => {
-        // this.fetchProducts();
-        // console.log('result888888', result);
         if (result.data.getMstSpecialList.success) {
-          // console.log('result888888', result);
           this.setState({ special_data: result.data.getMstSpecialList.result });
           this.setState({ specialData: result.data.getMstSpecialList.result });
         } else {
@@ -383,11 +354,7 @@ class HomeScreenCat extends React.PureComponent {
   async addToCart(id) {
     let IsLogin = await AsyncStorage.getItem('IsLogin');
     if (IsLogin !== 'true') {
-      // this.props.navigation.navigate('Auth');
-      var userIdData = null;
       this.setState({ cartLoading: true });
-      // console.log(">>>>>>>>>>>>>>>>>>>>>>id", userIdData);
-      // console.log(">>>>>>>>>>>>>>>>>>>>>>i", this.state.userInfo.id);
       client
         .mutate({
           mutation: ADD_TO_CART_NULL,
@@ -414,11 +381,7 @@ class HomeScreenCat extends React.PureComponent {
           console.log(err);
         });
     } else {
-      // console.log(">>>>>>>>>>>>>>>>>>>>>>id", id);
-      var userIdData = this.state.userInfo.id
       this.setState({ cartLoading: true });
-      // console.log(">>>>>>>>>>>>>>>>>>>>>>id", userIdData);
-      // console.log(">>>>>>>>>>>>>>>>>>>>>>i", this.state.userInfo.id);
       client
         .mutate({
           mutation: ADD_TO_CART,
@@ -431,7 +394,6 @@ class HomeScreenCat extends React.PureComponent {
           context: {
             headers: {
               Authorization: `Bearer ${this.props.state.userToken}`,
-              // 'Content-Length': 0,
             },
           },
         })
@@ -447,47 +409,23 @@ class HomeScreenCat extends React.PureComponent {
           console.log(err);
         });
     }
-
-    // }
   }
 
-
   renderItem = ({ item, index }) => (
-    <View style={{ flex: 1, backgroundColor: '#fff', padding: 10 }}>
+    <View style={{ flex: 1, backgroundColor: '#fff', padding: 10 }} key={index}>
       <TouchableOpacity
         activeOpacity={0.9}
-        onPress={() => {
-          this.props.navigation.navigate('Filter', { data: item }); ``
-        }}
+        onPress={() => { this.props.navigation.navigate('Filter', { data: item }); }}
         style={{ marginBottom: 10 }}>
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: '#FFF',
-            borderRadius: 15,
-            elevation: 5,
-          }}>
+        <View style={{ flex: 1, backgroundColor: '#FFF', borderRadius: 15, elevation: 5 }}>
           <View style={{ alignSelf: 'center', flex: 1 }}>
-            <Image
-              style={{ height: 100, width: 100, padding: 5, marginVertical: 5 }}
-              source={{
-                uri: `${imagePrefix}${item.productImage}`,
-              }}
-            />
+            <Image style={{ height: 100, width: 100, padding: 5, marginVertical: 5 }} source={{ uri: `${imagePrefix}${item.productImage}` }} />
           </View>
-          <View
-            style={{
-              flex: 1,
-              borderColor: '#eeeeee',
-              borderRadius: 15,
-              borderWidth: 1,
-            }}>
+          <View style={{ flex: 1, borderColor: '#eeeeee', borderRadius: 15, borderWidth: 1 }}>
             <View style={{ flexDirection: 'column', marginLeft: 10, margin: 10 }}>
               <Text numberOfLines={1} style={{ color: '#000', fontSize: 16, fontWeight: 'bold' }}>
-                {/* {item.productName.substr(0, 30)}... */}
                 {item.productName}
               </Text>
-              {/* {console.log("l>>>>>>>>>>>>>>>>>>",item.productID)} */}
               <GetRating companyId={item.productID} onprogress={(Rating) => { this.setState({ rating: Rating }); }} />
               <View style={{ flexDirection: "row", padding: 1, paddingBottom: 5, }}>
                 {this.state.maxRating.map((item, key) => {
@@ -535,8 +473,6 @@ class HomeScreenCat extends React.PureComponent {
               />
               <TouchableOpacity
                 onPress={() => {
-                  // console.log(item.productID);
-                  // alert("ghjkl")
                   this.addToCart(item.productID)
                 }}
 
@@ -554,79 +490,37 @@ class HomeScreenCat extends React.PureComponent {
   );
 
   render() {
-
     return (
       <View style={styles.container}>
-        <View
-          style={{
-            paddingBottom: 30,
-            flex: 1,
-          }}>
-          <View
-            style={{
-              height: 80,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
+        <View style={{ paddingBottom: 30, flex: 1 }}>
+          <View style={{ height: 80, alignItems: 'center', justifyContent: 'center' }}>
             <View style={styles.SectionStyle}>
-              <Image
-                source={require('../../assets/search.png')}
-                style={styles.ImageStyle}
-              />
-
+              <Image source={require('../../assets/search.png')} style={styles.ImageStyle} />
               <TextInput
                 style={{ flex: 1 }}
                 placeholder="Search Products"
                 underlineColorAndroid="transparent"
                 onChangeText={queryText => this.handleSearch(queryText)}
               />
-              <TouchableOpacity
-                onPress={() => {
-                  this.props.navigation.navigate('ChatItem');
-                }}
-              >
+              <TouchableOpacity onPress={() => { this.props.navigation.navigate('ChatItem'); }}>
                 <Image
                   source={require('../../assets/Group28.png')}
-                  style={{
-                    padding: 10,
-                    margin: 15,
-                    height: 20,
-                    width: 20,
-                    resizeMode: 'stretch',
-                    alignItems: 'center',
-                  }}
+                  style={{ padding: 10, margin: 15, height: 20, width: 20, resizeMode: 'stretch', alignItems: 'center' }}
                 />
               </TouchableOpacity>
             </View>
-
-
           </View>
-          <View
-            style={{
-              borderRadius: 5,
-              borderColor: '#DCDCDC',
-              borderWidth: 2,
-              height: 50,
-              width: 110,
-              left: 10,
-              bottom: 10
-            }}>
-            <Picker
-              selectedValue={this.state.user}
+          <View>
+            <RNPickerSelect
+              value={this.state.user}
               onValueChange={this.updateUser}
-              style={{ color: 'red', height: 40, width: 110 }}>
-              <Picker.Item label="Select" value="" />
-              <Picker.Item label="Purchase" value="Buy" />
-              <Picker.Item label="Bid" value="Bid" />
-              <Picker.Item label="Hire" value="Hire" />
-            </Picker>
+              items={filterItems}
+              textInputProps={styles.pickerContainer}
+            />
           </View>
           <FlatList
-
             ListEmptyComponent={this.EmptyListMessage('data')}
             numColumns={2}
-            // onEndReached={this.fetchProducts()}
-            // onEndReachedThreshold={0.5}
             ListFooterComponent={() => {
               return (
                 this.state.loading ? (
@@ -637,27 +531,11 @@ class HomeScreenCat extends React.PureComponent {
             ListHeaderComponent={() => {
               return (
                 <View style={{ padding: 5, flex: 1 }}>
-                  <TouchableOpacity
-                    onPress={() => {
-                      // this.props.navigation.navigate('FaqScreen');
-                    }}>
-                    <Text
-                      style={{ fontSize: 20, color: '#DB3236', marginLeft: 27 }}>
-                      SPECIAL PRODUCTS
-                    </Text>
-                  </TouchableOpacity>
-                  {/* <ScrollView horizontal>
-                    {this.state.special_data.map((item, index) => {
-                      return (
-                        <SpecialCard item={item} index={index} key={index} />
-                      );
-                    })}
-                  </ScrollView> */}
-
-                  <SpecialCard />
-
-                  <Text
-                    style={{ fontSize: 20, color: '#DB3236', marginLeft: 27 }}>
+                  <Text style={{ fontSize: 20, color: '#DB3236', marginLeft: 27 }}>
+                    SPECIAL PRODUCTS
+                  </Text>
+                  <SpecialCard allData={this.state.special_data} navigation={this.props.navigation} />
+                  <Text style={{ fontSize: 20, color: '#DB3236', marginLeft: 27 }}>
                     ALL PRODUCTS
                   </Text>
                 </View>
@@ -688,10 +566,7 @@ const mapDispatchToProps = dispatch => ({
   },
 });
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(HomeScreenCat);
+export default connect(mapStateToProps, mapDispatchToProps)(HomeScreenCat);
 
 const styles = StyleSheet.create({
   container: {
@@ -746,5 +621,16 @@ const styles = StyleSheet.create({
     height: 12,
     marginRight: 2
   },
-
+  pickerContainer: {
+    borderRadius: 5,
+    borderColor: '#DCDCDC',
+    borderWidth: 2,
+    height: 50,
+    width: 140,
+    left: 15,
+    bottom: 10,
+    textAlign: 'center',
+    color: 'red',
+    fontSize: 18
+  },
 });

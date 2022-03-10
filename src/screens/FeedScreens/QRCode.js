@@ -11,9 +11,7 @@ const QRCode = ({ navigation }) => {
   const [scan, setScan] = useState(false);
   const [ScanResult, setScanResult] = useState(false);
   const [result, setResult] = useState();
-  const desccription = 'hi';
-  const subCategoryName = navigation.getParam('subCategoryName');
-  console.log('result', result);
+
   useEffect(() => {
     // ShowCurrentDate();
   }, []);

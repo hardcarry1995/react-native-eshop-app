@@ -6,9 +6,8 @@ import {
 } from 'react-native';
 import Pdf from 'react-native-pdf';
 
-const ShowPDF = ({ navigation }) => {
-  const requestData = navigation.getParam('pdfPath');
-
+const ShowPDF = ({ navigation, route }) => {
+  const requestData = route.params.pdfPath;
   useEffect(() => {
   }, []);
 

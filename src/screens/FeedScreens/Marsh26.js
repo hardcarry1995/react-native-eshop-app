@@ -20,7 +20,7 @@ import { REQUEST_ITEM_POST_RESPONSE, GET_RESPONSE_ITEMS, GET_RESPONSE_ITEMS_NEW 
 import AsyncStorage from '@react-native-community/async-storage';
 import client from '../../constants/client';
 
-const Marsh26 = ({ navigation }) => {
+const Marsh26 = ({ navigation, route }) => {
   const [msgData, setmsgData] = useState([]);
   const [msgDataNew, setmsgDataNew] = useState([]);
   const [name_address, setname_address] = useState('');
@@ -33,22 +33,18 @@ const Marsh26 = ({ navigation }) => {
   const [filePath, setFilePath] = useState('')
   const [fileName, setFileName] = useState(null)
   const [source, setsource] = useState({ uri: 'http://samples.leanpub.com/thereactnativebook-sample.pdf', cache: true })
+  const requestData = route.params.requestData;
 
-  const requestData = navigation.getParam('requestData');
-  { console.log("7777777777777", filePath) }
 
   useEffect(() => {
     getToken();
-    // setAllPDF(setPDF);
   }, []);
-  // const source = {uri:'http://samples.leanpub.com/thereactnativebook-sample.pdf',cache:true};
 
   const renderDate = date => {
     return <Text style={styles.time}>{date}</Text>;
   };
 
   const setModalVisible = visible => {
-    // this.setState({ modalVisible: visible });
     setmodalVisibler(visible);
   };
   const getToken = async () => {
