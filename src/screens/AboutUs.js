@@ -88,7 +88,7 @@ const Map33 = ({ navigation }) => {
   const renderMapView = () => {
     if (!currentLatitude) return <></>;
     return (
-      platformType == 'huawie' ? <HMSMap camera={{ target: { latitude: 41, longitude: 29 }, zoom: 10 }}>
+      platformType == 'huawei' ? <HMSMap camera={{ target: { latitude: 41, longitude: 29 }, zoom: 10 }}>
         <HMSMarker
           coordinate={{ latitude: 41, longitude: 29 }}
           onInfoWindowClose={(e) => console.log("HMSMarker onInfoWindowClose")}

@@ -79,9 +79,7 @@ class TabBar extends React.Component {
     const { navigation } = this.props;
     const navigationState = this.props.state;
     return this.state.isVisible ? (
-      <View style={{}}>
-        <View
-          style={styles.tabBarContainer}>
+        <View style={styles.tabBarContainer}>
           {this.props.state.routes.map((route, index) => {
             if (route.name === 'HomeStack') {
               return (
@@ -148,7 +146,6 @@ class TabBar extends React.Component {
             }
           })}
         </View>
-      </View>
     ) : null;
   }
 }
@@ -178,15 +175,15 @@ const styles = StyleSheet.create({
   },
   largeButtonContainer: {
     alignItems: 'center',
-    elevation: 3,
+    elevation: 0.1,
     marginTop: -10,
     width: 70,
     height: 70,
     marginBottom: 50,
-    shadowOpacity: 0.8,
+    shadowOpacity: 0.1,
     backgroundColor: '#fff',
     borderRadius: 35,
-    shadowRadius: 2,
+    shadowRadius: 1,
   },
   larginButtonImage: {
     width: 55,

@@ -156,7 +156,7 @@ class DrawerContent extends Component {
             <View style={{ backgroundColor: 'transparent' }}>
               <CardItem style={{ backgroundColor: 'transparent' }} transparent>
                 <Image
-                  style={{ height: 25, width: 25, resizeMode: 'center' }}
+                  style={{ height: 25, width: 25, resizeMode: 'contain' }}
                   source={image}
                 />
                 <Text
@@ -227,7 +227,7 @@ class DrawerContent extends Component {
                 <View style={{ backgroundColor: 'transparent' }}>
                   <CardItem style={{ backgroundColor: 'transparent' }} transparent>
                     <Image
-                      style={{ height: 25, width: 25, resizeMode: 'center' }}
+                      style={{ height: 25, width: 25, resizeMode: 'contain' }}
                       source={require('../assets/menu/User.png')}
                     />
                     <Text
@@ -251,7 +251,7 @@ class DrawerContent extends Component {
                 <View style={{ backgroundColor: 'transparent', paddingBottom: 1 }}>
                   <CardItem style={{ backgroundColor: 'transparent' }} transparent>
                     <Image
-                      style={{ height: 25, width: 25, resizeMode: 'center' }}
+                      style={{ height: 25, width: 25, resizeMode: 'contain' }}
                       source={require('../assets/menu/clip.png')}
                     />
                     <Text

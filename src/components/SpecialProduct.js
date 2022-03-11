@@ -293,7 +293,7 @@ class SpecialProduct extends PureComponent {
               <TouchableOpacity
                 onPress={() => { this.props.navigation.navigate('Categories20', { categoryId: item?.categoryID, subCategoryId: item?.categoryID, subCategoryName: item?.categoryName, title: item?.specialName, desc: item?.specialDescription, startdate: item?.startDate, mapSpecialUpload: item?.mapSpecialUpload }) }}>
                 <Image
-                  style={{ height: 35, width: 35, tintColor: '#DB3236', resizeMode: "center" }}
+                  style={{ height: 35, width: 35, tintColor: '#DB3236', resizeMode: "contain" }}
                   source={require('../assets/menu/request.png')}
                 />
               </TouchableOpacity>

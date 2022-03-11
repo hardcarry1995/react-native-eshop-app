@@ -126,7 +126,6 @@ const textHeader = StyleSheet.create({
   },
   leftIcon: {
     justifyContent: 'center',
-    paddingLeft: 20,
     width: 48,
     height: 48,
   },
