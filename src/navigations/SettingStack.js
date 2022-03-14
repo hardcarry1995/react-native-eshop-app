@@ -8,7 +8,7 @@ const Stack = createNativeStackNavigator();
 
 function SettingStack() {
   return (
-    <Stack.Navigator screenOptions={{ gestureHandler: false, headerShown: false }}>
+    <Stack.Navigator screenOptions={{ gestureHandler: false }}>
       <Stack.Screen name="SettingScreen" component={SettingScreen} options={ScreenOptions} />
     </Stack.Navigator>
   )

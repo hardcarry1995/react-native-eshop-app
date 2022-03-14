@@ -115,7 +115,6 @@ function LoginScreen(props) {
       },
     );
     const emailpayload = await response.json();
-    console.log(emailpayload, '------------------------------------');
     console.log(emailpayload.elements[0]['handle~'].emailAddress);
 
   };
@@ -169,16 +168,8 @@ function LoginScreen(props) {
     if (result.isCancelled) {
       console.log('Login cancelled');
     } else {
-      console.log(result);
-      console.log(
-        'Login success with permissions: ' +
-        result.grantedPermissions.toString(),
-      );
-
       const fbProfile = await Profile.getCurrentProfile();
       let token = await AccessToken.getCurrentAccessToken();
-      console.log('accessToken ----', token.accessToken);
-
       setEmail(fbProfile.email);
       setFname(fbProfile.firstName);
       setLname(fbProfile.lastName);
@@ -202,7 +193,6 @@ function LoginScreen(props) {
     }
     let decodedLogin = decode(token.split('.')[1]);
     const decodedId = JSON.parse(decodedLogin);
-    console.log('decoded jti decodedId', decodedId);
     setLoading(true);
     client
       .query({
@@ -220,8 +210,6 @@ function LoginScreen(props) {
         },
       })
       .then(async result => {
-        console.log('Login response >>>>', result);
-        console.log('Login response >>>>', result.data.sSOLogin.result);
         setLoading(false);
 
         if (result.data.sSOLogin.success) {
@@ -239,7 +227,7 @@ function LoginScreen(props) {
           await AsyncStorage.setItem('userRole', resultData[3]);
           await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
           props.setUserToken(result.data.sSOLogin.result.token);
-          props.navigation.navigate('AuthLoading');
+          props.navigation.navigate('Main');
         } else {
           ToastAndroid.show(result.data.sSOLogin.message, ToastAndroid.SHORT);
         }
@@ -279,7 +267,7 @@ function LoginScreen(props) {
           userInfo.id = decoded.Id;
           await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
           props.setUserToken(result.data.oAuth.result.token);
-          props.navigation.navigate('AuthLoading');
+          props.navigation.navigate('Main');
         } else {
           ToastAndroid.show(result.data.oAuth.message, ToastAndroid.SHORT);
         }

@@ -8,6 +8,7 @@ import {
   Platform,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
+import { imagePrefix } from "../../constants/utils";
 
 export default class LoginScreen extends React.Component {
   constructor(props) {

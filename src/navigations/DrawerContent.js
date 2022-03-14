@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { ScrollView, TouchableOpacity, View, Image, Share } from 'react-native';
+import { ScrollView, TouchableOpacity, View, Image, Share, Platform, Linking } from 'react-native';
 import Colors from '../constants/colors';
 import { Card, CardItem, Text, Left, Body } from 'native-base';
 import Constant from '../constants/constant';
@@ -51,7 +51,6 @@ class DrawerContent extends Component {
         user_image: user_details.image,
       });
     }
-    console.log('hi', this.state.IsLoginData);
   };
 
   navigateToScreen = route => () => {
@@ -90,6 +89,14 @@ class DrawerContent extends Component {
         this.props.navigation.navigate(Constant.incoming_request);
         this.setState({ selectedRoute: Constant.incoming_request });
         break;
+      case Constant.give_feedback:
+      case Constant.rate_the_app:
+        if(Platform.OS === 'ios'){
+          Linking.openURL('market://details?id=myandroidappid')
+        } else if(Platform.OS === 'android'){
+          Linking.openURL('itms-apps://itunes.apple.com/us/app/ezyfind/id1611700455?mt=8')
+        }
+        break;
 
       default:
         this.props.navigation.navigate(route);
@@ -103,18 +110,17 @@ class DrawerContent extends Component {
 
   handleSignOut = async () => {
     await AsyncStorage.clear();
-    this.props.navigation.navigate('AuthLoading');
+    this.props.navigation.navigate('Main');
   };
 
   _ShareApp = async () => {
     try {
       const result = await Share.share({
-        message: 'Ezyfind',
+        message: 'https://apps.apple.com/us/app/ezyfind/id1611700455',
       });
 
       if (result.action === Share.sharedAction) {
         if (result.activityType) {
-          // shared with activity type of result.activityType
           console.log('result.activityType');
         } else {
           // shared

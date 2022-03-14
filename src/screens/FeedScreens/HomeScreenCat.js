@@ -43,8 +43,8 @@ class HomeScreenCat extends React.PureComponent {
       isListEnd: false,
       loginToken: '',
       user: '',
-      subcategoryId: this.props.route.params.categoryId,
-      categoryId: this.props.route.params.subCategoryId,
+      subcategoryId: this.props.route.params.subCategoryId,
+      categoryId: this.props.route.params.categoryId,
       starImageFilled:
         'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png',
       starImageCorner:

@@ -35,6 +35,10 @@
 	<string>635396299882798</string>
 	<key>FacebookDisplayName</key>
 	<string>EzyFind</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>itms-apps</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
