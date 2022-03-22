@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { StyleSheet, Text, View, Image, StatusBar, TouchableOpacity, TextInput, ScrollView, ToastAndroid, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, Image, StatusBar, TouchableOpacity, TextInput, ScrollView, ToastAndroid, ActivityIndicator, Platform } from 'react-native';
 import { encode } from 'base-64';
 import AsyncStorage from '@react-native-community/async-storage';
 import { connect } from 'react-redux';
@@ -97,7 +97,6 @@ function LoginScreen(props) {
       },
     );
     const apipayload = await response.json();
-    console.log(apipayload, 'apipayload----------------------------');
     setSocialId(apipayload?.id);
     setTrack(7)
     sociallogin();
@@ -121,8 +120,6 @@ function LoginScreen(props) {
 
   const { twitter, TWModal, loggedInUser, accessToken } = useTwitter({
     onSuccess: (user, accessToken) => {
-      console.log(user);
-      console.log(accessToken);
       setSocialId(user?.id);
       setTrack(6);
       sociallogin();
@@ -211,25 +208,30 @@ function LoginScreen(props) {
       })
       .then(async result => {
         setLoading(false);
-
         if (result.data.sSOLogin.success) {
           await AsyncStorage.setItem(
             'userToken',
             result.data.sSOLogin.result.token,
           );
-
           await AsyncStorage.setItem('IsLogin', 'true');
           let decoded = decode(result.data.sSOLogin.result.token.split('.')[1]);
           decoded = JSON.parse(decoded);
           let userInfo = result.data.sSOLogin.result;
           userInfo.id = decoded.Id;
           const resultData = Object.values(decoded);
-          await AsyncStorage.setItem('userRole', resultData[3]);
+          console.log(decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']);
+          await AsyncStorage.setItem('userRole', decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']);
           await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
           props.setUserToken(result.data.sSOLogin.result.token);
+          props.setUserData(userInfo);
+          props.setUserRole(decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']);
           props.navigation.navigate('Main');
         } else {
-          ToastAndroid.show(result.data.sSOLogin.message, ToastAndroid.SHORT);
+          if(Platform.OS === 'android'){
+            ToastAndroid.show(result.data.sSOLogin.message, ToastAndroid.SHORT);
+          } else {
+            alert(result.data.sSOLogin.message);
+          }
         }
       })
       .catch(err => {
@@ -413,7 +415,7 @@ function LoginScreen(props) {
               marginVertical: 15,
               alignSelf: 'center',
             }}>
-            Sign up with
+            Sign In with
           </Text>
 
           <View
@@ -507,6 +509,18 @@ const mapDispatchToProps = dispatch => ({
       payload: value,
     });
   },
+  setUserData: user => {
+    dispatch({
+      type: 'SET_USER',
+      payload: user
+    })
+  },
+  setUserRole : role => {
+    dispatch({
+      type : 'SET_USER_ROLE',
+      payload: role
+    })
+  }
 });
 
 export default connect(null, mapDispatchToProps)(LoginScreen);

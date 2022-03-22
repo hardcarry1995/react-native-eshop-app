@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { ScrollView, TouchableOpacity, View, Image, Share, Platform, Linking } from 'react-native';
+import { connect } from "react-redux";
 import Colors from '../constants/colors';
 import { Card, CardItem, Text, Left, Body } from 'native-base';
 import Constant from '../constants/constant';
@@ -34,23 +35,35 @@ class DrawerContent extends Component {
   };
 
   componentDidMount = async () => {
-    let user_info = await AsyncStorage.getItem('user_info');
-    let IsLogin = await AsyncStorage.getItem('IsLogin');
-    let userRole = await AsyncStorage.getItem('userRole');
-    this.setState({ setuserRole: userRole })
-    if (IsLogin == null) {
-      this.setState({ IsLoginData: 'false' })
+    if( Object.keys(this.props.user).length > 0){
+      this.setState({ 
+        IsLoginData : 'true',
+        user_name: this.props.user.name,
+        user_email: this.props.user.email,
+        user_image: this.props.user.image,
+      })
     } else {
-      this.setState({ IsLoginData: IsLogin })
+      let user_info = await AsyncStorage.getItem('userInfo');
+      let IsLogin = await AsyncStorage.getItem('IsLogin');
+      let userRole = await AsyncStorage.getItem('userRole');
+      this.props.setUserRole(userRole);
+      this.setState({ setuserRole: userRole })
+      if (IsLogin == null) {
+        this.setState({ IsLoginData: 'false' })
+      } else {
+        this.setState({ IsLoginData: IsLogin })
+      }
+      if (user_info) {
+        let user_details = JSON.parse(user_info);
+        this.props.setUser(user_details);
+        this.setState({
+          user_name: user_details.name,
+          user_email: user_details.email,
+          user_image: user_details.image,
+        });
+      }
     }
-    if (user_info) {
-      let user_details = JSON.parse(user_info);
-      this.setState({
-        user_name: user_details.name,
-        user_email: user_details.email,
-        user_image: user_details.image,
-      });
-    }
+    
   };
 
   navigateToScreen = route => () => {
@@ -110,6 +123,8 @@ class DrawerContent extends Component {
 
   handleSignOut = async () => {
     await AsyncStorage.clear();
+    this.props.setUser({});
+    this.props.setUserRole('');
     this.props.navigation.navigate('Main');
   };
 
@@ -194,26 +209,26 @@ class DrawerContent extends Component {
               <Left>
                 <Image
                   source={
-                    this.state.user_image
-                      ? { uri: this.state.user_image }
+                    this.props.user.image
+                      ? { uri: this.props.user.image }
                       : require('../assets/menu/User.png')
                   }
                   style={styles.img_view}
                 />
                 <Body>
                   <Text style={[{ color: '#fff' }, styles.font_applied]}>
-                    {this.state.user_name}
+                    {this.props.user.name}
                   </Text>
                   <Text
                     note
                     style={[{ color: '#fff', padding: 4, }, styles.font_applied]}>
-                    {this.state.user_email}
+                    {this.props.user.email}
                   </Text>
                 </Body>
               </Left>
             </CardItem>
           </Card>
-          {this.state.IsLoginData == 'false' &&
+          { Object.keys(this.props.user).length == 0 &&
             <View>
               <TouchableOpacity
                 onPress={this.navigateToScreen("AuthStack")}
@@ -224,7 +239,7 @@ class DrawerContent extends Component {
           }
         </View>
         <ScrollView showsVerticalScrollIndicator={false}>
-          {this.state.IsLoginData == 'true' &&
+          { Object.keys(this.props.user).length > 0 &&
             <View>
               <TouchableOpacity
                 key={'Constant.edit_profile' + 'Constant.edit_profile' + 'cont.edit_profile'}
@@ -275,37 +290,89 @@ class DrawerContent extends Component {
                   </CardItem>
                 </View>
               </TouchableOpacity>
-              {this.state.setuserRole == 'Main Business User' &&
+              {this.props.userRole == 'Main Business User' &&
+                <>
                 <TouchableOpacity
-                  key={'Constant.incoming_request' + 'Constant.incoming_request' + 'cont.incoming_request'}
-                  onPress={this.navigateToScreen(Constant.incoming_request)}
-                  activeOpacity={0.6}>
-                  <View style={{ backgroundColor: 'transparent', paddingBottom: 1 }}>
-                    <CardItem style={{ backgroundColor: 'transparent' }} transparent>
-                      <Image
-                        style={{ height: 25, width: 25, resizeMode: 'center' }}
-                        source={require('../assets/menu/clip.png')}
-                      />
-                      <Text
-                        style={[
-                          {
-                            color: '#232323',
-                            marginStart: 8,
-                            fontFamily: fontFamily.regular,
-                          },
-                          styles.font_applied,
-                        ]}>
-                        Incoming Requests
-                      </Text>
-                      {/* <Image style={{height:20, width:20}} source={require('../assets/menu/Hire.png')}/> */}
-                    </CardItem>
-                  </View>
-                </TouchableOpacity>
+                    key='my_enquiry'
+                    onPress={this.navigateToScreen("my_enquiry")}
+                    activeOpacity={0.6}>
+                    <View style={{ backgroundColor: 'transparent', paddingBottom: 1 }}>
+                      <CardItem style={{ backgroundColor: 'transparent' }} transparent>
+                        <Image
+                          style={{ height: 25, width: 25, resizeMode: 'contain' }}
+                          source={require('../assets/menu/clip.png')}
+                        />
+                        <Text
+                          style={[
+                            {
+                              color: '#232323',
+                              marginStart: 8,
+                              fontFamily: fontFamily.regular,
+                            },
+                            styles.font_applied,
+                          ]}>
+                          My Enquiry
+                        </Text>
+                        {/* <Image style={{height:20, width:20}} source={require('../assets/menu/Hire.png')}/> */}
+                      </CardItem>
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    key={'Constant.incoming_request' + 'Constant.incoming_request' + 'cont.incoming_request'}
+                    onPress={this.navigateToScreen(Constant.incoming_request)}
+                    activeOpacity={0.6}>
+                    <View style={{ backgroundColor: 'transparent', paddingBottom: 1 }}>
+                      <CardItem style={{ backgroundColor: 'transparent' }} transparent>
+                        <Image
+                          style={{ height: 25, width: 25, resizeMode: 'contain' }}
+                          source={require('../assets/menu/clip.png')}
+                        />
+                        <Text
+                          style={[
+                            {
+                              color: '#232323',
+                              marginStart: 8,
+                              fontFamily: fontFamily.regular,
+                            },
+                            styles.font_applied,
+                          ]}>
+                          Incoming Requests
+                        </Text>
+                        {/* <Image style={{height:20, width:20}} source={require('../assets/menu/Hire.png')}/> */}
+                      </CardItem>
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    key='incoming_enquiry'
+                    onPress={this.navigateToScreen('incoming_enquiry')}
+                    activeOpacity={0.6}>
+                    <View style={{ backgroundColor: 'transparent', paddingBottom: 1 }}>
+                      <CardItem style={{ backgroundColor: 'transparent' }} transparent>
+                        <Image
+                          style={{ height: 25, width: 25, resizeMode: 'contain' }}
+                          source={require('../assets/menu/clip.png')}
+                        />
+                        <Text
+                          style={[
+                            {
+                              color: '#232323',
+                              marginStart: 8,
+                              fontFamily: fontFamily.regular,
+                            },
+                            styles.font_applied,
+                          ]}>
+                          Incoming Enquiry
+                        </Text>
+                        {/* <Image style={{height:20, width:20}} source={require('../assets/menu/Hire.png')}/> */}
+                      </CardItem>
+                    </View>
+                  </TouchableOpacity>
+                </>
               }
             </View>
           }
           <View>{this.renderChannelButtons()}</View>
-          {this.state.IsLoginData == 'true' &&
+          {Object.keys(this.props.user).length > 0 &&
             <TouchableOpacity
               key={'Constant.logout' + 'Logout' + '../assets/menu/logout.png'}
               onPress={this.navigateToScreen(Constant.logout)}
@@ -371,4 +438,20 @@ const styles = {
   imageStyle: { borderRadius: 50 / 2 },
 };
 
-export default DrawerContent;
+const mapStateToProps = state => ({
+  user : state.user,
+  userRole: state.userRole
+})
+
+const mapDispatchToProps = dispatch => ({
+  setUser: user => dispatch({
+    type: 'SET_USER',
+    payload: user
+  }),
+  setUserRole: role => dispatch({
+    type: 'SET_USER_ROLE',
+    payload: role
+  })
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(DrawerContent);

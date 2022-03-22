@@ -3,6 +3,7 @@ const initialState = {
   userToken: null,
   signInMethod: '',
   refered_by:'',
+  userRole : ''
 };
 
 export default function(state = initialState, action) {
@@ -24,6 +25,11 @@ export default function(state = initialState, action) {
         ...state,
         user: action.payload,
       };
+    case 'SET_USER_ROLE':
+      return {
+        ...state,
+        userRole: action.payload
+      }
     case 'SET_METHOD':
       return {
         ...state,
