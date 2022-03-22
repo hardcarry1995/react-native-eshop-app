@@ -1,0 +1,178 @@
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator, Image, TouchableOpacity, SafeAreaView, FlatList} from 'react-native';
+import { imagePrefix } from '../../constants/utils';
+import { GET_INCOMING_ENQURIES } from '../../constants/queries';
+import AsyncStorage from '@react-native-community/async-storage';
+import client from '../../constants/client';
+import { GetRating } from '../../components/GetRating';
+import Moment from 'moment';
+
+const IncomingEnquiry = ({ navigation }) => {
+  const [data, setData] = useState([])
+  const [maxRating, setMaxrating] = useState([1, 2, 3, 4, 5,])
+  const [rating, setRating] = useState("2")
+  const [loading, setLoading] = useState(false);
+  const [isListEnd, setIsListEnd] = useState(false);
+  const [offset, setOffset] = useState(10);
+  const [isFetchedAll, setFetchedAll] = useState(false);
+
+  const starImageFilled = 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png';
+  const starImageCorner = 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png';
+
+  useEffect(() => {
+    getrequestItem();
+  }, []);
+
+  const getrequestItem = async () => {
+    let token = await AsyncStorage.getItem('userToken');
+    if (!loading && !isListEnd && !isFetchedAll) {
+      setLoading(true);
+      client
+        .mutate({
+          mutation: GET_INCOMING_ENQURIES,
+          context: {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+          variables: {
+            page: 1,
+            size: offset
+          },
+        })
+        .then(result => {
+          if (result.data.getBusinessIncomingEnquiry.success) {
+            if(result.data.getBusinessIncomingEnquiry.result.length == 0) { setFetchedAll(true);}
+            else {
+              setData((prevData) => ([...prevData, ...result.data.getBusinessIncomingEnquiry.result]));
+              setOffset(offset + 10);
+            }
+            setLoading(false);
+          } else {
+            setIsListEnd(true);
+            setLoading(false);
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    }
+  };
+
+  const renderFooter = () => {
+    return (
+      // Footer View with Loader
+      <View style={styles.footer}>
+        {loading ? (
+          <ActivityIndicator
+            color="black"
+            style={{ margin: 15 }} />
+        ) : null}
+      </View>
+    );
+  };
+
+
+  const renderItem = ({ item, index }) => (
+    <View>
+      <TouchableOpacity
+        activeOpacity={0.9}
+        onPress={() => {}}>
+        <View style={styles.main}>
+          <View style={{ width: "22%", justifyContent: "center" }}>
+            <Image
+              style={styles.image}
+              source={item.itemImagePath ? { uri: `${imagePrefix}${item.itemImagePath}` } : require('../../assets/NoImage.jpeg')}
+            />
+          </View>
+          <View style={{ width: 2, backgroundColor: '#D0D0D0', height: "80%", alignSelf: "center" }}
+          />
+
+          <View style={{ width: "77%", paddingVertical : 10 }}>
+            <Text style={styles.text}>
+              {item.enquiryTitle}
+            </Text>
+            <Text numberOfLines={3} style={styles.description}>
+              {item.enquiryDescription}
+            </Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+    </View>
+  );
+
+
+  return (
+    <SafeAreaView>
+      <FlatList
+        data={data}
+        keyExtractor={(item, i) => i}
+        ListFooterComponent={renderFooter}
+        renderItem={renderItem}
+        onEndReached={getrequestItem}
+        onEndReachedThreshold={0.5}
+      />
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  main: {
+    height: 100,
+    backgroundColor: 'white',
+    borderRadius: 15,
+    shadowRadius: 20,
+    elevation: 8,
+    marginLeft: 16,
+    marginRight: 16,
+    marginTop: 20,
+    flexDirection: "row",
+  },
+  image: {
+    height: 65,
+    width: 65,
+    marginLeft: 5,
+    resizeMode: 'contain',
+  },
+  text: {
+    marginLeft: 10,
+    color: '#323232',
+    fontWeight: 'bold',
+  },
+  description: {
+    color: '#323232',
+    fontSize: 11,
+    marginLeft: 10,
+    marginTop : 10,
+    lineHeight : 16
+  },
+  SectionStyle: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderWidth: 2,
+    borderColor: '#F54D30',
+    height: 43,
+    borderRadius: 5,
+    margin: 15,
+  },
+
+  ImageStyle: {
+    padding: 10,
+    margin: 5,
+    height: 20,
+    width: 20,
+    resizeMode: 'stretch',
+    alignItems: 'center',
+  },
+  starImageStyle: {
+    width: 20,
+    height: 20,
+  },
+});
+
+export default IncomingEnquiry;

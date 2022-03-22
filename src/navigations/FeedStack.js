@@ -16,6 +16,8 @@ import VideoRecord from "../components/VideoRecord";
 import FeedDetails from "../screens/FeedScreens/FeedDetails";
 import FeedComments from "../screens/FeedScreens/FeedComments";
 import EditFeed from "../screens/FeedScreens/EditFeed";
+import IncomingEnquiry from "../screens/MyRequestScreens/IncomingEnquiry";
+import MyEnquiry from "../screens/MyRequestScreens/MyEnquiry";
 import ScreenOptionsWithBack from "../components/ScreenOptionsWithBack";
 import ScreenOptions from "../components/ScreenOptions";
 
@@ -40,6 +42,8 @@ function FeedStack() {
       <Stack.Screen name="FeedDetails" component={FeedDetails} options={ScreenOptionsWithBack} />
       <Stack.Screen name="FeedComments" component={FeedComments} options={ScreenOptionsWithBack} />
       <Stack.Screen name="EditFeed" component={EditFeed} options={ScreenOptionsWithBack} />
+      <Stack.Screen name="IncomingEnquiry" component={IncomingEnquiry} options={ScreenOptions}  />
+      <Stack.Screen name="MyEnquiry" component={MyEnquiry} options={ScreenOptions}  />
     </Stack.Navigator>
   )
 }

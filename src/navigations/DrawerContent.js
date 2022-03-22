@@ -102,6 +102,14 @@ class DrawerContent extends Component {
         this.props.navigation.navigate(Constant.incoming_request);
         this.setState({ selectedRoute: Constant.incoming_request });
         break;
+      case "incoming_enquiry": 
+        this.props.navigation.navigate(Constant.feed, { screen: "IncomingEnquiry" });
+        this.setState({ selectedRoute: "IncomingEnquiry" });
+        break;
+      case "my_enquiry" : 
+        this.props.navigation.navigate(Constant.feed, { screen: "MyEnquiry" });
+        this.setState({ selectedRoute: "MyEnquiry" });
+        break;
       case Constant.give_feedback:
       case Constant.rate_the_app:
         if(Platform.OS === 'ios'){
@@ -207,14 +215,7 @@ class DrawerContent extends Component {
           <Card style={{ flex: 0, backgroundColor: 'transparent', marginLeft: 54 }} transparent>
             <CardItem style={{ backgroundColor: 'transparent' }} transparent>
               <Left>
-                <Image
-                  source={
-                    this.props.user.image
-                      ? { uri: this.props.user.image }
-                      : require('../assets/menu/User.png')
-                  }
-                  style={styles.img_view}
-                />
+                <Image source={ this.props.user.image ? { uri: this.props.user.image } : require('../assets/menu/User.png') } style={styles.img_view} />
                 <Body>
                   <Text style={[{ color: '#fff' }, styles.font_applied]}>
                     {this.props.user.name}
@@ -251,15 +252,7 @@ class DrawerContent extends Component {
                       style={{ height: 25, width: 25, resizeMode: 'contain' }}
                       source={require('../assets/menu/User.png')}
                     />
-                    <Text
-                      style={[
-                        {
-                          color: '#232323',
-                          marginStart: 8,
-                          fontFamily: fontFamily.regular,
-                        },
-                        styles.font_applied,
-                      ]}>
+                    <Text style={{ color: '#232323', marginStart: 8, fontFamily: fontFamily.regular }}>
                       Profile
                     </Text>
                   </CardItem>
@@ -275,24 +268,13 @@ class DrawerContent extends Component {
                       style={{ height: 25, width: 25, resizeMode: 'contain' }}
                       source={require('../assets/menu/clip.png')}
                     />
-                    <Text
-                      style={[
-                        {
-                          color: '#232323',
-                          marginStart: 8,
-                          fontFamily: fontFamily.regular,
-                        },
-                        styles.font_applied,
-                      ]}>
+                    <Text style={ { color: '#232323', marginStart: 8, fontFamily: fontFamily.regular}}>
                       My Request
                     </Text>
-                    {/* <Image style={{height:20, width:20}} source={require('../assets/menu/Hire.png')}/> */}
                   </CardItem>
                 </View>
               </TouchableOpacity>
-              {this.props.userRole == 'Main Business User' &&
-                <>
-                <TouchableOpacity
+              <TouchableOpacity
                     key='my_enquiry'
                     onPress={this.navigateToScreen("my_enquiry")}
                     activeOpacity={0.6}>
@@ -302,21 +284,14 @@ class DrawerContent extends Component {
                           style={{ height: 25, width: 25, resizeMode: 'contain' }}
                           source={require('../assets/menu/clip.png')}
                         />
-                        <Text
-                          style={[
-                            {
-                              color: '#232323',
-                              marginStart: 8,
-                              fontFamily: fontFamily.regular,
-                            },
-                            styles.font_applied,
-                          ]}>
+                        <Text style={{ color: '#232323', marginStart: 8, fontFamily: fontFamily.regular }}>
                           My Enquiry
                         </Text>
-                        {/* <Image style={{height:20, width:20}} source={require('../assets/menu/Hire.png')}/> */}
                       </CardItem>
                     </View>
                   </TouchableOpacity>
+              {this.props.userRole == 'Main Business User' &&
+                <>
                   <TouchableOpacity
                     key={'Constant.incoming_request' + 'Constant.incoming_request' + 'cont.incoming_request'}
                     onPress={this.navigateToScreen(Constant.incoming_request)}
@@ -329,20 +304,15 @@ class DrawerContent extends Component {
                         />
                         <Text
                           style={[
-                            {
-                              color: '#232323',
-                              marginStart: 8,
-                              fontFamily: fontFamily.regular,
-                            },
+                            {color: '#232323',marginStart: 8,fontFamily: fontFamily.regular},
                             styles.font_applied,
                           ]}>
                           Incoming Requests
                         </Text>
-                        {/* <Image style={{height:20, width:20}} source={require('../assets/menu/Hire.png')}/> */}
                       </CardItem>
                     </View>
                   </TouchableOpacity>
-                  <TouchableOpacity
+                  <TouchableOpacity 
                     key='incoming_enquiry'
                     onPress={this.navigateToScreen('incoming_enquiry')}
                     activeOpacity={0.6}>
@@ -352,18 +322,9 @@ class DrawerContent extends Component {
                           style={{ height: 25, width: 25, resizeMode: 'contain' }}
                           source={require('../assets/menu/clip.png')}
                         />
-                        <Text
-                          style={[
-                            {
-                              color: '#232323',
-                              marginStart: 8,
-                              fontFamily: fontFamily.regular,
-                            },
-                            styles.font_applied,
-                          ]}>
+                        <Text style={{ color: '#232323', marginStart: 8, fontFamily: fontFamily.regular }}>
                           Incoming Enquiry
                         </Text>
-                        {/* <Image style={{height:20, width:20}} source={require('../assets/menu/Hire.png')}/> */}
                       </CardItem>
                     </View>
                   </TouchableOpacity>
@@ -383,18 +344,9 @@ class DrawerContent extends Component {
                     style={{ height: 25, width: 25, resizeMode: 'center' }}
                     source={require('../assets/menu/logout.png')}
                   />
-                  <Text
-                    style={[
-                      {
-                        color: '#232323',
-                        marginStart: 8,
-                        fontFamily: fontFamily.regular,
-                      },
-                      styles.font_applied,
-                    ]}>
+                  <Text style={{ color: '#232323', marginStart: 8, fontFamily: fontFamily.regular }}>
                     Logout
                   </Text>
-                  {/* <Image style={{height:20, width:20}} source={require('../assets/menu/Hire.png')}/> */}
                 </CardItem>
               </View>
             </TouchableOpacity>
@@ -431,7 +383,6 @@ const styles = {
   signupText: {
     fontSize: 10,
     color: 'gray',
-    // alignSelf:'center'
     marginLeft: 30
   },
 

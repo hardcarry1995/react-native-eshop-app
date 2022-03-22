@@ -759,6 +759,39 @@ query GetRequestList($size: Int!) {
  }
 `;
 
+export const ENEQUIRY_ITEM_GET = gql`
+ query GetEnquiryList($size: Int!){
+  getCustomerEnquiryList(    
+    page: 1,
+    size: $size
+  ){
+    count,
+    currentPage,
+    message,
+    nextPage,
+    prevPage,
+    success,
+    totalPages,
+    result{
+       companyId,  
+      enquiryTitle,
+      enquiryDescription
+      mstCustomerEnquiryResponse{        
+        comment,
+        responseDate
+      }  
+       mapCustomerEnquiryUpload{        
+        customerEnquiryId,
+        uploadPath,
+        thumbNailPath
+      }  
+
+    }
+    
+  }
+}
+`;
+
 export const REQUEST_ITEM_GET_INCOMING = gql`
 query GetRequestList($size: Int!) {
   getIncomingItemRequestList(
@@ -811,6 +844,38 @@ query GetRequestList($size: Int!) {
     }
   }
 `;
+
+export const GET_INCOMING_ENQURIES = gql`
+query GetBusinessIncommingEnquries($page: Int!, $size: Int!){
+  getBusinessIncomingEnquiry(    
+    page: $page,
+    size: $size
+  ){
+    count,
+    currentPage,
+    message,
+    nextPage,
+    prevPage,
+    success,
+    totalPages,
+    result{
+        customerEnquiryId,
+       companyId,  
+      enquiryTitle,
+      enquiryDescription
+      mstCustomerEnquiryResponse{        
+        comment,
+        responseDate
+      }  
+       mapCustomerEnquiryUpload{        
+        customerEnquiryId,
+        uploadPath,
+        thumbNailPath
+      }  
+
+    }
+  }
+}`;
 
 export const GET_BUSINESS = gql`
 query GetBusinessList($size: Int!){
