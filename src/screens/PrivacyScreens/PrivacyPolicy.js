@@ -198,14 +198,17 @@ export default class PrivacyPolicy extends React.Component {
     this.setState({ hireData: item, quantity : 1 })
   }
 
-  getAllHireProduct = (Token) => {
+  getAllHireProduct = (Token, catIds = '') => {
     client
-      .mutate({
-        mutation: GET_ALL_HIRE_PRODUCT,
+      .query({
+        query: GET_ALL_HIRE_PRODUCT,
+        fetchPolicy: 'no-cache',
+        variables: {
+          categories: catIds
+        },
         context: {
           headers: {
             Authorization: `Bearer ${Token}`,
-            'Content-Length': 0,
           },
         },
       })
@@ -322,7 +325,16 @@ export default class PrivacyPolicy extends React.Component {
 
   filterItems = (keyword) => {
     this.setState({ searchText: keyword});
-    this._filter(keyword, this.state.categoriesForSearch);
+    let filtered = [...this.state.data];
+    if(keyword !== ""){
+      filtered = filtered.filter(item => item.productName.toLowerCase().includes(keyword.toLowerCase()));
+    }
+    this.setState((prevState) => {
+      return {
+        ...prevState,
+        filteredData : filtered
+      }
+    })
   }
 
   renderAmount = () => {
@@ -342,31 +354,18 @@ export default class PrivacyPolicy extends React.Component {
 
   _onSelectCategoryDone = (categories) => {
     this.setState({ categoriesForSearch: categories, showCategorySelector : false});
-    this._filter(this.state.searchText, categories);
+    this._filterByCategory(categories);
   } 
 
   _onPressSelectedCategory = (item) => {
     const items = this.state.categoriesForSearch.filter((cat) => cat.categoryId != item.categoryId);
     this.setState({ categoriesForSearch: items});
-    this._filter(this.state.searchText, items);
+    this._filterByCategory(items);
   }
 
-  _filter = (keyword, categories) => {
-    let filtered = [...this.state.data];
-    if(keyword !== ""){
-      filtered = filtered.filter(item => item.productName.toLowerCase().includes(keyword.toLowerCase()));
-    }
-    if(categories.length > 0){
-      const catIds = categories.map(cat => cat.categoryId);
-      filtered = filtered.filter(item => catIds.includes(item.categoryID));
-    }
-
-    this.setState((prevState) => {
-      return {
-        ...prevState,
-        filteredData : filtered
-      }
-    })
+  _filterByCategory = (categories) => {
+      const catIds = categories.map(cat => cat.categoryId).join(",");
+     this.getAllHireProduct(this.state.userTokenData, catIds);
   }
 
   render() {

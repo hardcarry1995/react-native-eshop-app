@@ -147,12 +147,12 @@ export const SPECIAL_PRODUCT_LIST_WITH_DISTANCE = gql`
 `;
 
 export const GET_PRODUCT = gql`
-query GetPrdProductList($size: Int!) {
+query GetPrdProductList($size: Int!, $categories: String = null) {
     getPrdProductList(
        productName: null,
        productId: null,
        categoryId: null,
-       domainCategoryIds:null,
+       domainCategoryIds:$categories,
        status: null,
        salesTypeId: null,
        scopeId:null,
@@ -1794,12 +1794,12 @@ export const ADD_CUSTOMER_ENQUIRY = gql`
 `;
 
 export const GET_BID_ALL_PRODUCT = gql`
-{
+query GetPrdProductList( $categories: String = null){
   getPrdProductList(
      productName: null,
      productId: null,
      categoryId: null,
-     domainCategoryIds:null,
+     domainCategoryIds:$categories,
      status: null,
      salesTypeId: 2,
      scopeId:null,
@@ -1886,12 +1886,12 @@ export const BID_ON_PRODUCT = gql`
 
 
 export const GET_ALL_HIRE_PRODUCT = gql`
-{
+query GetPrdProductList( $categories: String = null) {
   getPrdProductList(
      productName: null,
      productId: null,
      categoryId: null,
-     domainCategoryIds:null,
+     domainCategoryIds:$categories,
      status: null,
      salesTypeId: 3,
      scopeId:null,

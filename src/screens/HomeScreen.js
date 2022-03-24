@@ -270,8 +270,9 @@ class HomeScreen extends Component {
 
   handleSearch = (text) => {
     this.setState({ textnew: text });
-    this._filter(text, this.state.categoriesForSearch);
-    
+    let vdata = this.state.dataEMP.filter(i =>
+      i.productName.toLowerCase().includes(text.toLowerCase()))
+    this.setState({ data: vdata });
     // let vcdata = this.state.specialData.filter(i =>
     //   i.specialName.toLowerCase().includes(text.toLowerCase()))
     // this.setState({ special_data: vcdata });
@@ -312,13 +313,15 @@ class HomeScreen extends Component {
     this.fetchSpecialProduct(token);
 
   }
-  fetchProducts(token) {
+
+  fetchProducts(token, categories = null) {
     this.setState({ loading: true });
     client
       .query({
         query: GET_PRODUCT,
         variables: {
           size: this.state.size,
+          categories : categories
         },
         context: {
           headers: {
@@ -328,15 +331,17 @@ class HomeScreen extends Component {
       })
       .then(result => {
         if (result.data.getPrdProductList.result.length > 0) {
-          this.setState({ data: result.data.getPrdProductList.result });
           this.setState({ dataEMP: result.data.getPrdProductList.result });
+          let data = result.data.getPrdProductList.result ;
+          if(this.state.textnew !== ""){
+            data = data.filter(i => i.productName.toLowerCase().includes(this.state.textnew.toLowerCase()))
+          }
+          this.setState({ data: data });
           this.addCounrty(result.data.getPrdProductList.result);
           this.setState({ loading: false });
         } else {
-          ToastAndroid.show(
-            result.data.getPrdProductList.message,
-            ToastAndroid.SHORT,
-          );
+          this.setState({ dataEMP: [] });
+          this.setState({ data: [] });
           this.setState({ isListEnd: true });
           this.setState({ loading: false });
         }
@@ -366,12 +371,14 @@ class HomeScreen extends Component {
   fetchProductsNext() {
     if (!this.loading && !this.isListEnd) {
       this.setState({ loading: true });
+      const catIds = this.state.categoriesForSearch.map(cat => cat.categoryId).join(",");
       client
         .query({
           query: GET_PRODUCT,
           fetchPolicy: 'no-cache',
           variables: {
             size: this.state.size,
+            categories: catIds
           },
           context: {
             headers: {
@@ -533,31 +540,22 @@ class HomeScreen extends Component {
 
   _onSelectCategoryDone = (categories) => {
     this.setState({ categoriesForSearch: categories, showCategorySelector : false});
-    this._filter(this.state.textnew, categories);
+    this._filterByCategory(categories);
   } 
 
   _onPressSelectedCategory = (item) => {
     const items = this.state.categoriesForSearch.filter((cat) => cat.categoryId != item.categoryId);
     this.setState({ categoriesForSearch: items});
-    this._filter(this.state.textnew, items);
+    this._filterByCategory(items);
   }
 
-  _filter = (keyword, categories) => {
-    let filtered = [...this.state.dataEMP];
-    if(keyword !== ""){
-      filtered = filtered.filter(i => i.productName.toLowerCase().includes(keyword.toLowerCase()))
-    }
+  _filterByCategory = (categories) => {
     if(categories.length > 0){
-      const catIds = categories.map(cat => cat.categoryId);
-      filtered = filtered.filter(item => catIds.includes(item.categoryID));
+      const catIds = categories.map(cat => cat.categoryId).join(",");
+      this.fetchProducts(this.state.loginToken, catIds);
+    } else {
+      this.fetchProducts(this.state.loginToken);
     }
-
-    this.setState((prevState) => {
-      return {
-        ...prevState,
-        data : filtered
-      }
-    })
   }
 
   render() {

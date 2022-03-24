@@ -1,18 +1,5 @@
 import React from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  StatusBar,
-  TouchableOpacity,
-  TextInput,
-  ActivityIndicator,
-  FlatList,
-  ToastAndroid,
-  ScrollView,
-  Alert
-} from 'react-native';
+import { StyleSheet, Text, View, Image, StatusBar, TouchableOpacity, TextInput, ActivityIndicator, FlatList, ToastAndroid, ScrollView, Alert} from 'react-native';
 import CountDown from 'react-native-countdown-component';
 import { imagePrefix } from '../constants/utils';
 import { GetRating } from '../components/GetRating';
@@ -22,6 +9,9 @@ import client from '../constants/client';
 import Constants from "../constants/constant";
 import Moment from 'moment';
 import RNPickerSelect from 'react-native-picker-select';
+import CategorySelector from "../components/CategorySelector";
+import { Chip } from "react-native-elements";
+import ProductSearchInput from "../components/ProductSearchInput";
 
 const filterItems = [
   { label: 'Purchase', value: 'Buy' },
@@ -48,7 +38,9 @@ export default class SettingsScreen extends React.Component {
         'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png',
       starImageCorner:
         'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png',
-
+      showCategorySelector: false,
+      categoriesForSearch : [],
+      searchText : ""
     };
   }
 
@@ -59,17 +51,10 @@ export default class SettingsScreen extends React.Component {
     let token = await AsyncStorage.getItem('userToken');
     let userInfo = await AsyncStorage.getItem('userInfo');
     let IsLogin = await AsyncStorage.getItem('IsLogin');
-    this.setState({
-      userInfo: JSON.parse(userInfo),
-    });
-    this.setState({
-      userTokenData: token
-    });
-    this.setState({
-      userIsLogin: IsLogin
-    });
+    this.setState({ userInfo: JSON.parse(userInfo) });
+    this.setState({ userTokenData: token });
+    this.setState({ userIsLogin: IsLogin });
     this.getAllBidProduct(token);
-    console.log('token', token);
   }
   async addToFavourites(item) {
     console.log('addToFavourites', item)
@@ -184,21 +169,23 @@ export default class SettingsScreen extends React.Component {
     );
 
   };
-  getAllBidProduct = (Token) => {
+  getAllBidProduct = (Token, catIds = '') => {
     client
-      .mutate({
-        mutation: GET_BID_ALL_PRODUCT,
+      .query({
+        query: GET_BID_ALL_PRODUCT,
+        fetchPolicy: 'no-cache',
+        variables: {
+          categories: catIds
+        },
         context: {
           headers: {
             Authorization: `Bearer ${Token}`,
-            'Content-Length': 0,
           },
         },
       })
       .then(result => {
         this.setState({ cartLoading: false });
         if (result.data.getPrdProductList.success) {
-          console.log(result.data.getPrdProductList.result[0].prdBid);
           this.setState({ data: result.data.getPrdProductList.result })
           this.setState({ setAllcartcount: result.data.getPrdProductList.count })
         }
@@ -490,6 +477,34 @@ export default class SettingsScreen extends React.Component {
       </View>
     );
   }
+  filterItems = (keyword) => {
+    this.setState({ searchText: keyword});
+    let filtered = [...this.state.data];
+    if(keyword !== ""){
+      filtered = filtered.filter(item => item.productName.toLowerCase().includes(keyword.toLowerCase()));
+    }
+    this.setState((prevState) => {
+      return {
+        ...prevState,
+        filteredData : filtered
+      }
+    })
+  }
+  _onSelectCategoryDone = (categories) => {
+    this.setState({ categoriesForSearch: categories, showCategorySelector : false});
+    this._filterByCategory(categories);
+  } 
+
+  _onPressSelectedCategory = (item) => {
+    const items = this.state.categoriesForSearch.filter((cat) => cat.categoryId != item.categoryId);
+    this.setState({ categoriesForSearch: items});
+    this._filterByCategory(items);
+  }
+
+  _filterByCategory = (categories) => {
+      const catIds = categories.map(cat => cat.categoryId).join(",");
+     this.getAllBidProduct(this.state.userTokenData, catIds);
+  }
 
   render() {
     return (
@@ -500,23 +515,27 @@ export default class SettingsScreen extends React.Component {
           barStyle="dark-content"
         />
         <ScrollView style={{ padding: 5, flex: 1 }}>
-          <View style={styles.textinput}>
-            <Image
-              source={require('../assets/search.png')}
-              resizeMode="contain"
-              style={{
-                height: 20,
-                width: 20,
-                marginTop: 10,
-                marginLeft: 10,
-              }}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Search Products"
-              underlineColorAndroid="transparent"
-            />
-          </View>
+          <ProductSearchInput 
+            onChangeText={(search) => this.filterItems(search)} 
+            onPressFilterIcon={() => this.setState({ showCategorySelector : true})} 
+          />
+          {this.state.categoriesForSearch.length > 0 && <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom : 20, paddingHorizontal : 10 }}>
+            {this.state.categoriesForSearch.map(item => (
+              <Chip 
+                title={item.categoryName}
+                icon={{
+                  name: 'close',
+                  type: 'font-awesome',
+                  size: 14,
+                  color: 'white',
+                }}
+                onPress={() => this._onPressSelectedCategory(item)}
+                iconRight
+                titleStyle={{ fontSize: 10 }}
+                buttonStyle={{ backgroundColor: '#F54D30', marginBottom: 5}}
+              />
+            ))}
+          </View>}
           <View>
             <RNPickerSelect
               value={this.state.user}
@@ -549,6 +568,10 @@ export default class SettingsScreen extends React.Component {
             />
           </View>
         </ScrollView>
+        <CategorySelector 
+          visible={this.state.showCategorySelector} 
+          onDone={(values) => this._onSelectCategoryDone(values)}
+        />
       </View>
     );
   }
