@@ -23,7 +23,7 @@ import WorkInProgress from "../screens/WorkInProgress";
 import TabBar from "./BottomTabBar";
 // HomeStack Screens
 import HomeScreen from "../screens/HomeScreen";
-import Filter from "../screens/Filter";
+import ProductDetail from "../screens/ProductDetail";
 // ProductStack screens
 import ProductScreen from "../screens/ProductScreen";
 
@@ -58,7 +58,7 @@ const HomeStack = () => (
     <Stack.Screen name="Home" component={HomeScreen} />
     <Stack.Screen
       name="Filter"
-      component={Filter}
+      component={ProductDetail}
       options={({ navigation }) => ({
         headerStyle: textHeader.header_style,
         headerRight: () => (

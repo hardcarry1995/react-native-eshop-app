@@ -291,14 +291,14 @@ query GetPrdProductList($size: Int!) {
 `;
 
 export const ADD_TO_CART = gql`
-  mutation AddToCart($pid: Int!,$userid: Int!,$dateCreated: DateTime) {
+  mutation AddToCart($pid: Int!,$userid: Int!,$dateCreated: DateTime, $fromDate: String = null, $endDate: String = null, $quantity: Int = 1) {
     postPrdShoppingCartOptimized(
       prdShoppingCart: {
         productId: $pid
         dateCreated: $dateCreated
-        quantity: 1
-        fromDate: null
-        endDate: null
+        quantity: $quantity
+        fromDate: $fromDate
+        endDate: $endDate
         userId: $userid
       }
     ) {
@@ -331,6 +331,8 @@ export const ADD_TO_CART = gql`
     }
   }
 `;
+
+
 export const ADD_TO_CART_NULL = gql`
   mutation AddToCart($pid: Int!, $dateCreated: DateTime) {
       postPrdShoppingCartOptimized(
@@ -1103,7 +1105,28 @@ query GetRating($id: Int){
     }
   }
 }`
-  ;
+
+export const GET_PRODUCT_RATING = gql`
+query GetProductRating($id: Int){
+  getMstRatingScoreList(key:$id,keyType:4,page:1,size:10){
+    count,
+    currentPage,
+    message,
+    nextPage,
+    prevPage,
+    success,
+    totalPages,
+    result{
+      ratingScore,
+      ratingScoreName,
+      ratingScoreCount,
+      ratingScorePercent,
+      totalRatingCount,
+      totalRatingScore
+    }
+  }
+}`;
+
 export const GET_SPECIAL = gql`
 query GetSpecialList($size: Int!){
   getMstSpecialList(

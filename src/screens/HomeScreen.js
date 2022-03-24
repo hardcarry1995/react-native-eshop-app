@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, FlatList, ActivityIndicator, ToastAndroid, Linking } from 'react-native';
+import { StyleSheet, Text, View, FlatList, ActivityIndicator, ToastAndroid, Linking, Platform } from 'react-native';
 import NetInfo from "@react-native-community/netinfo";
 import AsyncStorage from '@react-native-community/async-storage';
 import RNPickerSelect from 'react-native-picker-select';
@@ -15,9 +15,10 @@ import DeepLinking from 'react-native-deep-linking';
 import setGet from '../utils/setGet';
 import ProductCard from '../components/ProductCard';
 import ProductSearchInput from '../components/ProductSearchInput';
+import CategorySelector from "../components/CategorySelector";
+import { Chip } from "react-native-elements";
 
 class HomeScreen extends Component {
-
   constructor(props) {
     super(props);
     SQLite.DEBUG = true;
@@ -30,7 +31,7 @@ class HomeScreen extends Component {
       loading: false,
       userInfo: {},
       cartLoading: false,
-      textnew: [],
+      textnew: "",
       dataEMP: [],
       SQLiteProduct: [],
       specialData: [],
@@ -51,6 +52,8 @@ class HomeScreen extends Component {
         'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png',
       starImageCorner:
         'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png',
+      showCategorySelector: false,
+      categoriesForSearch : []
 
     };
     this.linkingUrlSub = null;
@@ -267,12 +270,11 @@ class HomeScreen extends Component {
 
   handleSearch = (text) => {
     this.setState({ textnew: text });
-    let vdata = this.state.dataEMP.filter(i =>
-      i.productName.toLowerCase().includes(text.toLowerCase()))
-    this.setState({ data: vdata });
-    let vcdata = this.state.specialData.filter(i =>
-      i.specialName.toLowerCase().includes(text.toLowerCase()))
-    this.setState({ special_data: vcdata });
+    this._filter(text, this.state.categoriesForSearch);
+    
+    // let vcdata = this.state.specialData.filter(i =>
+    //   i.specialName.toLowerCase().includes(text.toLowerCase()))
+    // this.setState({ special_data: vcdata });
   };
 
   EmptyListMessage = ({ item }) => {
@@ -284,14 +286,16 @@ class HomeScreen extends Component {
     );
   };
   fetchMoreUsers = () => {
-    this.setState(
-      prevState => ({
-        size: prevState.size + 10,
-      }),
-      () => {
-        this.fetchProductsNext();
-      },
-    );
+    if(this.state.textnew == ""){
+      this.setState(
+        prevState => ({
+          size: prevState.size + 10,
+        }),
+        () => {
+          this.fetchProductsNext();
+        },
+      );
+    }
   };
 
   async fetchToken() {
@@ -440,7 +444,11 @@ class HomeScreen extends Component {
         })
         .then(result => {
           if (result.data.createMstFavourites.mstFavouriteId) {
-            ToastAndroid.show('Product added to Favourites', ToastAndroid.SHORT);
+            if(Platform.OS == "android"){
+              ToastAndroid.show('Product added to Favourites', ToastAndroid.SHORT);
+            } else if(Platform.OS == "ios"){
+              alert('Product added to Favourites');
+            }
           }
         })
         .catch(err => {
@@ -523,11 +531,61 @@ class HomeScreen extends Component {
     />
   );
 
+  _onSelectCategoryDone = (categories) => {
+    this.setState({ categoriesForSearch: categories, showCategorySelector : false});
+    this._filter(this.state.textnew, categories);
+  } 
+
+  _onPressSelectedCategory = (item) => {
+    const items = this.state.categoriesForSearch.filter((cat) => cat.categoryId != item.categoryId);
+    this.setState({ categoriesForSearch: items});
+    this._filter(this.state.textnew, items);
+  }
+
+  _filter = (keyword, categories) => {
+    let filtered = [...this.state.dataEMP];
+    if(keyword !== ""){
+      filtered = filtered.filter(i => i.productName.toLowerCase().includes(keyword.toLowerCase()))
+    }
+    if(categories.length > 0){
+      const catIds = categories.map(cat => cat.categoryId);
+      filtered = filtered.filter(item => catIds.includes(item.categoryID));
+    }
+
+    this.setState((prevState) => {
+      return {
+        ...prevState,
+        data : filtered
+      }
+    })
+  }
+
   render() {
     return (
       <View style={styles.container}>
         <View style={{ paddingBottom: 30, flex: 1 }}>
-          <ProductSearchInput onChangeText={(value) => this.handleSearch(value)} onPressFilterIcon={() => this.props.navigation.navigate('CategoryStack')} />
+          <ProductSearchInput 
+            onChangeText={(value) => this.handleSearch(value)} 
+            onPressFilterIcon={() => this.setState({ showCategorySelector : true})} />
+
+          {this.state.categoriesForSearch.length > 0 && <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom : 20, paddingHorizontal : 10}}>
+            {this.state.categoriesForSearch.map(item => (
+              <Chip 
+                title={item.categoryName}
+                icon={{
+                  name: 'close',
+                  type: 'font-awesome',
+                  size: 14,
+                  color: 'white',
+                }}
+                onPress={() => this._onPressSelectedCategory(item)}
+                iconRight
+                titleStyle={{ fontSize: 10 }}
+                buttonStyle={{ backgroundColor: '#F54D30', marginBottom: 5}}
+              />
+            ))}
+          </View>}
+          
           <RNPickerSelect
             value={this.state.user}
             onValueChange={this.updateUser}
@@ -550,6 +608,9 @@ class HomeScreen extends Component {
               )
             }}
             ListHeaderComponent={() => {
+              if(this.state.special_data.length === 0){
+                return null;
+              }
               return (
                 <View style={{ padding: 5, flex: 1 }}>
                   <Text style={styles.sectionLabel}> SPECIAL PRODUCTS </Text>
@@ -565,6 +626,10 @@ class HomeScreen extends Component {
             onEndReachedThreshold={0.5}
           />
         </View>
+        <CategorySelector 
+          visible={this.state.showCategorySelector} 
+          onDone={(values) => this._onSelectCategoryDone(values)}
+        />
       </View>
     );
   }

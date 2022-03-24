@@ -1,19 +1,5 @@
 import React from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  StatusBar,
-  TouchableOpacity,
-  TextInput,
-  FlatList,
-  ActivityIndicator,
-  ToastAndroid,
-  Modal,
-  ScrollView,
-} from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import { StyleSheet, Text, View, Image, StatusBar, TouchableOpacity, TextInput, FlatList, ActivityIndicator, ToastAndroid, Modal, ScrollView } from 'react-native';
 import DatePicker from 'react-native-datepicker';
 import { imagePrefix } from '../../constants/utils';
 import { GetRating } from '../../components/GetRating';
@@ -25,6 +11,9 @@ import Moment from 'moment';
 import { Alert } from 'react-native';
 import { Icon } from 'native-base';
 import RNPickerSelect from 'react-native-picker-select';
+import ProductSearchInput from "../../components/ProductSearchInput";
+import CategorySelector from "../../components/CategorySelector";
+import { Chip } from "react-native-elements";
 
 const filterItems = [
   { label: 'Purchase', value: 'Buy' },
@@ -40,6 +29,7 @@ export default class PrivacyPolicy extends React.Component {
       userInfo: [],
       userTokenData: '',
       data: [],
+      filteredData : [],
       userIsLogin: 'false',
       bidIdicator: false,
       amount: '',
@@ -50,12 +40,13 @@ export default class PrivacyPolicy extends React.Component {
       toDate: Moment().format('YYYY-MM-DD'),
       todayDate: '',
       totalDuration: '0',
+      searchText : "",
+      quantity : 1,
       maxRating: [1, 2, 3, 4, 5],
-      starImageFilled:
-        'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png',
-      starImageCorner:
-        'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png',
-
+      starImageFilled: 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png',
+      starImageCorner: 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png',
+      showCategorySelector: false,
+      categoriesForSearch : []
     };
   }
 
@@ -64,24 +55,18 @@ export default class PrivacyPolicy extends React.Component {
     const todayDate = Moment().format('YYYY-MM-DD');
     this.setState({ todayDate: todayDate })
   }
+
   async fetchToken() {
     let token = await AsyncStorage.getItem('userToken');
     let userInfo = await AsyncStorage.getItem('userInfo');
     let IsLogin = await AsyncStorage.getItem('IsLogin');
-    this.setState({
-      userInfo: JSON.parse(userInfo),
-    });
-    this.setState({
-      userTokenData: token
-    });
-    this.setState({
-      userIsLogin: IsLogin
-    });
+    this.setState({ userInfo: JSON.parse(userInfo) });
+    this.setState({ userTokenData: token });
+    this.setState({ userIsLogin: IsLogin });
     this.getAllHireProduct(token);
-    console.log('hire token', token);
   }
+
   async addToFavourites(item) {
-    console.log('addToFavourites', item)
     let IsLogin = await AsyncStorage.getItem('IsLogin');
     let token = await AsyncStorage.getItem('userToken');
     if (IsLogin !== 'true') {
@@ -98,12 +83,10 @@ export default class PrivacyPolicy extends React.Component {
           context: {
             headers: {
               Authorization: `Bearer ${token}`,
-              // 'Content-Length': 0,
             },
           },
         })
         .then(result => {
-          console.log('result>>>>>', result)
           if (result.data.createMstFavourites.mstFavouriteId) {
             ToastAndroid.show('Product added to Favourites', ToastAndroid.SHORT);
           }
@@ -113,9 +96,8 @@ export default class PrivacyPolicy extends React.Component {
         });
     }
   }
+
   hireTheProduct(visible) {
-    // this.setModalVisible(!modalVisible)
-    console.log('data', this.state.hireData);
     if (this.state.fromDate === '' || this.state.fromDate === undefined) {
       ToastAndroid.show(
         'Select start date',
@@ -163,11 +145,9 @@ export default class PrivacyPolicy extends React.Component {
         })
         .then(result => {
           this.setState({ cartLoading: false });
-          console.log(result);
           if (result.data.postPrdShoppingCartOptimized.success) {
             Alert.alert('Success', 'Hire product successfully')
           }
-
           this.setState({ modalVisible: visible });
           this.setState({ bidIdicator: true })
           // if (result.data.getPrdProductList.success) {
@@ -197,11 +177,9 @@ export default class PrivacyPolicy extends React.Component {
         })
         .then(result => {
           this.setState({ cartLoading: false });
-          console.log(result);
           if (result.data.postPrdShoppingCartOptimized.success) {
             Alert.alert('Success', 'Hire product successfully')
           }
-
           this.setState({ modalVisible: visible });
           this.setState({ bidIdicator: true })
         })
@@ -211,14 +189,13 @@ export default class PrivacyPolicy extends React.Component {
         });
     }
   }
+
   setModalVisible = visible => {
-    console.log(visible);
     this.setState({ modalVisible: visible });
   };
-  SetTheItemClick(item) {
-    this.setState({ hireData: item })
-    console.log('item>>>>', item);
 
+  SetTheItemClick(item) {
+    this.setState({ hireData: item, quantity : 1 })
   }
 
   getAllHireProduct = (Token) => {
@@ -234,9 +211,9 @@ export default class PrivacyPolicy extends React.Component {
       })
       .then(result => {
         this.setState({ cartLoading: false });
-        console.log(result);
         if (result.data.getPrdProductList.success) {
           this.setState({ data: result.data.getPrdProductList.result })
+          this.setState({ filteredData :result.data.getPrdProductList.result });
           this.setState({ setAllcartcount: result.data.getPrdProductList.count })
         }
       })
@@ -269,19 +246,8 @@ export default class PrivacyPolicy extends React.Component {
       <View
         style={{ marginBottom: 10 }}>
         <View
-          style={{
-            flex: 1,
-            backgroundColor: '#FFF',
-            borderColor: '#ccc',
-            borderRadius: 15,
-            borderWidth: 1,
-            elevation: 8,
-          }}>
+          style={{ flex: 1, backgroundColor: '#FFF', borderColor: '#ccc', borderRadius: 15, borderWidth: 1, elevation: 8 }}>
           <View style={{ alignSelf: 'center', flex: 1 }}>
-            {/* <Image
-              style={{height: 100, width: 100, padding: 5, marginVertical: 5}}
-              source={require('../assets/img/Rectangle.png')}
-            /> */}
             <TouchableOpacity
               onPress={() => {
                 this.setModalVisible(true)
@@ -289,19 +255,12 @@ export default class PrivacyPolicy extends React.Component {
               }}>
               <Image
                 style={{ height: 100, width: 100, padding: 5, marginVertical: 5 }}
-                source={{
-                  uri: `${imagePrefix}${item.productImage}`,
-                }}
+                source={{ uri: `${imagePrefix}${item.productImage}` }}
               />
             </TouchableOpacity>
           </View>
           <View
-            style={{
-              flex: 1,
-              borderColor: '#eeeeee',
-              borderRadius: 15,
-              borderWidth: 1,
-            }}>
+            style={{ flex: 1, borderColor: '#eeeeee', borderRadius: 15, borderWidth: 1 }}>
             <TouchableOpacity
               onPress={() => {
                 this.setModalVisible(true)
@@ -311,25 +270,7 @@ export default class PrivacyPolicy extends React.Component {
                 <Text style={{ color: '#000', fontSize: 16, fontWeight: 'bold' }} numberOfLines={1}>
                   {item.productName}
                 </Text>
-                {/* <CountDown
-                until={this.state.totalDuration}
-                //duration of countdown in seconds
-                timetoShow={('H', 'M', 'S')}
-                //formate to show
-                // onFinish={() => alert('finished')}
-                //on Finish call
-                // onPress={() => alert('hello')}
-                //on Press call
-                size={20}
-              /> */}
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    paddingTop: 1,
-                    paddingBottom: 5,
-                    alignSelf: 'flex-start',
-                  }}>
+                <View style={{ flex: 1, flexDirection: 'row', paddingTop: 1, paddingBottom: 5, alignSelf: 'flex-start' }}>
                   <GetRating companyId={item.productID} onprogress={(Rating) => { this.setState({ rating: Rating }); }} />
                   <View style={{ flexDirection: "row", padding: 1, paddingBottom: 5, }}>
                     {this.state.maxRating.map((item, key) => {
@@ -340,26 +281,13 @@ export default class PrivacyPolicy extends React.Component {
                         >
                           <Image
                             style={styles.starImageStyle}
-                            source={
-                              item <= item.ratingScore
-                                ? { uri: this.state.starImageFilled }
-                                : { uri: this.state.starImageCorner }
-                            }
+                            source={ item <= item.ratingScore ? { uri: this.state.starImageFilled } : { uri: this.state.starImageCorner }}
                           />
                         </TouchableOpacity>
                       );
                     })}
                   </View>
-                  <Text
-                    style={{
-                      fontSize: 10,
-                      marginLeft: 25,
-                      color: '#9f1d20',
-                      fontWeight: 'bold',
-                      // textTransform: 'capitalize',
-                      // flexDirection: 'row', justifyContent: 'flex-end',
-                      marginTop: -3,
-                    }}>
+                  <Text style={{ fontSize: 10, marginLeft: 25, color: '#9f1d20', fontWeight: 'bold', marginTop: -3 }}>
                     R {item.unitCost}
                   </Text>
                 </View>
@@ -368,16 +296,8 @@ export default class PrivacyPolicy extends React.Component {
                 </Text>
               </View>
             </TouchableOpacity>
-            <View
-              style={{
-                justifyContent: 'space-around',
-                flexDirection: 'row',
-                padding: 5,
-              }}>
-              <TouchableOpacity
-                onPress={() => {
-                  this.addToFavourites(item.productID)
-                }}>
+            <View style={{ justifyContent: 'space-around', flexDirection: 'row', padding: 5 }}>
+              <TouchableOpacity onPress={() => { this.addToFavourites(item.productID) }}>
                 <Image
                   style={{ height: 25, width: 25, tintColor: '#bbb' }}
                   source={require('../../assets/heart.png')}
@@ -387,9 +307,6 @@ export default class PrivacyPolicy extends React.Component {
                 onPress={() => {
                   this.setModalVisible(true)
                   this.SetTheItemClick(item)
-                  // alert('ttt')
-                  // this.props.navigation.navigate('HireProduct');
-                  // onPress={() => this.setModalVisible(true)}
                 }}>
                 <Image
                   style={{ height: 23, width: 23, tintColor: '#DB3236' }}
@@ -400,44 +317,84 @@ export default class PrivacyPolicy extends React.Component {
           </View>
         </View>
       </View>
-      {/* <View style={{ width: '100%', height: 1, backgroundColor: '#ABABAB' }} /> */}
     </View>
   );
 
-  render() {
+  filterItems = (keyword) => {
+    this.setState({ searchText: keyword});
+    this._filter(keyword, this.state.categoriesForSearch);
+  }
 
+  renderAmount = () => {
+    if(this.state.hireData.typeID == 4) {
+      return (
+        <Text style={{ fontSize: 12, color: '#DB3236', fontWeight: 'bold' }}>
+          R{this.state.hireData.unitCost.toFixed(2)}
+        </Text>
+      )
+    }
+    return (
+      <Text style={{ fontSize: 12, color: '#DB3236', fontWeight: 'bold' }}>
+          R{this.state.hireData.unitCost * this.state.quantity * Moment(this.state.toDate).diff(this.state.fromDate, 'days')}
+        </Text>
+    );
+  }
+
+  _onSelectCategoryDone = (categories) => {
+    this.setState({ categoriesForSearch: categories, showCategorySelector : false});
+    this._filter(this.state.searchText, categories);
+  } 
+
+  _onPressSelectedCategory = (item) => {
+    const items = this.state.categoriesForSearch.filter((cat) => cat.categoryId != item.categoryId);
+    this.setState({ categoriesForSearch: items});
+    this._filter(this.state.searchText, items);
+  }
+
+  _filter = (keyword, categories) => {
+    let filtered = [...this.state.data];
+    if(keyword !== ""){
+      filtered = filtered.filter(item => item.productName.toLowerCase().includes(keyword.toLowerCase()));
+    }
+    if(categories.length > 0){
+      const catIds = categories.map(cat => cat.categoryId);
+      filtered = filtered.filter(item => catIds.includes(item.categoryID));
+    }
+
+    this.setState((prevState) => {
+      return {
+        ...prevState,
+        filteredData : filtered
+      }
+    })
+  }
+
+  render() {
     const { modalVisible } = this.state;
     return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: '#fff',
-        }}>
-        <StatusBar
-          translucent
-          backgroundColor="transparent"
-          barStyle="dark-content"
-        />
-
+      <View style={{ flex: 1, backgroundColor: '#fff' }}>
         <ScrollView style={{ padding: 5, flex: 1 }}>
-          <View style={styles.textinput}>
-            {/* <Icon style={styles.searchIcon} name="ios-search" size={20} color="#000"/> */}
-            <Image
-              source={require('../../assets/search.png')}
-              resizeMode="contain"
-              style={{
-                height: 20,
-                width: 20,
-                marginTop: 10,
-                marginLeft: 10,
-              }}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Search Products"
-              underlineColorAndroid="transparent"
-            />
-          </View>
+          <ProductSearchInput 
+            onChangeText={(search) => this.filterItems(search)} 
+            onPressFilterIcon={() => this.setState({ showCategorySelector : true})} 
+          />
+          {this.state.categoriesForSearch.length > 0 && <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom : 20, paddingHorizontal : 10 }}>
+            {this.state.categoriesForSearch.map(item => (
+              <Chip 
+                title={item.categoryName}
+                icon={{
+                  name: 'close',
+                  type: 'font-awesome',
+                  size: 14,
+                  color: 'white',
+                }}
+                onPress={() => this._onPressSelectedCategory(item)}
+                iconRight
+                titleStyle={{ fontSize: 10 }}
+                buttonStyle={{ backgroundColor: '#F54D30', marginBottom: 5}}
+              />
+            ))}
+          </View>}
           <View>
             <RNPickerSelect
               value={this.state.user}
@@ -446,19 +403,12 @@ export default class PrivacyPolicy extends React.Component {
               textInputProps={styles.pickerContainer}
             />
           </View>
-          <View
-            style={{
-              justifyContent: 'center',
-              padding: 21,
-              alignItems: 'center',
-              flex: 1,
-            }}>
+          <View style={{ justifyContent: 'center', padding: 21, alignItems: 'center', flex: 1 }}>
             <Modal
               animationType="slide"
               transparent={true}
               visible={modalVisible}
               onRequestClose={() => {
-                // Alert.alert('Modal has been closed.');
                 this.setModalVisible(!modalVisible);
               }}>
               <View style={styles.centeredView}>
@@ -469,19 +419,19 @@ export default class PrivacyPolicy extends React.Component {
                     }}>
                     <Icon name="close" size={20} color="#000" />
                   </TouchableOpacity>
-                  {/* <Image
-                    style={{ marginTop: 10, height: 120, width: 120 }}
-                    source={require('../assets/img/Rectangle.png')}
-                  /> */}
                   <Image
                     style={{ marginTop: 10, height: 120, width: 120 }}
-                    source={{
-                      uri: `${imagePrefix}${this.state.hireData.productImage}`,
-                    }}
+                    source={{ uri: `${imagePrefix}${this.state.hireData.productImage}` }}
                   />
                   <View style={{ backgroundColor: '#FAFAFA', width: '100%', padding: 10 }}>
+                    { this.state.hireData.typeID == 1 && 
+                    <View>
+                      <Text style={{ fontSize: 14, textAlign: 'center', fontWeight: 'bold', width: '100%' }}>Quantity</Text> 
+                      <TextInput value={this.state.quantity.toString()} style={styles.quantityInput} onChangeText={(value) => this.setState({ quantity: value})}/>
+                    </View>
+                    } 
                     <View style={{ alignItems: 'center', marginTop: 10 }}>
-                      <Text style={{ fontSize: 14, textAlign: 'center', fontWeight: 'bold', width: '40%' }} numberOfLines={2} >Set Time Period for hire</Text>
+                      <Text style={{ fontSize: 14, textAlign: 'center', fontWeight: 'bold', width: '100%' }}>Set Time Period for hire</Text>
                     </View>
                     <View style={{ flexDirection: 'row', paddingStart: 10, marginTop: 10 }}>
                       <View style={{ width: '40%' }}>
@@ -566,12 +516,7 @@ export default class PrivacyPolicy extends React.Component {
                         </View>
                         <View style={{ flexDirection: 'row' }}>
                           <Text style={{ fontSize: 12, color: 'black' }}>Total: </Text>
-                          {this.state.toDate === '' &&
-                            <Text style={{ fontSize: 12, color: '#DB3236', fontWeight: 'bold' }}>R{this.state.hireData.unitCost}</Text>
-                          }
-                          {this.state.toDate !== '' &&
-                            <Text style={{ fontSize: 12, color: '#DB3236', fontWeight: 'bold' }}>R {this.state.hireData.unitCost * Moment(this.state.toDate).diff(this.state.fromDate, 'days')}</Text>
-                          }
+                          {this.renderAmount()}
                         </View>
                       </View>
                       <View style={{ width: '20%' }}>
@@ -593,7 +538,7 @@ export default class PrivacyPolicy extends React.Component {
             <FlatList
               style={{ flex: 1, width: '100%', marginBottom: -17 }}
               showsVerticalScrollIndicator={false}
-              data={this.state.data}
+              data={this.state.filteredData}
               renderItem={this.renderItem}
               ListFooterComponent={() => {
                 return (
@@ -604,10 +549,13 @@ export default class PrivacyPolicy extends React.Component {
                   ) : null
                 )
               }}
-            // ListEmptyComponent={this.ListEmpty}
             />
           </View>
         </ScrollView>
+        <CategorySelector 
+          visible={this.state.showCategorySelector} 
+          onDone={(values) => this._onSelectCategoryDone(values)}
+        />
       </View>
     );
   }
@@ -657,7 +605,7 @@ const styles = StyleSheet.create({
     paddingLeft: 0,
     backgroundColor: '#fff',
     color: '#424242',
-    marginLeft: 50,
+    marginLeft: 40,
     marginTop: -30,
     width: '80%',
     height: 40,
@@ -671,15 +619,21 @@ const styles = StyleSheet.create({
     padding: 5,
     height: 50,
   },
+  quantityInput : {
+    fontSize: 16,
+    borderRadius: 10,
+    borderWidth : 1,
+    borderColor: "#9f1d20",
+    height: 40,
+    paddingHorizontal : 10,
+    marginTop: 10
+  },
   container: {
     flex: 1,
     backgroundColor: 'white',
   },
   mainCardView: {
     height: '100%',
-    // width: '88%',
-    // alignItems: 'center',
-    // justifyContent: 'center',
     backgroundColor: 'white',
     borderRadius: 15,
     shadowColor: 'gray',
@@ -687,12 +641,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 1,
     shadowRadius: 8,
     elevation: 8,
-    // flexDirection: 'row',
     justifyContent: 'space-between',
-    // paddingLeft: 2,
-    // paddingRight: 2,
     marginTop: 10,
-    // marginBottom:4,
     marginLeft: 16,
     marginRight: 16,
   },

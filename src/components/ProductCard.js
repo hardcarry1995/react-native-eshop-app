@@ -1,12 +1,9 @@
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { GetRating } from './GetRating';
 import { imagePrefix } from '../constants/utils';
-import Colors from '../constants/colors';
 import { Rating } from 'react-native-elements';
 
 const ProductCard = ({ item, navigation, addToFavourites, addToCart }) => {
-
   const onPressItem = () => {
     navigation.navigate('Filter', { data: item });
   }

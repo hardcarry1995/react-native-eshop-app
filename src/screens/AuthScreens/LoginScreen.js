@@ -219,7 +219,6 @@ function LoginScreen(props) {
           let userInfo = result.data.sSOLogin.result;
           userInfo.id = decoded.Id;
           const resultData = Object.values(decoded);
-          console.log(decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']);
           await AsyncStorage.setItem('userRole', decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']);
           await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
           props.setUserToken(result.data.sSOLogin.result.token);
@@ -268,10 +267,16 @@ function LoginScreen(props) {
           let userInfo = result.data.oAuth.result;
           userInfo.id = decoded.Id;
           await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
+          props.setUserData(userInfo);
+          props.setUserRole(decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']);
           props.setUserToken(result.data.oAuth.result.token);
           props.navigation.navigate('Main');
         } else {
-          ToastAndroid.show(result.data.oAuth.message, ToastAndroid.SHORT);
+          if(Platform.OS === 'android'){
+            ToastAndroid.show(result.data.oAuth.message, ToastAndroid.SHORT);
+          } else {
+            alert(result.data.oAuth.message);
+          }
         }
       })
       .catch(err => {

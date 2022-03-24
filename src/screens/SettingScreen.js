@@ -185,7 +185,6 @@ export default class SettingsScreen extends React.Component {
 
   };
   getAllBidProduct = (Token) => {
-    // this.setState({ cartLoading: false });
     client
       .mutate({
         mutation: GET_BID_ALL_PRODUCT,
@@ -198,8 +197,8 @@ export default class SettingsScreen extends React.Component {
       })
       .then(result => {
         this.setState({ cartLoading: false });
-        console.log(result);
         if (result.data.getPrdProductList.success) {
+          console.log(result.data.getPrdProductList.result[0].prdBid);
           this.setState({ data: result.data.getPrdProductList.result })
           this.setState({ setAllcartcount: result.data.getPrdProductList.count })
         }
