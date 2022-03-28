@@ -25,6 +25,7 @@ class DrawerContent extends Component {
       { screen: Constant.about_us, title: Constant.about_us, image: cont.about_us, },
       { screen: Constant.my_Favirity, title: Constant.my_Favirity, image: cont.my_Favirity },
       { screen: Constant.my_Reviews, title: Constant.my_Reviews, image: cont.my_Reviews },
+      { screen: "MyBid", title: "My Bids", image: cont.my_Reviews},
       { screen: Constant.rate_the_app, title: Constant.rate_the_app, image: cont.rate_the_app },
       { screen: Constant.give_feedback, title: Constant.give_feedback, image: cont.give_feedback },
       { screen: Constant.share_app, title: Constant.share_app, image: cont.share_app },
@@ -109,6 +110,14 @@ class DrawerContent extends Component {
       case "my_enquiry" : 
         this.props.navigation.navigate(Constant.feed, { screen: "MyEnquiry" });
         this.setState({ selectedRoute: "MyEnquiry" });
+        break;
+      case Constant.settings: 
+        this.props.navigation.navigate(Constant.settings, { screen: "SettingScreen" });
+        this.setState({ selectedRoute: Constant.settings });
+        break;
+      case "MyBid" : 
+        this.props.navigation.navigate(Constant.settings, { screen : "MyBid"});
+        this.setState({ selectedRoute: "MyBid" });
         break;
       case Constant.give_feedback:
       case Constant.rate_the_app:

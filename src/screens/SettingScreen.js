@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, StatusBar, TouchableOpacity, TextInput, ActivityIndicator, FlatList, ToastAndroid, ScrollView, Alert} from 'react-native';
 import CountDown from 'react-native-countdown-component';
 import { imagePrefix } from '../constants/utils';
@@ -19,6 +19,154 @@ const filterItems = [
   { label: 'Hire', value: 'Hire' },
 ]
 
+function BidItem ({ item, onPressAddBid }) {
+
+  const [ lastBidAmount, setLastBidAmount ] = useState(0);
+  const [totalDurationData, setTotalDurationData ] = useState(0);
+  const [amount, setAmount ] = useState(0);
+  const [rating, setRating ] = useState(0);
+  const [disableDecrease, setDisableDecrease ] = useState(false);
+  
+  const maxRating =[1, 2, 3, 4, 5];
+  const starImageFilled = 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png';
+  const starImageCorner = 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png';
+
+  useEffect(() => {
+    const dataLength = item.prdBid.length;
+    const data = item.prdBid[dataLength - 1];
+    if (data === undefined) {
+      setLastBidAmount(0);
+    } else {
+      setLastBidAmount(data.bidAmount);
+    }
+
+    const  date = item.endDate;
+    // Moment()
+    //     .utcOffset('+05:30')
+    //     .format('YYYY-MM-DD hh:mm:ss');
+    const expirydate = '2021-12-23 04:00:45';
+    const diffr = Moment.duration(Moment(expirydate) .diff(Moment(date)));
+    // Difference of the expiry date-time
+    const hours = parseInt(diffr.asHours());
+    const minutes = parseInt(diffr.minutes());
+    const seconds = parseInt(diffr.seconds());
+    // Converting in seconds
+    const d = hours * 60 * 60 + minutes * 60 + seconds;
+    setTotalDurationData(d);
+
+  }, []);
+  
+  const _onPressAddBid = () => {
+    console.log(item);
+    onPressAddBid(item);
+  }
+  return (
+    <View style={{ flex: 1, backgroundColor: '#fff', padding: 5, marginBottom: 40 }}>
+      <View
+        style={{ flex: 1, flexDirection: 'column', alignItems: 'center', marginTop: 5 }}>
+        <View style={styles.mainCardView}>
+          <Image style={styles.proimg} source={{ uri: `${imagePrefix}${item.productImage}`}} />
+          <View style={styles.subCardView}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Text style={{ marginLeft: 10, }} numberOfLines={1}>{item.productName}</Text>
+              <View style={{  marginLeft: 10, }}>
+                <GetRating companyId={item.productID} onprogress={(Rating) => { setRating(Rating); }} />
+                <View style={{ flexDirection: "row", padding: 1, paddingBottom: 5, }}>
+                  {maxRating.map((item, key) => {
+                    return (
+                      <TouchableOpacity
+                        activeOpacity={0.7}
+                        key={item}
+                      >
+                        <Image
+                          style={styles.starImageStyle}
+                          source={
+                            item <= item.ratingScore
+                              ? { uri: starImageFilled }
+                              : { uri: starImageCorner }
+                          }
+                        />
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            </View>
+            <View style={{ flexDirection: 'row', marginVertical: 5, justifyContent: 'space-between', alignItems: 'center', paddingHorizontal : 10}}>
+              <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',}}>
+                <Text style={{ fontSize: 11,}}> Last Bid Amount: </Text>
+                <Text style={{ fontSize: 11, color: '#DB3236',  marginRight: 3 }}>
+                  R{lastBidAmount.toFixed(2)}
+                </Text>
+              </View>
+              <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                <Text style={{ fontSize: 11}}>
+                  Cut-off Date:
+                </Text>
+                {totalDurationData > 0 && <CountDown
+                  until={totalDurationData}
+                  timetoShow={('H', 'M', 'S')}
+                  timeLabels={{ h: null, m: null, s: null }}
+                  size={7}
+                />}
+              </View>
+            </View>
+            <View>
+              <Text style={styles.newdummyhead} numberOfLines={2}>
+                {item.description}
+              </Text>
+            </View>
+            <View style={{ marginTop: 10, flexDirection: 'row', justifyContent: 'space-around' }}>
+              <TouchableOpacity onPress={() => { this.addToFavourites(item.productID) }} style={{ width: 30, marginLeft: 10 }}>
+                <Image style={{ width: 15, height: 15, padding: 15 }} source={require('../assets/Bid1.png')} />
+              </TouchableOpacity>
+              <TextInput
+                style={{
+                  borderRadius: 5,
+                  fontSize: 12,
+                  borderColor: 'grey',
+                  borderWidth: 1,
+                  bottom: 25,
+                  padding: 5,
+                  height: 30,
+                  marginLeft: 30,
+                  marginRight: 30,
+                  marginTop: 25,
+                  width: 150
+                }}
+                placeholder="Enter Bid Amount"
+                placeholderTextColor="red"
+                onChangeText={text => {
+                 setAmount(text);
+                }}
+                keyboardType="numeric"
+              />
+              <TouchableOpacity onPress={_onPressAddBid}>
+                <Image style={{ width: 25, height: 25, padding: 15, marginRight: 20 }} source={require('../assets/Bid2.png')}/>
+              </TouchableOpacity>
+            </View>
+            <View style={{flexDirection: "row", justifyContent: "center", marginBottom : 20}}>
+              <TouchableOpacity style={{ ...styles.decreaseBtn}}>
+                <Image source={require('../assets/img/DownArrow.png')} />
+                <Text style={{ fontSize: 10, color: '#FAFAFA'}}>
+                  decrease bid by 10%
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={{...styles.increaseBtn}}>
+                <Text style={{ fontSize: 10, color: '#FAFAFA'}}>
+                  increase bid by 10%
+                </Text>
+                <Image source={require('../assets/img/upArrow.png')} />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+
 export default class SettingsScreen extends React.Component {
 
   constructor(props) {
@@ -34,10 +182,6 @@ export default class SettingsScreen extends React.Component {
       amount: '',
       rating: "2",
       maxRating: [1, 2, 3, 4, 5],
-      starImageFilled:
-        'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png',
-      starImageCorner:
-        'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png',
       showCategorySelector: false,
       categoriesForSearch : [],
       searchText : ""
@@ -107,7 +251,6 @@ export default class SettingsScreen extends React.Component {
   }
   addBid(item) {
     this.setState({ bidIdicator: true })
-    console.log('item>>>>>>>>', item)
     if (this.state.userIsLogin === 'true') {
       if (this.state.amount === '' || this.state.amount === undefined) {
         Alert.alert('Error', 'Enter Amount')
@@ -195,287 +338,9 @@ export default class SettingsScreen extends React.Component {
         console.log(err);
       });
   }
+
   renderItem = ({ item, index }) => {
-    let dataLength = item.prdBid.length;
-    let data = item.prdBid[dataLength - 1];
-    let bidAmount = 0;
-    if (data === undefined) {
-      bidAmount = 0;
-    }
-    if (data !== undefined) {
-      bidAmount = data.bidAmount;
-    }
-    let date = item.endDate;
-    // Moment()
-    //     .utcOffset('+05:30')
-    //     .format('YYYY-MM-DD hh:mm:ss');
-    let expirydate = '2021-12-23 04:00:45';
-    let diffr =
-      Moment.duration(Moment(expirydate)
-        .diff(Moment(date)));
-    // Difference of the expiry date-time
-    var hours = parseInt(diffr.asHours());
-    var minutes = parseInt(diffr.minutes());
-    var seconds = parseInt(diffr.seconds());
-
-    // Converting in seconds
-    var d = hours * 60 * 60 + minutes * 60 + seconds;
-    const totalDurationData = d;
-    // Settign up the duration of countdown
-    // this.setState({ totalDuration: d });
-    return (
-      <View style={{ flex: 1, backgroundColor: '#fff', padding: 5, marginBottom: 40 }} key={index}>
-        {/* <TouchableOpacity
-        activeOpacity={0.9}
-        onPress={() => {
-          // alert('ttt')
-          this.props.navigation.navigate('Details');
-        }}
-        style={{ marginBottom: 40 }}> */}
-        <View
-          style={{
-            flex: 1,
-            flexDirection: 'column',
-            alignItems: 'center',
-            marginTop: 5,
-          }}>
-          <View style={styles.mainCardView}>
-            {/* <View style={styles.subCardView}> */}
-            {/* <Image
-              source={require('../assets/img/Rectangle.png')}
-              resizeMode="contain"
-              style={styles.proimg}
-            /> */}
-            <Image
-              style={styles.proimg}
-              source={{
-                uri: `${imagePrefix}${item.productImage}`,
-              }}
-            />
-            <View style={styles.subCardView}>
-              <View style={{}}>
-                <Text style={{ marginLeft: 10, width: "50%" }} numberOfLines={1}>{item.productName}</Text>
-                <Text
-                  style={{
-                    marginTop: -20,
-                    fontSize: 11,
-                    alignSelf: 'flex-end',
-                    marginRight: 52,
-                  }}>
-                  Last Bid Amount:
-                </Text>
-                {/* {item.prdBid.map((items, key) => { */}
-                <Text
-                  style={{
-                    marginTop: -14,
-                    fontSize: 11,
-                    color: '#DB3236',
-                    alignSelf: 'flex-end',
-                    marginRight: 3,
-                  }}>
-                  R{bidAmount}
-                </Text>
-                {/* })} */}
-                <Text
-                  style={{
-                    marginTop: -1,
-                    fontSize: 11,
-                    alignSelf: 'flex-end',
-                    marginRight: 80,
-                  }}>
-                  Cut-off Date:
-                </Text>
-                {/* <Text
-                  style={{
-                    marginTop: -15,
-                    fontSize: 11,
-                    color: '#DB3236',
-                    alignSelf: 'flex-end',
-                    marginRight: 3,
-                  }}> */}
-                {/* {Moment(item.prdBid.createdDate).format('DD-MM-YYYY')} */}
-                {/* </Text>  
-                               */}
-                <View style={{
-                  marginTop: -15,
-                  color: '#DB3236',
-                  alignSelf: 'flex-end',
-                  marginRight: 1,
-                }}>
-                  <CountDown
-                    until={totalDurationData}
-                    timetoShow={('H', 'M', 'S')}
-                    timeLabels={{ h: null, m: null, s: null }}
-                    size={7}
-                  />
-
-                </View>
-              </View>
-              <View
-                style={{
-                  flex: 1,
-                  flexDirection: 'row',
-                  paddingBottom: 20,
-                  marginLeft: 10,
-                }}>
-
-                <GetRating companyId={item.productID} onprogress={(Rating) => { this.setState({ rating: Rating }); }} />
-                <View style={{ flexDirection: "row", padding: 1, paddingBottom: 5, }}>
-                  {this.state.maxRating.map((item, key) => {
-                    return (
-                      <TouchableOpacity
-                        activeOpacity={0.7}
-                        key={item}
-                      >
-                        <Image
-                          style={styles.starImageStyle}
-                          source={
-                            item <= item.ratingScore
-                              ? { uri: this.state.starImageFilled }
-                              : { uri: this.state.starImageCorner }
-                          }
-                        />
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-              </View>
-              <View>
-                <Text style={styles.newdummyhead} numberOfLines={2}>
-                  {item.description}
-                </Text>
-                {/* <Text
-                  style={{
-                    fontSize: 9,
-                    color: 'gray',
-                    textTransform: 'capitalize',
-                    flexDirection: 'row',
-                    justifyContent: 'flex-start',
-                    marginBottom: 10,
-                    marginTop: -11,
-                    marginLeft: 10,
-                  }}>
-                  Lorem lpsum Semibold Vertigo{' '}
-                </Text> */}
-              </View>
-
-              <View style={{ flex: 1, marginTop: 10, flexDirection: 'row' }}>
-                <View>
-                  <TouchableOpacity
-                    onPress={() => {
-                      this.addToFavourites(item.productID)
-                      // Alert.alert('hii');
-                    }}
-                    style={{ width: 30, marginLeft: 10 }}>
-                    <Image
-                      style={{
-                        width: 20, height: 20, padding: 15,
-                        // alignSelf: 'flex-start', 
-                      }}
-                      source={require('../assets/Bid1.png')}
-                    />
-                  </TouchableOpacity>
-                </View>
-                <View>
-                  <TextInput
-                    style={{
-                      borderRadius: 5,
-                      fontSize: 12,
-                      borderColor: 'grey',
-                      borderWidth: 1,
-                      bottom: 25,
-                      padding: 5,
-                      height: 30,
-                      marginLeft: 30,
-                      marginRight: 30,
-                      marginTop: 25,
-                      width: 150
-                    }}
-                    placeholder="Enter Bid Amount"
-                    placeholderTextColor="red"
-                    onChangeText={text => {
-                      this.setState({ amount: text });
-                    }}
-                    keyboardType="numeric"
-                  />
-                </View>
-                <View>
-                  <TouchableOpacity onPress={() => {
-                    this.addBid(item)
-                  }}>
-                    <Image
-                      style={{
-                        width: 25,
-                        height: 25,
-                        padding: 15,
-                        // alignSelf: 'flex-end',
-                        marginRight: 20,
-                      }}
-                      source={require('../assets/Bid2.png')}
-                    />
-                  </TouchableOpacity>
-                </View>
-              </View>
-              <View>
-                <View
-                  style={{
-                    borderWidth: 2,
-                    height: 20,
-                    width: 80,
-                    borderColor: 'red',
-                    borderTopLeftRadius: 5,
-                    borderBottomLeftRadius: 5,
-                    // marginTop: -15,
-                    backgroundColor: '#FC595D',
-                    alignSelf: 'center',
-                    marginLeft: -79,
-                  }}>
-                  <Image source={require('../assets/img/DownArrow.png')} />
-                  <Text
-                    style={{
-                      fontSize: 8,
-                      color: '#FAFAFA',
-                      alignSelf: 'flex-end',
-                      marginTop: -10,
-                    }}>
-                    decrease bid {this.getPercentageChange(bidAmount, this.state.amount)}%
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    borderWidth: 2,
-                    height: 20,
-                    width: 80,
-                    borderColor: '#38DF64',
-                    borderTopRightRadius: 5,
-                    borderBottomRightRadius: 5,
-                    marginTop: -20,
-                    backgroundColor: '#38DF64',
-                    alignSelf: 'center',
-                    marginRight: -79,
-                  }}>
-                  <Text
-                    style={{
-                      fontSize: 8,
-                      color: '#FAFAFA',
-                      alignSelf: 'flex-start',
-                      marginTop: 3,
-                    }}>
-                    increase bid {this.getPercentageChangeIncrease(this.state.amount, bidAmount)}%
-                  </Text>
-                  <Image
-                    style={{ alignSelf: 'flex-end', marginTop: -12 }}
-                    source={require('../assets/img/upArrow.png')}
-                  />
-                </View>
-              </View>
-            </View>
-          </View>
-        </View>
-        {/* </TouchableOpacity> */}
-        {/* <View style={{ width: '100%', height: 1, backgroundColor: '#ABABAB' }} /> */}
-      </View>
-    );
+   return <BidItem  item={item} key={index} onPressAddBid={(item) => this.addBid(item)} />
   }
   filterItems = (keyword) => {
     this.setState({ searchText: keyword});
@@ -693,9 +558,7 @@ const styles = StyleSheet.create({
     color: 'gray',
     textTransform: 'capitalize',
     flexDirection: 'row',
-    justifyContent: 'flex-start',
     marginBottom: 10,
-    marginTop: -20,
     marginLeft: 10,
   },
   proimg: {
@@ -722,4 +585,28 @@ const styles = StyleSheet.create({
     color: 'red',
     fontSize: 18
   },
+  decreaseBtn : {
+    borderWidth: 2,
+    height: 25,
+    width: 130,
+    borderColor: 'red',
+    borderTopLeftRadius: 5,
+    borderBottomLeftRadius: 5,
+    backgroundColor: '#FC595D',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+  },
+  increaseBtn : {
+    borderWidth: 2,
+    height: 25,
+    width: 130,
+    borderColor: '#38DF64',
+    borderTopRightRadius: 5,
+    borderBottomRightRadius: 5,
+    backgroundColor: '#38DF64',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+  }
 });

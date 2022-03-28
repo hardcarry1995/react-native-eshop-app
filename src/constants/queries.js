@@ -216,6 +216,76 @@ query GetPrdProductList($size: Int!, $categories: String = null) {
      }
    }
 `;
+export const GET_SINGLE_PRODUCT = gql`
+query GetPrdProductList($productId: Int!) {
+    getPrdProductList(
+       productName: null,
+       productId: $productId,
+       categoryId: null,
+       domainCategoryIds:null,
+       status: null,
+       salesTypeId: null,
+       scopeId:null,
+       userId:null,
+       page:1, size:10){
+       count,
+       currentPage,    
+       message,
+       nextPage,
+       prevPage,
+       success,
+       totalPages,
+       result{
+         activeText,
+         categoryID,
+         categoryName,
+         description,
+         documentName,
+         documentPath,
+         isActive,
+         ratingScore,
+         productID,
+         productImage,
+         productName,
+         productNumber,
+         salesTypeId,
+         typeID,
+         inventory,
+         clickCount,
+         viewCount
+         unitCost,
+         length, 
+         width, 
+         height, 
+         volume, 
+         weight, 
+         googleSchema,
+         domainCategory, 
+         startDate,
+         endDate,
+       mapProductImages{        
+           imageName,
+           imagePath
+         }   
+         prdBid{
+           bidId,
+           createdDate,
+           bidAmount,
+           userId
+         }
+         prdHire{
+           hireId, 
+           userId,
+           isAccepted,
+           fromDate, 
+           toDate,
+           returned
+         }
+        
+       }
+     }
+   }
+`;
 
 
 
@@ -2502,4 +2572,32 @@ export const GET_ADDRESS_LIST = gql`
       }
   } 
 `;
+
+export const GET_USER_TOP_BIDS = gql`
+{
+  getUserTopBids(          
+  page:1, size:100){
+      count,
+      currentPage,
+      message,
+      nextPage,
+      prevPage,
+      success,
+      totalPages
+      result{
+        userID,
+        firstName,
+        lastName,
+        email,
+        status,
+        userStatus,
+        userProfileImage,
+        userProfileThumbNailImage,
+        bidAmount, 
+        productID,
+        orderID,
+      }
+  }
+}
+`
 
