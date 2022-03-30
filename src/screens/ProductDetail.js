@@ -109,7 +109,7 @@ export default class ProductDetail extends React.Component {
             } else {
               alert('Product added to cart');
             }
-            this.props.navigation.navigate('Workout')
+            this.props.navigation.navigate('CartStack')
           }
         })
         .catch(err => {
@@ -143,7 +143,7 @@ export default class ProductDetail extends React.Component {
             } else {
               alert('Product added to cart');
             }
-            this.props.navigation.navigate('Workout')
+            this.props.navigation.navigate('CartStack')
           }
         })
         .catch(err => {

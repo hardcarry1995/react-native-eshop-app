@@ -32,10 +32,12 @@ import CategoryScreen from "../screens/CategoryScreen";
 
 // CartItem Stack Screens 
 import MyCartScreen from '../screens/CartScreens/MyCartScreen';
+import Checkout from "../screens/CartScreens/Checkout";
 
 // WishList Stack Screens
 import WishListScreen from '../screens/WishListScreen';
 import ScreenOptions from "../components/ScreenOptions";
+import RequestStack from "./RequestStack";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -94,6 +96,7 @@ const CategoryStack = () => (
 const CartStack = () => (
   <Stack.Navigator screenOptions={screenOptions}>
     <Stack.Screen name="MyCart" component={MyCartScreen} />
+    <Stack.Screen name="Checkout" component={Checkout} />
   </Stack.Navigator>
 )
 
@@ -130,6 +133,7 @@ const TabBarNavigator = () => (
     <Tab.Screen name={Constants.faq} component={FaqStack} options={{headerShown: false}} />
     <Tab.Screen name={Constants.logout} component={WorkInProgress} options={{headerShown: false}} />
     <Tab.Screen name={Constants.share_app} component={WorkInProgress} options={{headerShown: false}} />
+    <Tab.Screen name="RequestStack" component={RequestStack} options={{headerShown: false}} />
   </Tab.Navigator>
 )
 

@@ -361,7 +361,7 @@ query GetPrdProductList($size: Int!) {
 `;
 
 export const ADD_TO_CART = gql`
-  mutation AddToCart($pid: Int!,$userid: Int!,$dateCreated: DateTime, $fromDate: String = null, $endDate: String = null, $quantity: Int = 1) {
+  mutation AddToCart($pid: Int!,$userid: Int!,$dateCreated: DateTime, $fromDate: DateTime = null, $endDate: DateTime = null, $quantity: Int = 1) {
     postPrdShoppingCartOptimized(
       prdShoppingCart: {
         productId: $pid

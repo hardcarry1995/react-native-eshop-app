@@ -83,11 +83,6 @@ class DrawerContent extends Component {
       case Constant.near_by:
         this.props.navigation.navigate("ProductStack");
         break;
-
-      case Constant.feed:
-        this.props.navigation.navigate(Constant.feed, { screen: "ChatItem" });
-        break;
-
       case Constant.share_app:
         this.setState({ selectedRoute: Constant.feed_sidemenu });
         this.props.navigation.navigate('Feed');
@@ -110,6 +105,10 @@ class DrawerContent extends Component {
       case "my_enquiry" : 
         this.props.navigation.navigate(Constant.feed, { screen: "MyEnquiry" });
         this.setState({ selectedRoute: "MyEnquiry" });
+        break;
+      case  "Request an Item":
+        this.props.navigation.navigate("RequestStack", {screen: "RequestItem"});
+        this.setState({ selectedRoute: "Request an Item" });
         break;
       case Constant.settings: 
         this.props.navigation.navigate(Constant.settings, { screen: "SettingScreen" });

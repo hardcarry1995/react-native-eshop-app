@@ -36,9 +36,9 @@ export default class Workout extends React.PureComponent {
       this.fetchToken()
       , 5000
     );
-  }
-  componentWillUnmount() {
-    clearInterval(this.interval);
+    return () => {
+      clearInterval(this.interval);
+    }
   }
 
   async fetchToken() {
@@ -49,87 +49,6 @@ export default class Workout extends React.PureComponent {
       userTokenData: token
     });
     this.getShoppingCart(token);
-  }
-
-  updateUser = user => {
-    this.setState(
-      prevState => ({
-        user: user,
-      }),
-      () => {
-        if (this.state.user == 'Buy') {
-          this.props.navigation.navigate('Matches')
-        } if (this.state.user == 'Bid') {
-          this.props.navigation.navigate('SettingsScreen')
-        } if (this.state.user == 'Hire') {
-          this.props.navigation.navigate('PrivacyPolicy')
-        }
-      },
-    );
-
-  };
-
-  addToCart = async (id) => {
-    let IsLogin = await AsyncStorage.getItem('IsLogin');
-    let userToken = await AsyncStorage.getItem('userToken');
-    if (IsLogin !== 'true') {
-      client
-        .mutate({
-          mutation: ADD_TO_CART_NULL,
-          fetchPolicy: 'no-cache',
-          variables: {
-            pid: id,
-          },
-          context: {
-            headers: {
-              Authorization: `Bearer ${userToken}`,
-              'Content-Length': 0,
-            },
-          },
-        })
-        .then(result => {
-          this.setState({ cartLoading: false });
-          if (result.data.postPrdShoppingCartOptimized.success) {
-            ToastAndroid.show('Product added to cart', ToastAndroid.SHORT);
-            this.props.navigation.navigate('Workout')
-          }
-        })
-        .catch(err => {
-          this.setState({ cartLoading: false });
-          console.log(err);
-        });
-    } else {
-      let userToken1 = await AsyncStorage.getItem('userToken');
-      let userInfo = await AsyncStorage.getItem('userInfo');
-      let userID = JSON.parse(userInfo)
-      client
-        .mutate({
-          mutation: ADD_TO_CART,
-          fetchPolicy: 'no-cache',
-          variables: {
-            pid: id,
-            userid: Number(userID.id),
-            dateCreated: moment().toISOString()
-          },
-          context: {
-            headers: {
-              Authorization: `Bearer ${userToken1}`,
-              'Content-Length': 0,
-            },
-          },
-        })
-        .then(result => {
-          console.log('result', result);
-          if (result.data.postPrdShoppingCartOptimized.success) {
-            ToastAndroid.show('Product added to cart', ToastAndroid.SHORT);
-            this.props.navigation.navigate('Workout')
-          }
-        })
-        .catch(err => {
-          this.setState({ cartLoading: false });
-          console.log(err);
-        });
-    }
   }
 
   addQuantity = (item, index) => {
@@ -179,7 +98,6 @@ export default class Workout extends React.PureComponent {
           },
         },
       }).then(result => {
-        console.log('result', result);
         if (result?.data?.postPrdShoppingCartOptimized?.success) {
           ToastAndroid.show('Product added to cart', ToastAndroid.SHORT);
           this.fetchToken();
@@ -236,12 +154,13 @@ export default class Workout extends React.PureComponent {
       </View>
     );
   };
+  // Checkout button event.
   async checkLogin() {
     let IsLogin = await AsyncStorage.getItem('IsLogin');
     if (IsLogin === 'true') {
-      this.props.navigation.navigate('AddWorkout', { data: this.state.data, dataAll: this.state.AllDAtaAdd })
+      this.props.navigation.navigate('Checkout', { data: this.state.data, dataAll: this.state.AllDAtaAdd })
     } else {
-      this.props.navigation.navigate('Login')
+      this.props.navigation.navigate('AuthStack');
     }
   }
 
@@ -296,79 +215,31 @@ export default class Workout extends React.PureComponent {
                   source={item.productImage ? { uri: `${imagePrefix}${item.productImage}` } : require('../../assets/NoImage.jpeg')}
                 />
                 <View style={{ marginLeft: 10, width: '55%' }}>
-                  <Text
-                    style={{
-                      fontSize: 12,
-                      color: 'gray',
-                      fontWeight: 'bold',
-                      textTransform: 'capitalize',
-                      width: "80%",
-                    }}
-                    numberOfLines={1}>
+                  <Text style={{ fontSize: 12, color: 'gray', fontWeight: 'bold', textTransform: 'capitalize', width: "80%" }} numberOfLines={1}>
                     {item.productName}
                   </Text>
-                  <View
-                    style={{
-                      marginTop: 4,
-                      borderWidth: 0,
-                    }}>
-                    <Text numberOfLines={1}
-                      style={{
-                        color: 'gray',
-                        fontSize: 12,
-                      }}>
+                  <View style={{ marginTop: 4, borderWidth: 0 }}>
+                    <Text numberOfLines={1} style={{ color: 'gray', fontSize: 12, }}>
                       {item.description}
                     </Text>
                   </View>
-                  <View
-                    style={{
-                      marginTop: 4,
-                      borderWidth: 0,
-                    }}>
-                    <Text
-                      style={{
-                        color: 'red',
-                        fontSize: 15,
-                      }}>
-                      R {item.unitCost}
+                  <View style={{ marginTop: 4, borderWidth: 0, }}>
+                    <Text style={{ color: 'red', fontSize: 15, }}>
+                      R{(item.unitCost * item.quantity).toFixed(2)}
                     </Text>
                   </View>
-                  <View
-                    style={{
-                      marginTop: 4,
-                      borderWidth: 0,
-                    }}>
-                    <Text
-                      style={{
-                        color: 'gray',
-                        fontSize: 12,
-                      }}>
-                      R {item.unitCost}
+                  <View style={{ marginTop: 4, borderWidth: 0, }}>
+                    <Text style={{ color: 'gray', fontSize: 12, }}>
+                      R{item.unitCost.toFixed(2)}
                     </Text>
                   </View>
                 </View>
-
-                <View
-                  style={{
-                    shadowColor: 'gray',
-                    shadowOffset: { width: 0, height: 0 },
-                  }}>
+                <View style={{ shadowColor: 'gray', shadowOffset: { width: 0, height: 0 }, }}>
                 </View>
               </View>
             </View>
-            <View
-              style={{
-                shadowOpacity: 1,
-                width: "20%",
-                alignSelf: "center",
-              }}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignSelf: "center",
-                  justifyContent: "space-between"
-                }}>
-
+            <View style={{ shadowOpacity: 1, width: "20%", alignSelf: "center", }}>
+              <View style={{ flexDirection: 'row', alignSelf: "center", justifyContent: "space-between"}}>
                 <TouchableOpacity onPress={() =>
                   this.removeQuantity(item, index)
                 }>
@@ -376,19 +247,10 @@ export default class Workout extends React.PureComponent {
                     -
                   </Text>
                 </TouchableOpacity>
-                <Text
-                  style={{
-                    color: 'black',
-                    fontSize: 18,
-                    marginHorizontal: 10,
-                    height: 28,
-                    paddingHorizontal: 2,
-                  }}>
+                <Text style={{ color: 'black', fontSize: 18, marginHorizontal: 10, height: 28, paddingHorizontal: 2, }}>
                   {item.quantity}
                 </Text>
-                <TouchableOpacity onPress={() =>
-                  this.addQuantity(item, index)
-                }>
+                <TouchableOpacity onPress={() => this.addQuantity(item, index) }>
                   <Text style={{ color: 'black', fontSize: 20 }}>
                     +
                   </Text>
@@ -403,13 +265,7 @@ export default class Workout extends React.PureComponent {
 
   renderCartView() {
     return (<View style={{ flex: 1 }}>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignSelf: 'flex-end',
-          marginRight: 25,
-          marginTop: -40,
-        }}>
+      <View style={{ flexDirection: 'row', alignSelf: 'flex-end', marginRight: 25, marginTop: -40}}>
         <Text style={{ color: 'gray' }}>Total Items(s): </Text>
         <Text style={{ color: 'black' }}>{this.state.setAllcartcount}</Text>
       </View>
@@ -432,32 +288,20 @@ export default class Workout extends React.PureComponent {
       <View />
       {this.state.setAllcartcount !== 0 &&
         <View
-          style={{
-            flex: 1,
-            justifyContent: 'flex-end',
-            position: 'relative',
-            marginTop: 90,
-          }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              paddingBottom: 5,
-              alignSelf: 'center',
-            }}>
+          style={{ flex: 1, justifyContent: 'flex-end', position: 'relative', marginTop: 90 }}>
+          <View style={{ flexDirection: 'row', paddingBottom: 5, alignSelf: 'center' }}>
             <Text style={{ marginLeft: 12, color: '#323232', fontSize: 20 }}>
               Total:
             </Text>
             <Text style={{ marginLeft: 12, color: 'red', fontSize: 20 }}>
-              R {this.state.setTotalValue}
+              R{this.state.setTotalValue.toFixed(2)}
             </Text>
           </View>
 
           <TouchableOpacity
             disabled={this.state.checkoutLoading}
             style={[styles.button, { backgroundColor: this.state.checkoutLoading ? '#ccc' : '#ff5a60' }]}
-            onPress={() =>
-              this.checkLogin()
-            }>
+            onPress={() => this.checkLogin() }>
             <Text style={styles.buttonText}>Check Out</Text>
           </TouchableOpacity>
         </View>
@@ -468,13 +312,7 @@ export default class Workout extends React.PureComponent {
   render() {
     return (
       <SafeAreaView style={styles.container}>
-        <Text
-          style={{
-            marginTop: -5,
-            fontWeight: 'bold',
-            fontSize: 20,
-            padding: 20,
-          }}>
+        <Text style={{ marginTop: -5, fontWeight: 'bold', fontSize: 20, padding: 20, }}>
           My Cart
         </Text>
         {this.state.firstcartLoading ?
