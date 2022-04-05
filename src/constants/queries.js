@@ -1145,6 +1145,13 @@ export const GET_SHOPPING_CART = gql`
         recordID
         totalPrice
         unitCost
+        prdProduct{
+          productId,
+          productName,
+          typeId,
+          scopeId,
+          salesTypeId
+        }
       }
       totalAmount,
       amountExlVat,

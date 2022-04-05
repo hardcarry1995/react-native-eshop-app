@@ -6,6 +6,7 @@ import RBSheet from 'react-native-raw-bottom-sheet';
 import { GET_ADDRESS_LIST, purchaseShoppingCartAsync } from '../../constants/queries';
 import AsyncStorage from '@react-native-community/async-storage';
 import client from '../../constants/client';
+import CartItem from "../../components/CartItem";
 
 export default class CheckOut extends React.Component {
   constructor(props) {
@@ -24,7 +25,6 @@ export default class CheckOut extends React.Component {
   }
   componentDidMount() {
     const { data, dataAll} = this.props.route.params;
-    console.log("Data All:",  dataAll);
     this.setState({totalCount: data.length});
     this.interval = setInterval(() => this.getAddressUserInter(), 5000);
     this.getAddressUser();
@@ -33,6 +33,13 @@ export default class CheckOut extends React.Component {
         clearInterval(this.interval);
     }
   }
+
+  UNSAFE_componentWillMount() {
+    if(this.interval){
+      clearInterval(this.interval);
+    }
+  }
+
   async fetchToken() {
     let token = await AsyncStorage.getItem('userToken');
     let userInfo = await AsyncStorage.getItem('userInfo');
@@ -132,30 +139,6 @@ export default class CheckOut extends React.Component {
     );
   }
 
-  renderItem = ({item, index}) => (
-    <View style={styles.card}>
-      <Image
-        style={{width: 80, height: 100, marginLeft: 2, marginRight: 2}}
-        source={ item.productImage ? {uri: `${imagePrefix}${item.productImage}`} : require('../../assets/NoImage.jpeg') }
-      />
-      <Text style={{fontSize: 16, left: 122, bottom: 110, width: '50%'}} numberOfLines={1}>
-        {item.productName}
-      </Text>
-      <Text style={{fontSize: 14, left: 122, opacity: 0.5, bottom: 110}}>
-        Dunlop
-      </Text>
-      <Text style={{fontSize: 15, left: 122, color: 'red', bottom: 100}}>
-        R{item.unitCost.toFixed(2)}
-      </Text>
-      <Text style={{fontSize: 15, left: 122, opacity: 0.5, bottom: 95}}>
-        R{(item.unitCost * item.quantity).toFixed(2)}
-      </Text>
-      <Text style={{fontSize: 13, marginLeft: 250, marginTop: -125}}>
-        Qty: {item.quantity}
-      </Text>
-    </View>
-  );
-
   alluserAddressSelectionView() {
     if(!this.state.alluserAddress.length > 0){
        return <ActivityIndicator size="large" color="#000" />;
@@ -252,19 +235,11 @@ export default class CheckOut extends React.Component {
           </View>
 
           <View style={{ height: 1, backgroundColor: 'grey', marginVertical: 30, marginHorizontal: 20, }} />
-          <FlatList
-            ListFooterComponent={() => {
-              return (
-                this.state.loading && (
-                  <ActivityIndicator size="large" color="#000" />
-                )
-              );
-            }}
-            keyExtractor={(item, i) => i.toString()}
-            data={data}
-            renderItem={this.renderItem}
-          />
-
+          <View style={{ paddingHorizontal: 20}}>
+            {data.map((item, index) => {
+              return <CartItem item={item} key={index} />
+            })}
+          </View>
           <View style={{ height: 1, backgroundColor: 'grey', marginVertical: 30, marginHorizontal: 20, }}/>
 
           <View>
@@ -382,16 +357,16 @@ const styles = StyleSheet.create({
   },
   card: {
     height: 120,
-    width: '90%',
     backgroundColor: '#FFFFFF',
     borderRadius: 15,
     padding: 20,
     elevation: 24,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 3},
+    shadowOffset: {width: 0, height: 1},
     shadowOpacity: 0.5,
-    shadowRadius: 5,
-    left: 20,
+    shadowRadius: 2,
     marginBottom: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });

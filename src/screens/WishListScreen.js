@@ -384,7 +384,6 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 20,
     width: 180,
-    // marginTop: 30,
     alignSelf: 'center',
   },
   buttonText: {
@@ -403,13 +402,8 @@ const styles = StyleSheet.create({
   mainCardView: {
     height: 100,
     width: '95%',
-    // alignSelf: 'center',/
     backgroundColor: 'white',
     borderRadius: 15,
-    // shadowColor: 'gray',
-    // shadowOffset: { width: 0, height: 0 },///
-    // shadowOpacity: 1,
-    // shadowRadius: 8,
     elevation: 8,
     flexDirection: 'row',
     paddingLeft: 16,
@@ -417,22 +411,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
     marginBottom: 6,
     alignSelf: "center",
-    // backgroundColor:"red",
-
-    // marginLeft: 16,
-    // marginRight: 16,
   },
-  // subCardView: {
-  //   height: 90,
-  //   width: 50,
-  //   // borderRadius: 25,
-  //   backgroundColor: 'white',
-  //   borderColor: 'white',
-  //   borderWidth: 1,
-  //   borderStyle: 'solid',
-  //   // alignItems: 'center',
-  //   // justifyContent: 'center',
-  // },
   emptyListStyle: {
     marginBottom: 15,
     textAlign: 'center',

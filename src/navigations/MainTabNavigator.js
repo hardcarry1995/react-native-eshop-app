@@ -37,6 +37,7 @@ import Checkout from "../screens/CartScreens/Checkout";
 // WishList Stack Screens
 import WishListScreen from '../screens/WishListScreen';
 import ScreenOptions from "../components/ScreenOptions";
+import ScreenOptionsWithBack from "../components/ScreenOptionsWithBack";
 import RequestStack from "./RequestStack";
 
 const Stack = createNativeStackNavigator();
@@ -94,9 +95,9 @@ const CategoryStack = () => (
 // Define ItemCart Stack
 // This is same as WorkoutStack
 const CartStack = () => (
-  <Stack.Navigator screenOptions={screenOptions}>
-    <Stack.Screen name="MyCart" component={MyCartScreen} />
-    <Stack.Screen name="Checkout" component={Checkout} />
+  <Stack.Navigator >
+    <Stack.Screen name="MyCart" component={MyCartScreen} options={screenOptions} />
+    <Stack.Screen name="Checkout" component={Checkout} options={ScreenOptionsWithBack}/>
   </Stack.Navigator>
 )
 

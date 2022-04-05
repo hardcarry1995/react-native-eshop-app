@@ -8,6 +8,7 @@ import Geolocation from '@react-native-community/geolocation';
 import Geocoder from 'react-native-geocoding';
 import { PermissionsAndroid } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
+import RNPickerSelect from 'react-native-picker-select';
 
 Geocoder.init("AIzaSyCNjKB84RyfVRuvuU8sCcQT6uWB_wVY03s") //rescue
 
@@ -389,6 +390,7 @@ const RequestItem = ({ navigation, route }) => {
           </MapView>
         </View>
         <View style={{ borderRadius: 10, borderColor: '#DBDBDB', borderWidth: 1, height: 50, width: '90%', alignSelf: 'center', margin: 20, }}>
+          
           <Picker
             selectedValue={selectProvince}
             onValueChange={(itemValue, itemIndex) => {
