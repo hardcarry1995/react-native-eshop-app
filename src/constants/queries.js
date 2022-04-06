@@ -2643,3 +2643,25 @@ export const CREATE_CONTACT_REQUEST = gql`
     }
   }
 `
+export const GET_RATING_LIST = gql`
+{
+  getRatingList(key:null,keyType:null,page:1,size:10){
+    count,
+    currentPage,
+    message,
+    nextPage,
+    prevPage,
+    success,
+    totalPages,
+    result{
+       mST_RatingID,
+       title,
+       review,
+       name,
+       ratingScore,
+       dateofReview
+      
+    }
+  }
+}
+`

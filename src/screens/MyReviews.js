@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, SafeAreaView, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import { GET_ALL_MAGAZINE_LIST } from '../constants/queries';
+import { GET_ALL_MAGAZINE_LIST, GET_RATING_LIST } from '../constants/queries';
 import client from '../constants/client';
 import Moment from 'moment';
 import { Rating } from 'react-native-elements';
@@ -27,16 +27,6 @@ export default class MyReviews extends React.Component {
     this.fetchToken();
   }
 
-
-  handleSearch = (text) => {
-    this.setState({
-      textnew: text,
-    });
-    let vdata = this.state.setAllcartcount.filter(i =>
-      i.magazineName.toLowerCase().includes(text.toLowerCase()))
-    this.setState({ data: vdata });
-  };
-
   async fetchToken() {
     let token = await AsyncStorage.getItem('userToken');
     let userInfo = await AsyncStorage.getItem('userInfo');
@@ -46,110 +36,57 @@ export default class MyReviews extends React.Component {
     this.setState({
       userTokenData: token
     });
-    this.getShoppingCart(token);
+    this.getRatingList(token);
   }
 
 
-  async fetchTokenNew() {
-    let token = await AsyncStorage.getItem('userToken');
-    let userInfo = await AsyncStorage.getItem('userInfo');
-    this.setState({
-      userInfo: JSON.parse(userInfo),
-    });
-    this.setState({
-      userTokenData: token
-    });
-    this.getrequestItem(token);
-    console.log('token', token);
-  }
-
-  fetchMoreUsers = () => {
+  fetchMoreReviews = () => {
     this.setState(
       prevState => ({
         offset: prevState.offset + 10,
       }),
       () => {
-        this.getrequestItem();
+        this.getRatingList();
       },
     );
   }
 
-  getShoppingCart(Token) {
+  getRatingList = (token = null) => {
     this.setState({ cartLoading: true });
     client
-      .query({
-        query: GET_ALL_MAGAZINE_LIST,
-        context: {
-          headers: {
-            Authorization: `Bearer ${Token}`,
-          },
+    .query({
+      query: GET_RATING_LIST,
+      context: {
+        headers: {
+          Authorization: `Bearer ${token === null ? this.state.userTokenData : token}`,
         },
-        variables: {
-          size: this.state.offset
-        },
-      })
-      .then(result => {
-        console.log(result.data.getMagazinesList.result);
-        this.setState({ cartLoading: false });
-        this.setState({ data: result.data.getMagazinesList.result })
-        this.setState({ setAllcartcount: result.data.getMagazinesList.result })
-      })
-      .catch(err => {
-        this.setState({ cartLoading: false });
-        console.log(err);
-      });
-  }
-  getrequestItem() {
-    if (!this.state.cartLoading) {
-      this.setState({ cartLoading: true });
-      client
-        .query({
-          query: GET_ALL_MAGAZINE_LIST,
-          fetchPolicy: 'no-cache',
-          variables: {
-            size: this.state.offset,
-          },
-          context: {
-            headers: {
-              Authorization: `Bearer ${this.state.userTokenData}`,
-            },
-          },
-        })
-        .then(result => {
-          this.setState({ cartLoading: false });
-          this.setState({ data: result.data.getMagazinesList.result })
-          this.setState({ setAllcartcount: result.data.getMagazinesList.result })
-        })
-        .catch(err => {
-          this.setState({ cartLoading: false });
-          console.log(err);
-        });
-    }
+      },
+      variables: {
+        size: this.state.offset
+      },
+    })
+    .then(result => {
+      this.setState({ cartLoading: false });
+      this.setState({ data: result.data.getRatingList.result })
+      this.setState({ setAllcartcount: result.data.getRatingList.result })
+    })
+    .catch(err => {
+      this.setState({ cartLoading: false });
+      console.log(err);
+    });
   }
 
   renderItem = ({ item, index }) => (
-    <TouchableOpacity key={index} onPress={() => { this.props.navigation.push('Catalogue36', { detail: item }) }} activeOpacity={0.9}>
+    <TouchableOpacity key={index} activeOpacity={0.9}>
       <View style={styles.main}>
-        <View>
-          <View style={{ width: 1, height: 80, backgroundColor: '#D0D0D0', marginLeft: 87, marginTop: 10, }} />
-          <Image
-            style={styles.image}
-            source={item.itemImagePath ? { uri: `${imagePrefix}${item.mapEflyersUploadDtos[0].documentName}` } : require('../assets/NoImage.jpeg')}
-          />
-        </View>
-        <View>
-          <Text style={styles.text} numberOfLines={1}>{item.magazineName}</Text>
-          {/* Adding Star Review */}
-          <View style={{ marginLeft: 107, bottom : 68, alignItems: 'flex-start',}}>
-            <Rating imageSize={16} readonly startingValue={item.ratingScore} />
-          </View>
-          <Text style={{ marginLeft: 110, bottom: 65, color: '#A8A8A8', fontSize: 11, }}>
-            {Moment(item.startDate).format('DD-MMM-YYYY')}
-          </Text>
-          <Text numberOfLines={1} style={{ marginLeft: 110, bottom: 60, color: '#323232', fontSize: 11, }}>
-            {item.eFlyerDescription}
-          </Text>
-        </View>
+        <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
+        <Rating imageSize={16} readonly startingValue={item.ratingScore} style={{ alignItems: 'flex-start'}} />
+        <Text style={{ color: '#A8A8A8', fontSize: 11, marginVertical: 2 }}>
+          {Moment(item.dateofReview).format('DD-MMM-YYYY')}
+        </Text>
+        <Text style={{ color: '#323232', fontSize: 11, }}>
+          {item.review}
+        </Text>
       </View>
     </TouchableOpacity>
   );
@@ -171,7 +108,7 @@ export default class MyReviews extends React.Component {
             keyExtractor={(item, i) => i}
             data={this.state.data}
             renderItem={this.renderItem}
-            onEndReached={this.fetchMoreUsers}
+            onEndReached={this.fetchMoreReviews}
             onEndReachedThreshold={0.5}
           />
         </SafeAreaView>
@@ -185,7 +122,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   main: {
-    height: 100,
     backgroundColor: 'white',
     borderRadius: 15,
     shadowRadius: 20,
@@ -193,6 +129,8 @@ const styles = StyleSheet.create({
     marginLeft: 16,
     marginRight: 16,
     marginTop: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
   },
   image: {
     height: 64,
@@ -200,11 +138,13 @@ const styles = StyleSheet.create({
     marginTop: -75,
     marginLeft: 10,
   },
-  text: {
-    marginLeft: 110,
-    bottom: 70,
+  name : {
     color: '#323232',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 5
   },
+ 
   SectionStyle: {
     flexDirection: 'row',
     justifyContent: 'center',
