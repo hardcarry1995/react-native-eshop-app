@@ -3,36 +3,35 @@ import { StyleSheet, View, Text, Switch, TouchableOpacity, ScrollView, ToastAndr
 import { GET_PROVINCE, GET_CITY, GET_SUBURB, GET_ALL_STATE, GET_ALL_CITY_NEW, GET_ALL_SUBURB } from '../constants/queries';
 import client from '../constants/client';
 import AsyncStorage from '@react-native-community/async-storage';
-import { Picker } from '@react-native-picker/picker';
 import Geolocation from '@react-native-community/geolocation';
 import Geocoder from 'react-native-geocoding';
 import { PermissionsAndroid } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import RNPickerSelect from 'react-native-picker-select';
+import CategorySelector from "../components/CategorySelector";
 
 Geocoder.init("AIzaSyCNjKB84RyfVRuvuU8sCcQT6uWB_wVY03s") //rescue
 
 const RequestItem = ({ navigation, route }) => {
   const [switchValue, setSwitchValue] = useState(false);
   const [province, setProvince] = useState([]);
-  const [selectProvince, setSelectProvince] = useState('');
+  const [selectProvince, setSelectProvince] = useState(null);
   const [city, setCity] = useState([]);
-  const [selectCity, setSelectCity] = useState('');
+  const [selectCity, setSelectCity] = useState(null);
   const [suburb, setSuburb] = useState([]);
-  const [selectSub, setSelectSub] = useState('');
+  const [selectSub, setSelectSub] = useState(null);
   const [currentLatitude, setCurrentLatitude] = useState(-28.4793);
   const [currentLongitude, setCurrentLongitude] = useState(24.6727);
   const [locationStatus, setLocationStatus] = useState('');
-  const [coordinates, setCurrentcoordinates] = useState([]);
   const [mapstate, setMapState] = useState('');
-  const [data, setData] = useState([]);
   const [dataEMP, setAllProvince] = useState([]);
-  const [username, setQuery] = useState('');
   const [initialRegion, setinitialRegion] = useState();
+  const [showCategorySelector, setShowCategorySelector] = useState(false);
+  const [categoryId, setCategoryId] = useState('');
+  const [subCategoryId, setSubCategoryId] = useState('');
+  const [subCategoryName, setSubCategoryName] = useState('');
+
   const [mapRegion, setMapReson] = useState();
-  const categoryId = "";
-  const subCategoryId = "";
-  const subCategoryName = "";
   const title = "";
   const desc = "";
   const startdate = "";
@@ -45,7 +44,6 @@ const RequestItem = ({ navigation, route }) => {
       getLocation();
       getLocationData();
       getOneTimeLocation();
-      handleSearch('Free State');
     } else {
       setTheAllData();
       setSelectProvince('')
@@ -78,11 +76,6 @@ const RequestItem = ({ navigation, route }) => {
     setMapReson(region);
   }
 
-  const handleSearch = text => {
-    let vdata = dataEMP.filter(i => i.provinceName.toLowerCase().includes(text.toLowerCase()))
-    console.log('vdata', vdata[0].provinceId)
-  };
-
   const AddCreateFeed = () => {
     if(selectProvince == ''){
       Alert.alert('Error','Select Province/State ');
@@ -92,7 +85,6 @@ const RequestItem = ({ navigation, route }) => {
     }else if(selectSub == ''){
       Alert.alert('Error','Select Saburb');
     }else{
-    console.log('subCategoryId',subCategoryId);
     navigation.navigate('CreateFeed', {
       categoryId: categoryId,
       subCategoryId: subCategoryId,
@@ -115,7 +107,6 @@ const RequestItem = ({ navigation, route }) => {
         setSelectProvince(addressComponent[addressComponent.length-3].long_name)
         setSelectCity(addressComponent[addressComponent.length-4].long_name)
         setSelectSub(addressComponent[addressComponent.length-5].long_name)
-        // console.log(json)
       }).catch(error => console.warn(error));
     }, (error) => {
       console.log(error.code, error.message);
@@ -292,7 +283,14 @@ const RequestItem = ({ navigation, route }) => {
       .then(async result => {
         if (result.data.getProvince.success) {
           fetchAllState();
-          setProvince(result.data.getProvince.result);
+          const updateProvinces = result.data.getProvince.result.map((item ) => {
+            return {
+              ...item,
+              label: item.provinceName,
+              value: item.provinceId
+            }
+          })
+          setProvince(updateProvinces);
         } else {
           ToastAndroid.show( result.data.getProvince.message, ToastAndroid.SHORT );
         }
@@ -321,7 +319,14 @@ const RequestItem = ({ navigation, route }) => {
       })
       .then(async result => {
         if (result.data.getCityByProvince.success) {
-          setCity(result.data.getCityByProvince.result);
+          const updatedCities = result.data.getCityByProvince.result.map(item => {
+            return {
+              ...item,
+              label : item.cityName,
+              value : item.cityId
+            }
+          })
+          setCity(updatedCities);
         } else {
           ToastAndroid.show( result.data.getCityByProvince.message, ToastAndroid.SHORT );
         }
@@ -350,7 +355,14 @@ const RequestItem = ({ navigation, route }) => {
       })
       .then(async result => {
         if (result.data.getSuburbByCity.success) {
-          setSuburb(result.data.getSuburbByCity.result);
+          const updatedSuperb = result.data.getSuburbByCity.result.map(item => {
+            return {
+              ...item,
+              label : item.suburbName,
+              value : item.suburbId
+            }
+          })
+          setSuburb(updatedSuperb);
         } else {
           ToastAndroid.show( result.data.getSuburbByCity.message, ToastAndroid.SHORT );
         }
@@ -359,6 +371,21 @@ const RequestItem = ({ navigation, route }) => {
         console.log(err);
       });
   };
+
+  const setCategory = (categories) => {
+    if(categories.length === 0) {
+      setShowCategorySelector(false);
+      return;
+    }
+
+    const category = categories[0];
+
+    setCategoryId(category.parentCategoryId);
+    setSubCategoryId(category.categoryId);
+    setSubCategoryName(category.categoryName);
+    setShowCategorySelector(false);
+
+  }
 
   return (
     <View style={{ flex: 1 }}>
@@ -389,27 +416,21 @@ const RequestItem = ({ navigation, route }) => {
             />
           </MapView>
         </View>
+        <TouchableOpacity style={styles.categorySelectorButton} onPress={() => setShowCategorySelector(true)}>
+          <Text style={styles.categoryButtonText}>{ subCategoryName === "" ? `Select a category` : subCategoryName }</Text>
+        </TouchableOpacity>
+
         <View style={{ borderRadius: 10, borderColor: '#DBDBDB', borderWidth: 1, height: 50, width: '90%', alignSelf: 'center', margin: 20, }}>
-          
-          <Picker
-            selectedValue={selectProvince}
+          <RNPickerSelect
+            value={selectProvince}
             onValueChange={(itemValue, itemIndex) => {
               setSelectProvince(itemValue);
               fetchCity(itemValue);
             }}
-            style={{ color: '#6D6B6B', height: 45}}>
-            <Picker.Item label={selectProvince} value="5" />
-            <Picker.Item label="Select Province/State" value="" />
-            {province.map((item, i) => {
-              return (
-                <Picker.Item
-                  key={i}
-                  label={item.provinceName}
-                  value={item.provinceId}
-                />
-              );
-            })}
-          </Picker>
+            items={province}
+            textInputProps={styles.pickerContainer}
+            placeholder= {{ label: "Select a province...", value: null }}
+          />
         </View>
 
         <View
@@ -421,19 +442,16 @@ const RequestItem = ({ navigation, route }) => {
             alignSelf: 'center',
             margin: 5,
           }}>
-          <Picker
-            selectedValue={selectCity}
+          <RNPickerSelect
+            value={selectCity}
             onValueChange={(itemValue, itemIndex) => {
               setSelectCity(itemValue);
               fetchSuburb(itemValue);
             }}
-            style={{ color: '#6D6B6B', height: 45 }}>
-            <Picker.Item label={selectCity} value="25" />
-            <Picker.Item label="Select City" value="" />
-            {city.map((item, i) => {
-              return <Picker.Item label={item.cityName} value={item.cityId} />;
-            })}
-          </Picker>
+            items={city}
+            textInputProps={styles.pickerContainer}            
+            placeholder= {{ label: "Select a city...", value: null }}
+          />
         </View>
 
         <View
@@ -445,22 +463,16 @@ const RequestItem = ({ navigation, route }) => {
             alignSelf: 'center',
             margin: 15,
           }}>
-          <Picker
-            selectedValue={selectSub}
-            onValueChange={(itemValue, itemIndex) => {
-              setSelectSub(itemValue);
-            }}
-            style={{ color: '#6D6B6B', height: 45 }}>
-            <Picker.Item label={selectSub} value="125" />
-            <Picker.Item label="Select Suburb" value="" />
-            {suburb.map((item, i) => {
-              return (
-                <Picker.Item label={item.suburbName} value={item.suburbId} />
-              );
-            })}
-          </Picker>
+            <RNPickerSelect
+              value={selectSub}
+              onValueChange={(itemValue, itemIndex) => {
+                setSelectSub(itemValue);
+              }}
+              items={suburb}
+              textInputProps={styles.pickerContainer}
+              placeholder= {{ label: "Select a sub...", value: null }}
+          />
         </View>
-
         <TouchableOpacity
           style={{
             height: 35,
@@ -472,6 +484,7 @@ const RequestItem = ({ navigation, route }) => {
             alignSelf: 'center',
           }}
           onPress={() => {
+
             AddCreateFeed()
           }}>
           <Text style={{ color: '#FAFAFA', alignSelf: 'center', marginTop: 7 }}>
@@ -479,6 +492,7 @@ const RequestItem = ({ navigation, route }) => {
           </Text>
         </TouchableOpacity>
       </ScrollView>
+      <CategorySelector visible={showCategorySelector} multiple={false} onDone={setCategory} />
     </View>
   );
 };
@@ -523,4 +537,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingLeft: 20
   },
+  pickerContainer: {
+    borderRadius: 5,
+    borderColor: '#DCDCDC',
+    borderWidth: 2,
+    height: 50,
+    textAlign: 'center',
+    color: 'red',
+    fontSize: 18
+  },
+  categorySelectorButton : {
+    borderRadius: 10, 
+    borderColor: '#DBDBDB', 
+    borderWidth: 3, 
+    height: 50, 
+    width: '90%', 
+    marginHorizontal: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  categoryButtonText : {
+    textAlign: 'center',
+    color: 'red',
+    fontSize: 18
+  }
 });

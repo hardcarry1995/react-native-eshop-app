@@ -118,7 +118,11 @@ class DrawerContent extends Component {
         this.props.navigation.navigate(Constant.settings, { screen : "MyBid"});
         this.setState({ selectedRoute: "MyBid" });
         break;
-      case Constant.give_feedback:
+      
+      case Constant.give_feedback: 
+        this.props.navigation.navigate("ContactStack", { screen : "ContactForm "});
+        this.setState({ selectedRoute: Constant.give_feedback });
+        break;
       case Constant.rate_the_app:
         if(Platform.OS === 'ios'){
           Linking.openURL('market://details?id=myandroidappid')

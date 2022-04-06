@@ -1,18 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-  Image,
-  TouchableOpacity,
-  TextInput,
-  SafeAreaView,
-  ScrollView,
-  FlatList
-} from 'react-native';
-import { bearerToken, imagePrefix } from '../../constants/utils';
-import { REQUEST_ITEM, REQUEST_ITEM_GET } from '../../constants/queries';
+import { View, Text, StyleSheet, ActivityIndicator, Image, TouchableOpacity, SafeAreaView, FlatList } from 'react-native';
+import { imagePrefix } from '../../constants/utils';
+import { REQUEST_ITEM_GET } from '../../constants/queries';
 import AsyncStorage from '@react-native-community/async-storage';
 import client from '../../constants/client';
 import { GetRating } from '../../components/GetRating';
@@ -26,20 +15,16 @@ const Request24 = ({ navigation }) => {
   const [isListEnd, setIsListEnd] = useState(false);
   const [offset, setOffset] = useState(10);
 
-  const starImageFilled =
-    'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png';
-  const starImageCorner =
-    'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png';
+  const starImageFilled = 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png';
+  const starImageCorner = 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png';
   useEffect(() => {
     getrequestItem();
   }, []);
 
-  // const dateDMY = Moment(data.itemRequestDate).format('DD-MM-YYYY');
   const getrequestItem = async () => {
     let resultdata = await AsyncStorage.getItem('userInfo');
     let jsondata = JSON.parse(resultdata);
     let token = await AsyncStorage.getItem('userToken');
-    console.log('token>>>>>>>>>>', token);
     if (!loading && !isListEnd) {
       setLoading(true);
       client
@@ -48,7 +33,6 @@ const Request24 = ({ navigation }) => {
           context: {
             headers: {
               Authorization: `Bearer ${token}`,
-              // 'Content-Length': 0,
             },
           },
           variables: {
@@ -57,7 +41,6 @@ const Request24 = ({ navigation }) => {
           },
         })
         .then(async result => {
-          console.log('result>>>>>>>>>............', result.data.getItemRequestList.result)
           if (result.data.getItemRequestList.success) {
             setData(result.data.getItemRequestList.result)
             setOffset(offset + 10);
@@ -92,36 +75,18 @@ const Request24 = ({ navigation }) => {
       <TouchableOpacity
         activeOpacity={0.9}
         onPress={() => {
-          navigation.push('RequestNew25', { data: item });
+          navigation.navigate('RequestNew25', { data: item });
         }}>
         <View style={styles.main}>
           <View style={{ width: "22%", justifyContent: "center" }}>
-
-            {/* <Image
-              style={styles.image}
-              source={require('../assets/S32.png')}
-            /> */}
             <Image
               style={styles.image}
-              source={item.itemImagePath
-                ?
-                { uri: `${imagePrefix}${item.itemImagePath}` }
-                :
-                require('../../assets/NoImage.jpeg')}
+              source={item.itemImagePath ? { uri: `${imagePrefix}${item.itemImagePath}` } : require('../../assets/NoImage.jpeg')}
             />
           </View>
 
-          <View
-            style={{
-              width: "0.5%",
-              backgroundColor: '#D0D0D0',
-              height: "80%",
-              alignSelf: "center"
-            }}
-          />
-
+          <View style={{ width: "0.5%", backgroundColor: '#D0D0D0', height: "80%", alignSelf: "center" }} />
           <View style={{ width: "77%" }}>
-
             <Text style={styles.text}>
               {item.itemRequestTitle}
             </Text>
@@ -135,31 +100,18 @@ const Request24 = ({ navigation }) => {
                   >
                     <Image
                       style={styles.starImageStyle}
-                      source={
-                        item <= rating
-                          ? { uri: starImageFilled }
-                          : { uri: starImageCorner }
-                      }
+                      source={ item <= rating ? { uri: starImageFilled } : { uri: starImageCorner }}
                     />
                   </TouchableOpacity>
                 );
               })}
             </View>
 
-            <Text
-              style={{
-                color: '#A8A8A8',
-                fontSize: 11,
-                marginLeft: 10
-              }}>
+            <Text style={{ color: '#A8A8A8', fontSize: 11, marginLeft: 10}}>
               {Moment(item.itemRequestDate).format('DD-MMM-YYYY')}
             </Text>
             <Text numberOfLines={1}
-              style={{
-                color: '#323232',
-                fontSize: 11,
-                marginLeft: 10
-              }}>
+              style={{ color: '#323232', fontSize: 11, marginLeft: 10 }}>
               {item.itemRequestDescription}
             </Text>
           </View>

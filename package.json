@@ -30,6 +30,7 @@
     "axios": "^0.26.1",
     "base-64": "^1.0.0",
     "fbjs": "^3.0.4",
+    "formik": "^2.2.9",
     "graphql": "^16.3.0",
     "moment": "^2.29.1",
     "native-base": "^2.13.12",
@@ -74,10 +75,12 @@
     "react-native-svg": "^12.1.1",
     "react-native-swipeout": "^2.3.6",
     "react-native-toast": "^1.0.1",
+    "react-native-toast-message": "^2.1.5",
     "react-native-vector-icons": "^9.1.0",
     "react-native-webview": "^11.17.2",
     "react-redux": "^7.2.6",
-    "redux": "^4.1.2"
+    "redux": "^4.1.2",
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "@babel/core": "^7.17.5",

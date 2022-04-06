@@ -1,18 +1,11 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  FlatList,
-  SafeAreaView,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, SafeAreaView, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import { GET_ALL_MAGAZINE_LIST } from '../constants/queries';
 import client from '../constants/client';
 import Moment from 'moment';
+import { Rating } from 'react-native-elements';
+
 
 export default class MyReviews extends React.Component {
   constructor(props) {
@@ -28,8 +21,6 @@ export default class MyReviews extends React.Component {
       userInfo: [],
       userTokenData: ''
     };
-
-    // this.intervalID = setInterval(this.fetchToken(), 5000);
   }
 
   componentDidMount() {
@@ -56,7 +47,6 @@ export default class MyReviews extends React.Component {
       userTokenData: token
     });
     this.getShoppingCart(token);
-    console.log('token', token);
   }
 
 
@@ -89,15 +79,9 @@ export default class MyReviews extends React.Component {
     client
       .query({
         query: GET_ALL_MAGAZINE_LIST,
-        // fetchPolicy: 'no-cache',
-        // variables: {
-        //   pid: id,
-        //   userId: this.state.userInfo.id,
-        // },
         context: {
           headers: {
             Authorization: `Bearer ${Token}`,
-            // 'Content-Length': 0,
           },
         },
         variables: {
@@ -105,13 +89,10 @@ export default class MyReviews extends React.Component {
         },
       })
       .then(result => {
+        console.log(result.data.getMagazinesList.result);
         this.setState({ cartLoading: false });
-        console.log("ccccccccccccccccccccccccccccccccccccccccccc", result)
-        // if (result.data.getMagazinesList.success) {
         this.setState({ data: result.data.getMagazinesList.result })
         this.setState({ setAllcartcount: result.data.getMagazinesList.result })
-        // ToastAndroid.show('Product added to cart', ToastAndroid.SHORT);
-        // }
       })
       .catch(err => {
         this.setState({ cartLoading: false });
@@ -131,19 +112,13 @@ export default class MyReviews extends React.Component {
           context: {
             headers: {
               Authorization: `Bearer ${this.state.userTokenData}`,
-              // 'Content-Length': 0,
             },
           },
         })
         .then(result => {
           this.setState({ cartLoading: false });
-          console.log("ccccccccccccccccccccccccccccccccccccccccccc", result)
-          // if (result.data.getMagazinesList.success) {
-          // // this.setState({ offset: this.state.offset + 10 })
           this.setState({ data: result.data.getMagazinesList.result })
           this.setState({ setAllcartcount: result.data.getMagazinesList.result })
-          // ToastAndroid.show('Product added to cart', ToastAndroid.SHORT);
-          // }
         })
         .catch(err => {
           this.setState({ cartLoading: false });
@@ -153,110 +128,25 @@ export default class MyReviews extends React.Component {
   }
 
   renderItem = ({ item, index }) => (
-    <TouchableOpacity key={index}
-      onPress={() => {
-        this.props.navigation.push('Catalogue36', { detail: item });
-      }}
-      activeOpacity={0.9}>
+    <TouchableOpacity key={index} onPress={() => { this.props.navigation.push('Catalogue36', { detail: item }) }} activeOpacity={0.9}>
       <View style={styles.main}>
         <View>
-          <View
-            style={{
-              width: 1,
-              height: 80,
-              backgroundColor: '#D0D0D0',
-              marginLeft: 87,
-              marginTop: 10,
-            }}
-          />
+          <View style={{ width: 1, height: 80, backgroundColor: '#D0D0D0', marginLeft: 87, marginTop: 10, }} />
           <Image
             style={styles.image}
-            source={item.itemImagePath
-              ?
-              { uri: `${imagePrefix}${item.mapEflyersUploadDtos[0].documentName}` }
-              :
-              require('../assets/NoImage.jpeg')}
+            source={item.itemImagePath ? { uri: `${imagePrefix}${item.mapEflyersUploadDtos[0].documentName}` } : require('../assets/NoImage.jpeg')}
           />
         </View>
         <View>
           <Text style={styles.text} numberOfLines={1}>{item.magazineName}</Text>
-
-          <View
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              paddingTop: 5,
-              paddingBottom: 20,
-            }}>
-            <Image
-              style={{
-                width: 15,
-                height: 15,
-                marginLeft: 110,
-                marginRight: 2,
-                bottom: 70,
-              }}
-              source={require('../assets/stargold.png')}
-            />
-            <Image
-              style={{
-                width: 15,
-                height: 15,
-                marginLeft: 2,
-                marginRight: 2,
-                bottom: 70,
-              }}
-              source={require('../assets/stargold.png')}
-            />
-            <Image
-              style={{
-                width: 15,
-                height: 15,
-                marginLeft: 2,
-                marginRight: 2,
-                bottom: 70,
-              }}
-              source={require('../assets/stargold.png')}
-            />
-            <Image
-              style={{
-                width: 15,
-                height: 15,
-                marginLeft: 2,
-                marginRight: 2,
-                bottom: 70,
-              }}
-              source={require('../assets/stargold.png')}
-            />
-            <Image
-              style={{
-                width: 15,
-                height: 15,
-                marginLeft: 2,
-                marginRight: 2,
-                bottom: 70,
-              }}
-              source={require('../assets/stargold.png')}
-            />
+          {/* Adding Star Review */}
+          <View style={{ marginLeft: 107, bottom : 68, alignItems: 'flex-start',}}>
+            <Rating imageSize={16} readonly startingValue={item.ratingScore} />
           </View>
-
-          <Text
-            style={{
-              marginLeft: 110,
-              bottom: 70,
-              color: '#A8A8A8',
-              fontSize: 11,
-            }}>
-
+          <Text style={{ marginLeft: 110, bottom: 65, color: '#A8A8A8', fontSize: 11, }}>
             {Moment(item.startDate).format('DD-MMM-YYYY')}
           </Text>
-          <Text numberOfLines={1}
-            style={{
-              marginLeft: 110,
-              bottom: 65,
-              color: '#323232',
-              fontSize: 11,
-            }}>
+          <Text numberOfLines={1} style={{ marginLeft: 110, bottom: 60, color: '#323232', fontSize: 11, }}>
             {item.eFlyerDescription}
           </Text>
         </View>
@@ -268,10 +158,7 @@ export default class MyReviews extends React.Component {
     return (
       <View style={styles.container}>
         <SafeAreaView>
-          {/* <ScrollView> */}
-          {/* <View style={{ backgroundColor: 'white' }}> */}
           <FlatList
-            // ListEmptyComponent={this.EmptyListMessage('data')}
             ListFooterComponent={() => {
               return (
                 this.state.cartLoading ? (
@@ -286,10 +173,7 @@ export default class MyReviews extends React.Component {
             renderItem={this.renderItem}
             onEndReached={this.fetchMoreUsers}
             onEndReachedThreshold={0.5}
-          // ListEmptyComponent={this.ListEmpty}
           />
-          {/* </View> */}
-          {/* </ScrollView> */}
         </SafeAreaView>
       </View>
     );

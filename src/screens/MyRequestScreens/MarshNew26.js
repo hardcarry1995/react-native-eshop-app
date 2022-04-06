@@ -1,22 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Image,
-  Alert,
-  Dimensions,
-  TextInput,
-  FlatList,
-  Modal,
-  PermissionsAndroid,
-  ToastAndroid,
-  ActivityIndicator
-} from 'react-native';
-import RNFetchBlob from 'react-native-blob-util';
+import { StyleSheet, Text, View, TouchableOpacity, Image, Alert, Dimensions, TextInput, FlatList, Modal, ToastAndroid, ActivityIndicator } from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
-import { REQUEST_ITEM_POST_RESPONSE, GET_RESPONSE_ITEMS, GET_RESPONSE_ITEMS_NEW } from '../../constants/queries';
+import { REQUEST_ITEM_POST_RESPONSE, GET_RESPONSE_ITEMS } from '../../constants/queries';
 import AsyncStorage from '@react-native-community/async-storage';
 import client from '../../constants/client';
 
@@ -32,7 +17,6 @@ const Marsh26 = ({ navigation, route }) => {
   const [loading, setLoading] = useState(false);
   const [filePath, setFilePath] = useState('')
   const [fileName, setFileName] = useState(null)
-  const [source, setsource] = useState({ uri: 'http://samples.leanpub.com/thereactnativebook-sample.pdf', cache: true })
 
   const requestData = route.params.requestData;
 
@@ -40,12 +24,7 @@ const Marsh26 = ({ navigation, route }) => {
     getToken();
   }, []);
 
-  const renderDate = date => {
-    return <Text style={styles.time}>{date}</Text>;
-  };
-
   const setModalVisible = visible => {
-    // this.setState({ modalVisible: visible });
     setmodalVisibler(visible);
   };
   const getToken = async () => {
@@ -59,95 +38,18 @@ const Marsh26 = ({ navigation, route }) => {
     setIdData(requestData.itemRequestID)
   }
 
-  const getTokenNew = async () => {
-    let resultdata = await AsyncStorage.getItem('userInfo');
-    setUserInfo(resultdata);
-    let jsondata = JSON.parse(resultdata);
-    let token = await AsyncStorage.getItem('userToken');
-    SetToken(token)
-    Setjsondata(jsondata)
-  }
-
-  const historyDownload = () => {
-    //Function to check the platform
-    //If iOS the start downloading
-    //If Android then ask for runtime permission
-    if (Platform.OS === 'ios') {
-      this.downloadHistory();
-    } else {
-      try {
-        PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-          {
-            title: 'storage title',
-            message: 'storage_permission',
-          },
-        ).then(granted => {
-          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-            //Once user grant the permission start downloading
-            console.log('Storage Permission Granted.');
-            downloadHistory();
-          } else {
-            //If permission denied then show alert 'Storage Permission 
-            // Not Granted'
-            Alert.alert('storage_permission');
-          }
-        });
-      } catch (err) {
-        //To handle permission related issue
-        console.log('error', err);
-      }
-    }
-  }
-
-
-  const downloadHistory = async () => {
-    const { config, fs } = RNFetchBlob;
-    let PictureDir = fs.dirs.PictureDir;
-    let date = new Date();
-    let options = {
-      fileCache: true,
-      addAndroidDownloads: {
-        //Related to the Android only
-        useDownloadManager: true,
-        notification: true,
-        path:
-          PictureDir +
-          '/Report_Download' +
-          Math.floor(date.getTime() + date.getSeconds() / 2),
-        description: 'Risk Report Download',
-      },
-    };
-    config(options)
-      .fetch('GET', url)
-      .then((res) => {
-        //Showing alert after successful downloading
-        console.log('res -> ', JSON.stringify(res));
-        alert('Report Downloaded Successfully.');
-      });
-  }
-
   const requestItem = () => {
     if (name_address == '') {
       ToastAndroid.show('write something first', ToastAndroid.SHORT);
       return;
     }
     setLoading(true)
-    let variablesDAta = {
-      title: name_address,
-      itemRequestId: requestData.itemRequestID,
-      userId: Number(jsondata.id),
-      filePath: filePath,
-      fileName: fileName
-    }
-    console.log('variablesDAta', variablesDAta);
     client
       .mutate({
         mutation: REQUEST_ITEM_POST_RESPONSE,
         context: {
           headers: {
             Authorization: `Bearer ${token}`,
-            // 'Content-Length': 0,
           },
         },
         variables: {
@@ -159,13 +61,9 @@ const Marsh26 = ({ navigation, route }) => {
         },
       })
       .then(async result => {
-        console.log('requestData>>>', result)
         if (result.data.postMstItemResponse.success) {
           setname_address('')
           setmsgDataNew([])
-          // setTimeout(function () {              
-          //    getRequestData();
-          // }, 1000);
           let tdata = {
             comment: name_address,
             companyId: null,
@@ -201,18 +99,12 @@ const Marsh26 = ({ navigation, route }) => {
             let j = msgData.length - 1;
             while (i != j) {
               i++;
-              // console.log(i)
               msgDataNew.push(msgData[i])
             }
           }
           msgDataNew.push(tdata)
-          // navigation.navigate('Marsh26');
 
           setmsgData(msgDataNew)
-          // console.log('msgDataNew', msgDataNew)
-          // console.log('msgDataNew length', msgData.length)
-          // console.log('msgDataNew mhhhh length', msgData)
-          // Alert.alert('Success', result.data.postMstItemResponse.message)
           setLoading(false)
         } else {
           Alert.alert('Failed', result.data.postMstItemResponse.message)
@@ -224,22 +116,15 @@ const Marsh26 = ({ navigation, route }) => {
   };
   const showPDFOnClick = (item) => {
     navigation.navigate('ShowPDF', { pdfPath: item });
-    console.log('item......', item)
   }
-
-
   const getRequestItemNext = () => {
-
     let id = requestData.itemRequestID
-    // console.log('variablesDAta', variablesDAta);
-
     client
       .query({
         query: GET_RESPONSE_ITEMS,
         context: {
           headers: {
             Authorization: `Bearer ${token}`,
-            // 'Content-Length': 0,
           },
         },
         variables: {
@@ -247,7 +132,6 @@ const Marsh26 = ({ navigation, route }) => {
         },
       })
       .then(async result => {
-        console.log('GET_RESPONSE_ITEMS>>>>>!!!!!!!!!!!!!', result.data.getResponseItems)
         if (result.data.getResponseItems) {
           setmsgData(result.data.getResponseItems);
         } else {
@@ -259,47 +143,14 @@ const Marsh26 = ({ navigation, route }) => {
       });
   };
 
-  const getRequestData = () => {
-    // console.log('variablesDAta', variablesDAta);
-
-    client
-      .query({
-        query: GET_RESPONSE_ITEMS_NEW,
-        context: {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            // 'Content-Length': 0,
-          },
-        },
-        variables: {
-          id: idTo,
-        },
-      })
-      .then(async result => {
-        // console.log('9999999999999', result.data.getResponseItems)
-        // setmsgData(result.data.getResponseItems); 
-        if (result.data.getResponseItems) {
-          setmsgData(result.data.getResponseItems);
-          // [...msgData, result.data.getResponseItems]
-        } else {
-          Alert.alert('Failed', 'No Data Found')
-        }
-      })
-      .catch(err => {
-        console.log('REQUEST_ITEM_GET_RESPONSE Error', err);
-      });
-  };
   const selectFileDoc = async value => {
     try {
       const res = await DocumentPicker.pick({
         type: [DocumentPicker.types.pdf, DocumentPicker.types.doc, DocumentPicker.types.xlsx, DocumentPicker.types.docx],
       });
-
-      console.log('res : ' + JSON.stringify(res));
       setFilePath(res.uri)
       setFileName(res.name)
     } catch (err) {
-      // setSingleFile(null);
       if (DocumentPicker.isCancel(err)) {
         alert('Canceled');
       } else {
@@ -309,186 +160,136 @@ const Marsh26 = ({ navigation, route }) => {
     }
   };
 
-  // const { modalVisible } = this.state;
   return (
+    <View style={styles.container}>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          Alert.alert('Modal has been closed.');
+          setModalVisible(!modalVisible);
+        }}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={{ marginTop: 20, fontSize: 15 }}>
+              Would you like to accept the offer
+            </Text>
+            <View style={{ flexDirection: 'row' }}>
+              <TouchableOpacity
+                style={[styles.button, styles.buttonClo]}
+                onPress={() => setModalVisible(false)}>
+                <Text style={styles.textStyle}>Purchase</Text>
+                <Image
+                  style={{
+                    resizeMode: 'center',
+                    height: 15,
+                    width: 15,
+                    marginTop: -17,
+                    marginLeft: 10,
+                  }}
+                  source={require('../../assets/noun_Check.png')}
+                />
+              </TouchableOpacity>
 
-    <>
-
-      <View style={styles.container}>
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            Alert.alert('Modal has been closed.');
-            setModalVisible(!modalVisible);
-          }}>
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              {/* <Image style={{marginTop:10}} source={require('../assets/congratulation10.png')} /> */}
-              <Text style={{ marginTop: 20, fontSize: 15 }}>
-                Would you like to accept the offer
-              </Text>
-              <View style={{ flexDirection: 'row' }}>
-                <TouchableOpacity
-                  style={[styles.button, styles.buttonClo]}
-                  // onPress={() => this.setModalVisible(!modalVisible)}
-                  onPress={() => setModalVisible(false)}>
-                  <Text style={styles.textStyle}>Purchase</Text>
-                  <Image
-                    style={{
-                      resizeMode: 'center',
-                      height: 15,
-                      width: 15,
-                      marginTop: -17,
-                      marginLeft: 10,
-                    }}
-                    source={require('../../assets/noun_Check.png')}
-                  />
-                </TouchableOpacity>
-
-                <TouchableOpacity style={[styles.butt, styles.buttonClose]}
-                  onPress={() =>
-                    navigation.goBack()}>
-                  <Text style={styles.textSty}>Decline</Text>
-                  <Image
-                    style={{
-                      resizeMode: 'center',
-                      height: 15,
-                      width: 15,
-                      marginTop: -17,
-                      marginLeft: 10,
-                    }}
-                    source={require('../../assets/cros.png')}
-                  />
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity style={[styles.butt, styles.buttonClose]}
+                onPress={() =>
+                  navigation.goBack()}>
+                <Text style={styles.textSty}>Decline</Text>
+                <Image
+                  style={{
+                    resizeMode: 'center',
+                    height: 15,
+                    width: 15,
+                    marginTop: -17,
+                    marginLeft: 10,
+                  }}
+                  source={require('../../assets/cros.png')}
+                />
+              </TouchableOpacity>
             </View>
           </View>
-        </Modal>
+        </View>
+      </Modal>
 
-        {/* <View
-          style={{
-            backgroundColor: '#E84B4B',
-            height: 30,
-            width: 80,
-            alignSelf: 'center',
-            marginTop: 20,
-            borderRadius: 5,
-          }}> */}
-        {/* <Text style={{color: '#FFFFFF', alignSelf: 'center', marginTop: 5}}>
-            13/05/20
-          </Text> */}
-        {/* </View> */}
-        {/* <View style={styles.container}>
-          <Pdf
-            source={{uri:'content://com.android.providers.downloads.documents/document/7973',cache:true}}
-            onLoadComplete={(numberOfPages, filePath) => {
-              console.log(`number of pages: ${numberOfPages}`);
-            }}
-            onPageChanged={(page, numberOfPages) => {
-              console.log(`current page: ${page}`);
-            }}
-            onError={(error) => {
-              console.log(error);
-            }}
-            onPressLink={(uri) => {
-              console.log(`Link presse: ${uri}`)
-            }}
-            style={styles.pdf} />
-        </View> */}
-        <FlatList
-          style={styles.list}
-          data={msgData}
-          keyExtractor={item => {
-            return item.id;
-          }}
-          renderItem={comment => {
-            // console.log(this.state.msgData);
-            const item = comment.item;
-            let inMessage = '';
-            let itemStyle = inMessage ? styles.itemIn : styles.itemOut;
-            return (
-              <View>
-                <View style={styles.itemOut}>
-                  {/* {!inMessage && this.renderDate(item.date)} */}
-                  <View style={styles.balloon}>
-                    <Text>{item.comment}</Text>
-                    {/* <Text>{item.mapItemResponseUpload[0].uploadPath}</Text> */}
-                  </View>
-                  {/* {inMessage && this.renderDate(item.date)} */}
+      <FlatList
+        style={styles.list}
+        data={msgData}
+        keyExtractor={item => {
+          return item.id;
+        }}
+        renderItem={comment => {
+          const item = comment.item;
+          let inMessage = '';
+          let itemStyle = inMessage ? styles.itemIn : styles.itemOut;
+          return (
+            <View>
+              <View style={styles.itemOut}>
+                <View style={styles.balloon}>
+                  <Text>{item.comment}</Text>
                 </View>
-                {item.mapItemResponseUpload[0].documentName !== null && (
-                  <View style={{ alignSelf: 'flex-end' }}>
-                    <TouchableOpacity onPress={() => showPDFOnClick(item.mapItemResponseUpload[0].uploadPath)}>
-                      <View style={styles.itemOutNew}>
-                        <View>
-                          <Image
-                            source={require('../../assets/PDFSHOW.png')}
-                            style={{ width: 20, height: 20, marginRight: 5, marginTop: 0, resizeMode: 'contain' }}
-                          />
-                        </View>
-                        <View >
-                          <Text>{item.mapItemResponseUpload[0].documentName}</Text>
-                        </View>
-                      </View>
-                    </TouchableOpacity>
-                  </View>
-                )}
               </View>
-            );
-          }}
-        />
+              {item.mapItemResponseUpload[0].documentName !== null && (
+                <View style={{ alignSelf: 'flex-end' }}>
+                  <TouchableOpacity onPress={() => showPDFOnClick(item.mapItemResponseUpload[0].uploadPath)}>
+                    <View style={styles.itemOutNew}>
+                      <View>
+                        <Image
+                          source={require('../../assets/PDFSHOW.png')}
+                          style={{ width: 20, height: 20, marginRight: 5, marginTop: 0, resizeMode: 'contain' }}
+                        />
+                      </View>
+                      <View >
+                        <Text>{item.mapItemResponseUpload[0].documentName}</Text>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+          );
+        }}
+      />
 
-        {/* <TouchableOpacity onPress={() => {
-          historyDownload();
-        }}>
-          <Text
-            style={{
-            }}>
-            Download Data
-          </Text>
-        </TouchableOpacity> */}
-        <View style={styles.footer}>
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.inputs}
-              placeholder="Write a message..."
-              underlineColorAndroid="transparent"
-              value={name_address}
-              onChangeText={name_address => setname_address(name_address)}
+      <View style={styles.footer}>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.inputs}
+            placeholder="Write a message..."
+            underlineColorAndroid="transparent"
+            value={name_address}
+            onChangeText={name_address => setname_address(name_address)}
+          />
+          <TouchableOpacity onPress={() => selectFileDoc()}>
+            <Image
+              style={{ height: 24, width: 17, marginRight: 10 }}
+              source={require('../../assets/M26_1.png')}
             />
-            <TouchableOpacity onPress={() => selectFileDoc()}>
-              <Image
-                style={{ height: 24, width: 17, marginRight: 10 }}
-                source={require('../../assets/M26_1.png')}
-              />
-            </TouchableOpacity>
+          </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => setModalVisible(true)}>
-              <Image
-                style={{ height: 22, width: 15, marginRight: 19 }}
-                source={require('../../assets/M26_2.png')}
-              />
-            </TouchableOpacity>
-          </View>
-
-          <TouchableOpacity style={styles.btnSend}
-            onPress={() => {
-              requestItem();
-            }}>
-            {loading ? (
-              <ActivityIndicator color="#000" />
-            ) : (
-              <Image
-                source={require('../../assets/M26_3.png')}
-                style={styles.iconSend}
-              />
-            )}
+          <TouchableOpacity onPress={() => setModalVisible(true)}>
+            <Image
+              style={{ height: 22, width: 15, marginRight: 19 }}
+              source={require('../../assets/M26_2.png')}
+            />
           </TouchableOpacity>
         </View>
+
+        <TouchableOpacity style={styles.btnSend}
+          onPress={() => {
+            requestItem();
+          }}>
+          {loading ? (
+            <ActivityIndicator color="#000" />
+          ) : (
+            <Image
+              source={require('../../assets/M26_3.png')}
+              style={styles.iconSend}
+            />
+          )}
+        </TouchableOpacity>
       </View>
-    </>
+    </View>
   );
 }
 
@@ -502,7 +303,6 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: 'row',
     height: 60,
-    // backgroundColor: '#eeeeee',
     paddingHorizontal: 10,
     padding: 5,
   },
@@ -533,7 +333,6 @@ const styles = StyleSheet.create({
   inputs: {
     height: 40,
     marginLeft: 16,
-    // borderBottomColor: '#FFFFFF',
     flex: 1,
   },
   balloon: {
@@ -548,17 +347,14 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     backgroundColor: 'lightblue',
     elevation: 4,
-    // padding:2,
     margin: 5,
     borderRadius: 15
   },
   itemOutNew: {
     flexDirection: 'row',
-    // justifyContent:'flex-end',
     backgroundColor: 'white',
     elevation: 5,
     padding: 12,
-    // width:'40%',
     margin: 5,
     borderRadius: 15
   },
@@ -584,13 +380,10 @@ const styles = StyleSheet.create({
     marginTop: 22,
     backgroundColor: 'rgba(0,0,0,0.5)',
     marginTop: -10,
-    // backgroundColor:"#7A7A7A",
-    // opacity:0.8
   },
   modalView: {
     backgroundColor: 'white',
     borderRadius: 20,
-    //   padding: 95,
     height: '20%',
     width: '80%',
     alignItems: 'center',
@@ -605,8 +398,6 @@ const styles = StyleSheet.create({
   },
   button: {
     borderRadius: 10,
-    // padding: 10,
-    // elevation: 2
     height: 30,
     width: 120,
     marginTop: 40,
@@ -615,8 +406,6 @@ const styles = StyleSheet.create({
   },
   butt: {
     borderRadius: 10,
-    // padding: 10,
-    // elevation: 2
     height: 30,
     width: 120,
     marginTop: 40,
@@ -628,8 +417,6 @@ const styles = StyleSheet.create({
 
   textStyle: {
     color: '#232323',
-    // fontWeight: "bold",
-    // textAlign: "center",
     fontSize: 15,
     alignSelf: 'center',
     marginTop: 4,
@@ -637,8 +424,6 @@ const styles = StyleSheet.create({
   },
   textSty: {
     color: '#FFFFFF',
-    // fontWeight: "bold",
-    // textAlign: "center",
     fontSize: 15,
     alignSelf: 'center',
     marginTop: 5,

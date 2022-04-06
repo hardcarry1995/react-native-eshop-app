@@ -7,6 +7,7 @@ import store from './src/redux/store';
 import client from './src/constants/client';
 import { MenuProvider } from 'react-native-popup-menu';
 import AppNavigator from './src/navigations/AppNavigator';
+import Toast from 'react-native-toast-message';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           </MenuProvider>
         </View>
       </Provider>
+      <Toast />
     </ApolloProvider>
   );
 };

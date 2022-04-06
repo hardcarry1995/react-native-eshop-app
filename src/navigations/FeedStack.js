@@ -27,7 +27,6 @@ function FeedStack() {
   return (
     <Stack.Navigator screenOptions={{ gestureHandler: false }}>
       <Stack.Screen name="ChatItem" component={CategoryScreen} options={ScreenOptions} />
-      <Stack.Screen name="RequestItem" component={RequestItem} options={ScreenOptionsWithBack} />
       <Stack.Screen name="Feed" component={Feed} options={ScreenOptionsWithBack} />
       <Stack.Screen name="HomeWithParam" component={HomeScreenCat} options={ScreenOptionsWithBack} />
       <Stack.Screen name="Request25" component={Request25} options={ScreenOptionsWithBack} />

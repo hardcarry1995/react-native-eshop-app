@@ -1418,41 +1418,53 @@ export const REQUEST_ITEM_POST_RESPONSE = gql`
     $fileName:String
   ) {
     postMstItemResponse(mstItemResponse:{
-    	comment: $title,
-        companyId: null,
+      comment: $title,
+      companyId: null,
+      createdBy: null,
+      createdDate: null,
+      isAccepted: null,
+      isActive: null,
+      isRejected: null,
+      itemRequestId: $itemRequestId,
+      itemResponseId: 0,
+      modifiedBy: null,
+      modifiedDate: null,
+      replyToId: null,
+      responseDate: "2015-06-23T17:35:44.68",
+      userId: $userId,
+      mapItemResponseUpload:{
         createdBy: null,
-        createdDate: null,
-        isAccepted: null,
-        isActive: null,
-        isRejected: null,
-        itemRequestId: $itemRequestId,
-        itemResponseId: 0,
+        createdDate: "2015-08-14T13:27:23.747",
+        documentName: $fileName,
+        irUploadId: null,
+        isActive: true,
+        itemResponseId: null,
         modifiedBy: null,
         modifiedDate: null,
-        replyToId: null,
-        responseDate: "2015-06-23T17:35:44.68",
-        userId: $userId,
-    	  mapItemResponseUpload:{
-      	createdBy: null,
-        createdDate: "2015-08-14T13:27:23.747",
-          documentName: $fileName,
-          irUploadId: null,
-          isActive: true,
-          itemResponseId: null,
-          modifiedBy: null,
-          modifiedDate: null,
-          uploadPath: $filePath
-    		}
+        uploadPath: $filePath
+      }
   	}
   ){
-    count,
-    currentPage,
-    message,
-    nextPage,
-    prevPage,
-    success,
-    totalPages,
-    result
+    itemResponseId,
+    comment,
+    companyId,
+    createdBy,
+    createdDate,
+    isAccepted,
+    isActive,
+    isRejected,
+    itemRequestId,
+    itemResponseId,
+    modifiedBy,
+    modifiedDate,
+    replyToId,
+    responseDate,
+    userId
+    mapItemResponseUpload{        
+      irUploadId,
+      itemResponseId,
+      uploadPath
+    }  
   }
 }
 
@@ -2607,4 +2619,27 @@ export const GET_USER_TOP_BIDS = gql`
   }
 }
 `
-
+export const CREATE_CONTACT_REQUEST = gql`
+  mutation createContactRequest(
+    $fullname: String,
+    $email : String,
+    $phone : String,
+    $subject : String,
+    $message : String,
+    $date : DateTime
+  ){
+    createMstContactForm(
+      mstContactForm: {
+          contactId: 0,
+          contactNo: $phone,
+          createdDate: $date,
+          emailAddress: $email,
+          fullName: $fullname,
+          message: $message,
+          subject: $subject
+      }
+    ) {
+      contactId
+    }
+  }
+`

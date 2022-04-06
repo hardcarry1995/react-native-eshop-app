@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Dimensions, SafeAreaView, Image, TextInput, ToastAndroid, ActivityIndicator, ScrollView, TouchableOpacity, Platform, PixelRatio } from 'react-native'
+import React from 'react';
+import { StyleSheet, Text, View, Dimensions, SafeAreaView, Image, ToastAndroid, ActivityIndicator, ScrollView, TouchableOpacity, Platform, PixelRatio } from 'react-native'
 import Modal from "react-native-modal";
 import { MAIN_CATEGORY, SUB_CATEGORY } from '../constants/queries';
 import client from '../constants/client';
@@ -34,6 +34,8 @@ export default class CategorySelector extends React.Component {
       catIcon: '',
       selectedCategories : []
     };
+
+    this.maxCount = this.props.multiple ? 10 : 1;
   }
 
   componentDidMount() {
@@ -123,8 +125,8 @@ export default class CategorySelector extends React.Component {
   }
 
   _onPressSubCategory = (item) => {
-    if(this.state.selectedCategories.length == 10) {
-      alert('You can select up to 10 categories');
+    if(this.state.selectedCategories.length == this.maxCount) {
+      alert(`You can select up to ${this.maxCount} categories`);
       return;
     }
     if(this.state.selectedCategories.findIndex((cat) => cat.categoryId === item.categoryId ) > -1) return;
@@ -213,12 +215,16 @@ export default class CategorySelector extends React.Component {
               </View>
             </View>
           </ScrollView>
-          
-        
         </SafeAreaView>
       </Modal>
     );
   }
+}
+
+CategorySelector.defaultProps = {
+  visible: false,
+  multiple: true,
+  onDone: (categories) => console.log(categories)
 }
 
 const styles = StyleSheet.create({

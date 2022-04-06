@@ -1,14 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  TextInput,
-  SafeAreaView,
-  ScrollView,
-} from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, SafeAreaView, ScrollView } from 'react-native';
 import { imagePrefix } from '../../constants/utils';
 import Moment from 'moment';
 import { GET_RESPONSE_ITEMS } from '../../constants/queries';
@@ -29,20 +20,14 @@ const Request25 = ({ navigation, route }) => {
       navigation.navigate('Auth');
     } else {
       let resultdata = await AsyncStorage.getItem('userInfo');
-      let jsondata = JSON.parse(resultdata);
       let token = await AsyncStorage.getItem('userToken');
-      console.log('resultdata', resultdata);
-
       let id = data.itemRequestID
-      // console.log('variablesDAta', variablesDAta);
-
       client
         .query({
           query: GET_RESPONSE_ITEMS,
           context: {
             headers: {
               Authorization: `Bearer ${token}`,
-              // 'Content-Length': 0,
             },
           },
           variables: {
@@ -69,305 +54,136 @@ const Request25 = ({ navigation, route }) => {
       <ScrollView>
         <View>
           <View>
-            {/* <Image
-              style={{ height: 190, width: 200, alignSelf: 'center' }}
-              source={require('../assets/R25.png')}
-            /> */}
             <Image
               style={{ height: 190, width: 200, alignSelf: 'center' }}
-              source={data.itemImagePath
-                ?
-                { uri: `${imagePrefix}${data.itemImagePath}` }
-                :
-                require('../../assets/NoImage.jpeg')}
+              source={data.itemImagePath ? { uri: `${imagePrefix}${data.itemImagePath}` } : require('../../assets/NoImage.jpeg')}
             />
           </View>
-          <View style={{}}>
-            <View style={styles.main}>
-              <View>
-                <Text style={{ color: '#9F1D20', fontSize: 21, padding: 15 }}>
-
-                  {data.itemRequestTitle}
-                </Text>
-                <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15 }}>
-                  Request Date
-                </Text>
-                <Text
-                  style={{ marginLeft: 135, marginTop: -20, color: '#C9C9C9' }}>
-
-                  {dateDMY}
-                </Text>
-                <Text
-                  style={{
-                    color: '#232323',
-                    marginLeft: 15,
-                    fontSize: 15,
-                    marginTop: 20,
-                  }}>
-                  Category Details
-                </Text>
-                <Text
-                  style={{
-                    color: '#E22727',
-                    marginLeft: 15,
-                    fontSize: 15,
-                    opacity: 0.7,
-                  }}>
-                  {data.itemCategory}
-                </Text>
-                {/* <Text
-                  style={{
-                    color: '#232323',
-                    marginLeft: 80,
-                    fontSize: 15,
-                    marginTop: -20,
-                  }}>
-                  {'>>'}
-                </Text>
-                <Text
-                  style={{
-                    color: '#E22727',
-                    marginLeft: 100,
-                    fontSize: 15,
-                    marginTop: -20,
-                    opacity: 0.7,
-                  }}>
-                  {data.itemCategory}
-                </Text> */}
-                {/* <Text
-                  style={{
-                    color: '#232323',
-                    marginLeft: 179,
-                    fontSize: 15,
-                    marginTop: -20,
-                  }}>
-                  {'>>'}
-                </Text> */}
-                {/* <Text
-                  style={{
-                    color: '#E22727',
-                    marginLeft: 199,
-                    fontSize: 15,
-                    marginTop: -20,
-                    opacity: 0.7,
-                  }}>
-                  Spare Parts
-                </Text>
-                <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15 }}>
-                  {'>>'}
-                </Text> */}
-                {/* <Text
-                  style={{
-                    color: '#E22727',
-                    marginLeft: 35,
-                    fontSize: 15,
-                    marginTop: -20,
-                    opacity: 0.7,
-                  }}>
-                  Volks
-                </Text> */}
-                <Text
-                  style={{
-                    color: '#232323',
-                    marginLeft: 15,
-                    fontSize: 15,
-                    marginTop: 18,
-                  }}>
-                  Status Request
-                </Text>
-                <Text
-                  style={{
-                    color: '#2CD826',
-                    marginLeft: 140,
-                    fontSize: 15,
-                    marginTop: -20,
-                  }}>
-                  {data.itemRequestStatus}
-                </Text>
-                <Text
-                  style={{
-                    color: '#232323',
-                    marginLeft: 15,
-                    fontSize: 15,
-                    marginTop: 18,
-                  }}>
-                  Description
-                </Text>
-                <Text
-                  style={{
-                    color: '#C9C9C9',
-                    marginLeft: 15,
-                    fontSize: 15,
-                    marginTop: -2,
-                  }}>
-
-                  {data.itemRequestDescription}
-                </Text>
-                {data.suburb !== null &&
-                  <View>
-                    <Text
-                      style={{
-                        color: '#232323',
-                        marginLeft: 15,
-                        fontSize: 15,
-                        marginTop: 18,
-                      }}>
-                      Suburb
-                    </Text>
-                    <Text
-                      style={{
-                        color: '#C9C9C9',
-                        marginLeft: 140,
-                        fontSize: 15,
-                        marginTop: -20,
-                      }}>
-                      {data.suburb}
-                    </Text>
-                  </View>
-                }
-                {data.suburb === null &&
-                  <View>
-                    <Text
-                      style={{
-                        color: '#232323',
-                        marginLeft: 15,
-                        fontSize: 15,
-                        marginTop: 18,
-                      }}>
-                      Suburb
-                    </Text>
-                    <Text
-                      style={{
-                        color: '#C9C9C9',
-                        marginLeft: 140,
-                        fontSize: 15,
-                        marginTop: -20,
-                      }}>
-                      Not Provide
-                    </Text>
-                  </View>
-                }
-              </View>
+          <View style={styles.main}>
+            <View>
+              <Text style={{ color: '#9F1D20', fontSize: 21, padding: 15 }}>
+                {data.itemRequestTitle}
+              </Text>
+              <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15 }}>
+                Request Date
+              </Text>
+              <Text style={{ marginLeft: 135, marginTop: -20, color: '#C9C9C9' }}>
+                {dateDMY}
+              </Text>
+              <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15, marginTop: 20 }}>
+                Category Details
+              </Text>
+              <Text style={{ color: '#E22727', marginLeft: 15, fontSize: 15, opacity: 0.7}}>
+                {data.itemCategory}
+              </Text>
+              <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15, marginTop: 18 }}>
+                Status Request
+              </Text>
+              <Text style={{ color: '#2CD826', marginLeft: 140, fontSize: 15, marginTop: -20, }}>
+                {data.itemRequestStatus}
+              </Text>
+              <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15, marginTop: 18 }}>
+                Description
+              </Text>
+              <Text style={{ color: '#C9C9C9', marginLeft: 15, fontSize: 15, marginTop: -2 }}>
+                {data.itemRequestDescription}
+              </Text>
+              {data.suburb !== null &&
+                <View>
+                  <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15, marginTop: 18 }}>
+                    Suburb
+                  </Text>
+                  <Text style={{ color: '#C9C9C9', marginLeft: 140, fontSize: 15, marginTop: -20 }}>
+                    {data.suburb}
+                  </Text>
+                </View>
+              }
+              {data.suburb === null &&
+                <View>
+                  <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15, marginTop: 18, }}>
+                    Suburb
+                  </Text>
+                  <Text style={{ color: '#C9C9C9', marginLeft: 140, fontSize: 15, marginTop: -20, }}>
+                    Not Provide
+                  </Text>
+                </View>
+              }
             </View>
           </View>
 
-          <View style={{}}>
-            <View style={styles.main2}>
-              <View>
-                <Text style={{ color: '#9F1D20', fontSize: 21, padding: 15 }}>
-                  Selected Company
-                </Text>
+          <View style={styles.main2}>
+            <View>
+              <Text style={{ color: '#9F1D20', fontSize: 21, padding: 15 }}>
+                Selected Company
+              </Text>
 
-                {data.selectedCompany === null &&
-                  <Text style={{
-                    color: '#232323',
-                    fontSize: 16,
-                    padding: 15,
-                    marginTop: -20,
-                  }}>
-                    No Selected Company
-                  </Text>
-                }
-                {data.selectedCompany !== null &&
-                  <Text style={{
-                    color: '#232323',
-                    fontSize: 16,
-                    padding: 15,
-                    marginTop: -20,
-                  }}>
-                    {data.selectedCompany}
-                  </Text>
-                }
-              </View>
+              {data.selectedCompany === null &&
+                <Text style={{ color: '#232323', fontSize: 16, padding: 15, marginTop: -20 }}>
+                  No Selected Company
+                </Text>
+              }
+              {data.selectedCompany !== null &&
+                <Text style={{ color: '#232323', fontSize: 16, padding: 15, marginTop: -20, }}>
+                  {data.selectedCompany}
+                </Text>
+              }
             </View>
           </View>
 
           <View style={{ marginBottom: 40 }}>
             <View style={styles.main3}>
-              <View>
-                <Text style={{ color: '#9F1D20', fontSize: 21, padding: 15 }}>
-                  Responses({vehicleData == '' || vehicleData == undefined ? '0' : '1'})
-                  {/* ({ vehicleData!==''? vehicleData.length:1}) */}
-                </Text>
-                {vehicleData == undefined &&
-                  <View>
-                    <View style={styles.footer}>
-                      <View style={styles.inputContainer}>
-                        <TextInput
-                          style={styles.inputs}
-                          placeholder="Write a message..."
-                          underlineColorAndroid="transparent"
-                          value={name_address}
-                          onChangeText={name_address => setname_address(name_address)}
-                        />
-                      </View>
-
-                      <TouchableOpacity style={styles.btnSend}
-                        onPress={() => {
-                          navigation.navigate('MarshNew26', { requestData: data });
-                        }}>
-                        <Image
-                          source={require('../../assets/M26_3.png')}
-                          style={styles.iconSend}
-                        />
-                      </TouchableOpacity>
+              <Text style={{ color: '#9F1D20', fontSize: 21, padding: 15 }}>
+                Responses({vehicleData == '' || vehicleData == undefined ? '0' : '1'})
+              </Text>
+              {vehicleData == undefined &&
+                <View>
+                  <View style={styles.footer}>
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        style={styles.inputs}
+                        placeholder="Write a message..."
+                        underlineColorAndroid="transparent"
+                        value={name_address}
+                        onChangeText={name_address => setname_address(name_address)}
+                      />
                     </View>
-                  </View>
-                }
 
-                {/* ------- */}
-
-                {vehicleData !== undefined &&
-                  <View>
-                    <Text
-                      style={{
-                        color: '#232323',
-                        fontSize: 17,
-                        padding: 15,
-                        marginTop: -20,
-                        marginLeft: 10,
-                      }}>
-                      Marsh
-                    </Text>
-                    <Text
-                      style={{
-                        color: '#232323',
-                        fontSize: 15,
-                        padding: 15,
-                        marginTop: -23,
-                        marginLeft: 10,
-                        opacity: 0.7,
-                      }}>
-                      {vehicleData == '' || vehicleData == undefined ? 'Hello' : vehicleData.comment}
-                    </Text>
-
-                    <Image
-                      style={{
-                        height: 10,
-                        width: 10,
-                        marginTop: -63,
-                        marginLeft: 77,
-                      }}
-                      source={require('../../assets/R25_1.png')}
-                    />
-                    <TouchableOpacity
+                    <TouchableOpacity style={styles.btnSend}
                       onPress={() => {
                         navigation.navigate('MarshNew26', { requestData: data });
                       }}>
                       <Image
-                        style={{
-                          height: 20,
-                          width: 20,
-                          alignSelf: 'flex-end',
-                          marginRight: 20,
-                        }}
-                        source={require('../../assets/R25_2.png')}
+                        source={require('../../assets/M26_3.png')}
+                        style={styles.iconSend}
                       />
                     </TouchableOpacity>
                   </View>
-                }
-                {/* ------- */}
-              </View>
+                </View>
+              }
+              {vehicleData !== undefined &&
+                <View>
+                  <Text style={{ color: '#232323', fontSize: 17, padding: 15, marginTop: -20, marginLeft: 10 }}>
+                    Marsh
+                  </Text>
+                  <Text style={{ color: '#232323', fontSize: 15, padding: 15, marginTop: -23, marginLeft: 10, opacity: 0.7, }}>
+                    {vehicleData == '' || vehicleData == undefined ? 'Hello' : vehicleData.comment}
+                  </Text>
+
+                  <Image
+                    style={{ height: 10, width: 10, marginTop: -63, marginLeft: 77, }}
+                    source={require('../../assets/R25_1.png')}
+                  />
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigation.navigate('MarshNew26', { requestData: data });
+                    }}>
+                    <Image 
+                      style={{ height: 20, width: 20, alignSelf: 'flex-end', marginRight: 20, }}
+                      source={require('../../assets/R25_2.png')}
+                    />
+                  </TouchableOpacity>
+                </View>
+              }
             </View>
           </View>
         </View>
@@ -378,7 +194,6 @@ const Request25 = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
   main: {
-    // height: 340,
     backgroundColor: 'white',
     borderRadius: 15,
     shadowRadius: 20,
@@ -414,7 +229,6 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: 'row',
     height: 60,
-    // backgroundColor: '#eeeeee',
     paddingHorizontal: 10,
     padding: 5,
   },
@@ -462,7 +276,6 @@ const styles = StyleSheet.create({
   itemOut: {
     alignSelf: 'flex-end',
     backgroundColor: 'lightblue',
-    // padding:2,
     margin: 5,
     borderRadius: 15
   },
@@ -488,8 +301,6 @@ const styles = StyleSheet.create({
     marginTop: 22,
     backgroundColor: 'rgba(0,0,0,0.5)',
     marginTop: -10,
-    // backgroundColor:"#7A7A7A",
-    // opacity:0.8
   },
 });
 

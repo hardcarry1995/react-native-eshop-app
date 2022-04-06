@@ -19,6 +19,7 @@ import IncomingRequest from "../screens/IncomingRequest";
 import MyRequestStack from "./MyRequestStack";
 import FaqStack from "./FaqStack";
 import WorkInProgress from "../screens/WorkInProgress";
+import ContactFrom from "../screens/ContactForm";
 
 import TabBar from "./BottomTabBar";
 // HomeStack Screens
@@ -109,32 +110,47 @@ const WishStack = () => (
   </Stack.Navigator>
 )
 
+// Contact Stack
+const ContactStack = () => (
+  <Stack.Navigator screenOptions={screenOptions}>
+    <Stack.Screen name="ContactForm" component={ContactFrom} />
+  </Stack.Navigator>
+)
+// My Review Staack 
+
+const ReviewStack  = () => (
+  <Stack.Navigator screenOptions={screenOptions}>
+    <Stack.Screen name="MyReview" component={MyReviews} />
+  </Stack.Navigator>
+)
+
 // Define TabBar
 const TabBarNavigator = () => (
   <Tab.Navigator
     tabBar={props => <TabBar {...props} />}
-    screenOptions={{ gestureEnabled: false }}
+    screenOptions={{ gestureEnabled: false, headerShown: false }}
   >
-    <Tab.Screen name="HomeStack" component={HomeStack} options={{headerShown: false}}/>
-    <Tab.Screen name="ProductStack" component={ProductStack} options={{headerShown: false}} />
-    <Tab.Screen name="CategoryStack" component={CategoryStack} options={{headerShown: false}} />
-    <Tab.Screen name="CartStack" component={CartStack} options={{headerShown: false}} />
-    <Tab.Screen name="WishStack" component={WishStack} options={{headerShown: false}} />
-    <Tab.Screen name={Constants.feed} component={FeedStack} options={{headerShown: false}} />
-    <Tab.Screen name={Constants.edit_profile} component={ProfileStack} options={{headerShown: false}}/>
-    <Tab.Screen name={Constants.privacy_policy} component={PrivacyStack} options={{headerShown: false}} />
-    <Tab.Screen name={Constants.term_condition} component={TermConditionStack} options={{headerShown: false}} />
-    <Tab.Screen name={Constants.change_password} component={ChangePasswordStack} options={{headerShown: false}} />
-    <Tab.Screen name={Constants.settings} component={SettingStack} options={{headerShown: false}} />
-    <Tab.Screen name={Constants.my_Reviews} component={MyReviews} options={{headerShown: false}} />
-    <Tab.Screen name={Constants.contact_us} component={CatalogueStack} options={{headerShown: false}} />
-    <Tab.Screen name={Constants.about_us} component={AboutUs} options={{headerShown: false}} />
-    <Tab.Screen name={Constants.incoming_request} component={IncomingRequest} options={{headerShown: false}}  />
-    <Tab.Screen name={Constants.my_request_stack} component={MyRequestStack} options={{headerShown: false}} />
-    <Tab.Screen name={Constants.faq} component={FaqStack} options={{headerShown: false}} />
-    <Tab.Screen name={Constants.logout} component={WorkInProgress} options={{headerShown: false}} />
-    <Tab.Screen name={Constants.share_app} component={WorkInProgress} options={{headerShown: false}} />
-    <Tab.Screen name="RequestStack" component={RequestStack} options={{headerShown: false}} />
+    <Tab.Screen name="HomeStack" component={HomeStack} />
+    <Tab.Screen name="ProductStack" component={ProductStack} />
+    <Tab.Screen name="CategoryStack" component={CategoryStack}  />
+    <Tab.Screen name="CartStack" component={CartStack}  />
+    <Tab.Screen name="WishStack" component={WishStack}  />
+    <Tab.Screen name={Constants.feed} component={FeedStack}  />
+    <Tab.Screen name={Constants.edit_profile} component={ProfileStack} />
+    <Tab.Screen name={Constants.privacy_policy} component={PrivacyStack}  />
+    <Tab.Screen name={Constants.term_condition} component={TermConditionStack}  />
+    <Tab.Screen name={Constants.change_password} component={ChangePasswordStack}  />
+    <Tab.Screen name={Constants.settings} component={SettingStack}  />
+    <Tab.Screen name={Constants.my_Reviews} component={ReviewStack}  />
+    <Tab.Screen name={Constants.contact_us} component={CatalogueStack}  />
+    <Tab.Screen name={Constants.about_us} component={AboutUs}  />
+    <Tab.Screen name={Constants.incoming_request} component={IncomingRequest}   />
+    <Tab.Screen name={Constants.my_request_stack} component={MyRequestStack}  />
+    <Tab.Screen name={Constants.faq} component={FaqStack}  />
+    <Tab.Screen name={Constants.logout} component={WorkInProgress} />
+    <Tab.Screen name={Constants.share_app} component={WorkInProgress}  />
+    <Tab.Screen name="RequestStack" component={RequestStack}  />
+    <Tab.Screen name="ContactStack" component={ContactStack}  />
   </Tab.Navigator>
 )
 
