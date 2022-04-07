@@ -21,10 +21,8 @@ const TermCondition = ({ navigation }) => {
   const [userToken, setUserToken] = useState('');
   const [userInfo, setUserInfo] = useState([]);
 
-  const starImageFilled =
-    'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png';
-  const starImageCorner =
-    'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png';
+  const starImageFilled = 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png';
+  const starImageCorner = 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png';
   useEffect(() => {
     getrequestItem();
   }, []);
@@ -44,6 +42,7 @@ const TermCondition = ({ navigation }) => {
     setUserInfo(jsondata)
     getrequestItemtt(token)
   }
+
   const getrequestItemtt = (token) => {
     if (loadMoreNext) {
       setLoading(true);
@@ -75,7 +74,6 @@ const TermCondition = ({ navigation }) => {
         });
     }
   };
-
 
   const getrequestItemNext = () => {
     if (loadMoreNext) {
@@ -161,6 +159,7 @@ const TermCondition = ({ navigation }) => {
       </TouchableOpacity>
     </View>
   );
+  
   return (
     <SafeAreaView>
       <ScrollView>

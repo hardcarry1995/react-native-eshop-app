@@ -98,6 +98,11 @@ class DrawerContent extends Component {
         this.props.navigation.navigate(Constant.incoming_request);
         this.setState({ selectedRoute: Constant.incoming_request });
         break;
+
+      case Constant.term_condition:
+        this.props.navigation.navigate(Constant.term_condition, { screen : "TermCondition" });
+        this.setState({ selectedRoute: Constant.incoming_request });
+        break;
       case "incoming_enquiry": 
         this.props.navigation.navigate(Constant.feed, { screen: "IncomingEnquiry" });
         this.setState({ selectedRoute: "IncomingEnquiry" });

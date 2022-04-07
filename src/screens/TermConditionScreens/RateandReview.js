@@ -24,11 +24,8 @@ const RateandReview = ({ navigation, route }) => {
   const data = route.params.detail;
   const type = route.params.type;
 
-  const starImageFilled =
-    'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png';
-  const starImageCorner =
-    'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png';
-
+  const starImageFilled = 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png';
+  const starImageCorner = 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png';
 
   useEffect(() => {
     getUserInfo();
@@ -42,7 +39,6 @@ const RateandReview = ({ navigation, route }) => {
     setDataUserInfo(more_info);
   }
   const getDataUsingPost = () => {
-    let id = 0
     let companyIdGo = 0
     let specialIdGo = 0
     let eflyerIdGo = 0
@@ -64,21 +60,11 @@ const RateandReview = ({ navigation, route }) => {
       specialIdGo = 0
       eflyerIdGo = data.eflyerId
     }
-    let variablesdata = {
-      companyId: companyIdGo,
-      specialId: specialIdGo,
-      eflyerId: eflyerIdGo,
-      ratingScore: rating * 10,
-      reviewData: name_address,
-      userId: Number(userdataInfo?.id)
-    }
-    console.log('variablesdata', variablesdata)
     client
       .mutate({
         mutation: GIVE_BUSINESS_RATING,
-        // fetchPolicy: 'no-cache',
         variables: {
-          companyId: companyIdGo,
+          companyId: parseInt(companyIdGo),
           specialId: specialIdGo,
           eflyerId: eflyerIdGo,
           ratingScore: rating * 10,
@@ -92,14 +78,9 @@ const RateandReview = ({ navigation, route }) => {
         },
       })
       .then(result => {
-        console.log('result-----------', result);
         if (result.data.postMstRating.success) {
-          // ToastAndroid.show(
-          //   result.data.postMstRating.message,
-          //   ToastAndroid.SHORT
-          // );
           Alert.alert("Success", result.data.postMstRating.message)
-          navigation.goBack();
+          // navigation.goBack();
         } else {
           ToastAndroid.show(
             result.data.postMstRating.message,
@@ -112,138 +93,67 @@ const RateandReview = ({ navigation, route }) => {
       });
   }
   return (
-    <SafeAreaView>
-      <ScrollView>
-        <View>
-          <View>
-            <Image
-              style={{ height: 190, width: 360, alignSelf: 'center' }}
-              source={require('../../assets/home29.png')}
-            />
-          </View>
-          <View>
-            {type === 1 &&
-              <Text
-                style={{
-                  color: '#9F1D20',
-                  fontSize: 21,
-                  padding: 25,
-                  alignSelf: 'center',
-                }}>
-
-                {data.specialName}
-              </Text>
-            }
-            {type === 2 &&
-              <Text
-                style={{
-                  color: '#9F1D20',
-                  fontSize: 21,
-                  padding: 25,
-                  alignSelf: 'center',
-                }}>
-
-                {data.companyNam}
-              </Text>
-            }
-            {type === 3 &&
-              <Text
-                style={{
-                  color: '#9F1D20',
-                  fontSize: 21,
-                  padding: 25,
-                  alignSelf: 'center',
-                }}>
-
-                {data.magazineName}
-              </Text>
-            }
-            {/* <Image
-              style={{
-                height: 30,
-                width: 173,
-                alignSelf: 'center',
-                marginTop: -5,
-              }}
-              source={require('../assets/G29.png')}
-            /> */}
-            <View style={{ flexDirection: "row", justifyContent: "center", marginTop: 5 }}>
-              {maxRating.map((item, key) => {
-                return (
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    key={item}
-                    onPress={() => setRating(item)}
-                  >
-                    <Image
-                      style={styles.starImageStyle}
-                      source={
-                        item <= rating
-                          ? { uri: starImageFilled }
-                          : { uri: starImageCorner }
-                      }
-                    />
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </View>
-          <View style={{}}>
-            <View style={styles.main}>
-              <TextInput
-                placeholder="Write a review.."
-                multiline={true}
-                style={{ paddingLeft: 10 }}
-                value={name_address}
-                onChangeText={name_address => setname_address(name_address)}
-              // numberOfLines={5}
-              />
-              {/* <View>
-                <Text
-                  style={{
-                    color: '#C1BFBF',
-                    fontSize: 21,
-                    padding: 15,
-                    opacity: 0.5,
-                  }}>
-                  Write a review..
-                </Text>
-              </View> */}
-            </View>
-          </View>
-
-          <TouchableOpacity onPress={() => {
-            getDataUsingPost();
-          }}
-            style={{
-              height: 35,
-              width: 130,
-              backgroundColor: '#9F1D20',
-              alignSelf: 'center',
-              marginTop: 50,
-              borderRadius: 5,
-              marginBottom: 30
-            }}>
-            <Text
-              style={{
-                alignSelf: 'center',
-                marginTop: 8,
-                color: '#FFFFFF',
-                fontSize: 15,
-              }}>
-              Submit
-            </Text>
-          </TouchableOpacity>
+    <View>
+        <Image
+          style={{ height: 190, width: 360, alignSelf: 'center' }}
+          source={require('../../assets/home29.png')}
+        />
+      <View>
+        {type === 1 &&
+          <Text style={{ color: '#9F1D20', fontSize: 21, padding: 25, alignSelf: 'center', }}>
+            {data.specialName}
+          </Text>
+        }
+        {type === 2 &&
+          <Text style={{ color: '#9F1D20', fontSize: 21, padding: 25, alignSelf: 'center', }}>
+            {data.companyNam}
+          </Text>
+        }
+        {type === 3 &&
+          <Text style={{ color: '#9F1D20', fontSize: 21, padding: 25, alignSelf: 'center', }}>
+            {data.magazineName}
+          </Text>
+        }
+        <View style={{ flexDirection: "row", justifyContent: "center", marginTop: 5 }}>
+          {maxRating.map((item, key) => {
+            return (
+              <TouchableOpacity
+                activeOpacity={0.7}
+                key={item}
+                onPress={() => setRating(item)}
+              >
+                <Image
+                  style={styles.starImageStyle}
+                  source={ item <= rating ? { uri: starImageFilled } : { uri: starImageCorner } }
+                />
+              </TouchableOpacity>
+            );
+          })}
         </View>
-      </ScrollView>
-    </SafeAreaView>
+      </View>
+      <View style={styles.main}>
+        <TextInput
+          placeholder="Write a review.."
+          multiline={true}
+          value={name_address}
+          style={styles.reviewInput}
+          onChangeText={name_address => setname_address(name_address)}
+        />
+      </View>
+
+      <TouchableOpacity 
+        onPress={() => { getDataUsingPost(); }}
+        style={styles.submitButton}>
+        <Text style={{ color: '#FFFFFF', fontSize: 16, }}>
+          Submit
+        </Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   main: {
-    height: 200,
-    backgroundColor: 'white',
     borderRadius: 15,
     shadowRadius: 20,
     elevation: 2,
@@ -257,6 +167,34 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
     alignSelf: 'center',
   },
+  reviewInput: {
+    backgroundColor: "#fff", 
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingLeft: 10,
+    paddingRight: 10,
+    height: 200, 
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 1,
+    elevation: 2,
+    borderRadius: 10
+  },
+  submitButton: {
+    height: 40,
+    width: 130,
+    backgroundColor: '#9F1D20',
+    alignSelf: 'center',
+    marginTop: 50,
+    borderRadius: 5,
+    marginBottom: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+  }
 });
 
 export default RateandReview;

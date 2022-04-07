@@ -15,10 +15,8 @@ const WhiteHouse = ({ navigation, route }) => {
   const data = route.params.detail;
   const datego = moment(data.joinDate).format('DD MMM YYYY');
 
-  const starImageFilled =
-    'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png';
-  const starImageCorner =
-    'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png';
+  const starImageFilled = 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png';
+  const starImageCorner = 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png';
 
   useEffect(() => {
     fetchToken();
@@ -45,9 +43,6 @@ const WhiteHouse = ({ navigation, route }) => {
     );
   };
   const fetchProducts = async (token) => {
-    let variablesData = {
-      id: data.companyId,
-    }
     client
       .query({
         query: GET_SPECIAL_LIST_BY_COMPANY,
@@ -57,11 +52,12 @@ const WhiteHouse = ({ navigation, route }) => {
           },
         },
         variables: {
-          id: data.companyId,
+          id: data.companyId.toString(),
         },
       })
 
-      .then(async result => {
+      .then(result => {
+        console.log(result);
         setSpecial(result.data.getMstSpecialList.result)
       })
       .catch(err => {
@@ -78,7 +74,7 @@ const WhiteHouse = ({ navigation, route }) => {
           },
         },
         variables: {
-          id: data.companyId,
+          id: data.companyId.toString(),
         },
       })
 
@@ -124,8 +120,10 @@ const WhiteHouse = ({ navigation, route }) => {
 
   const renderItemSpecial = ({ item, index }) => (
     <View key={index}>
-      <TouchableOpacity activeOpacity={0.9}
-        onPress={() => { navigation.navigation('Special', { detail: item }); }}>
+      <TouchableOpacity 
+        activeOpacity={0.9}
+        onPress={() => { navigation.navigation('Special', { detail: item }); }}
+      >
         <View style={styles.mainGet}>
           <View style={{ width: "22%", justifyContent: "center" }}>
             <Image
@@ -217,179 +215,175 @@ const WhiteHouse = ({ navigation, route }) => {
   );
 
   return (
-    <SafeAreaView>
-      <ScrollView>
-        <View>
+    <ScrollView>
+      <View style={{ flex: 1, paddingTop: 20 }}>
+        <View style={{ alignItems: 'center'}}>
           <Image
             style={styles.image1}
             source={data.logoPath ? { uri: `${imagePrefix}${data.logoPath}` } : require('../../assets/NoImage.jpeg')}
+            resizeMode="contain"
           />
-          <View style={{}}>
-            <View style={styles.main}>
-              <View>
-                <Text style={{ color: '#9F1D20', fontSize: 21, padding: 15 }}>
-                  {data.companyName}
-                </Text>
-                <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15 }}>
-                  Address
-                </Text>
-                <Text
-                  style={{ marginLeft: 80, marginTop: -20, color: '#C9C9C9' }}>
-                  {data.compStreetAddress} {data.compCityName} {data.compCountryName}
-                </Text>
-                <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15, marginTop: 20 }}>
-                  Registered Date
-                </Text>
-                <Text style={{ color: '#C9C9C9', marginLeft: 130, fontSize: 15, marginTop: -20 }}>
-                  {datego}
-                </Text>
-                <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15, marginTop: 18 }}>
-                  Status
-                </Text>
-                <Text style={{ color: '#2CD826', marginLeft: 75, fontSize: 15, marginTop: -20 }}>
-                  {data.companyStatus}
-                </Text>
-              </View>
-            </View>
-          </View>
-
-          <View style={{ marginTop: 10 }}>
-            <View style={styles.main2}>
-              <View>
-                <Text style={{ color: '#9F1D20', fontSize: 21, padding: 15 }}>
-                  Contact Information
-                </Text>
-                <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15 }}>
-                  Phone
-                </Text>
-                <Text
-                  style={{ marginLeft: 80, marginTop: -20, color: '#C9C9C9' }}>
-                  {data.compPhone}
-                </Text>
-                <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15, marginTop: 20 }}>
-                  Fax
-                </Text>
-                <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15, marginTop: 18 }}>
-                  Website
-                </Text>
-                <Text
-                  style={{ marginLeft: 80, marginTop: -20, color: '#C9C9C9' }}>
-                  {data.compWebSite}
-                </Text>
-                <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15, marginTop: 18 }}>
-                  Email
-                </Text>
-                <Text
-                  style={{ marginLeft: 80, marginTop: -20, color: '#C9C9C9' }}>
-                  {data.compEmailId}
-                </Text>
-                <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15, marginTop: 18 }}>
-                  Helpline Number
-                </Text>
-                <Text
-                  style={{ marginLeft: 150, marginTop: -20, color: '#C9C9C9' }}>
-                  {data.compHelpDeskNumber}
-                </Text>
-                <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15, marginTop: 18 }}>
-                  Help Desk
-                </Text>
-                <TouchableOpacity onPress={() => { nagotiatePrice(data); }}
-                  style={{
-                    height: 35,
-                    width: 130,
-                    backgroundColor: '#9F1D20',
-                    alignSelf: 'center',
-                    marginTop: 25,
-                    borderRadius: 5,
-                  }}>
-                  <Text style={{ alignSelf: 'center', marginTop: 8, color: '#FFFFFF', fontSize: 15, }}>
-                    Contact Now
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-
-          <View style={{}}>
-            <View style={styles.main3}>
-              <View>
-                <Text style={{ color: '#9F1D20', fontSize: 21, alignSelf: 'center', marginTop: 10 }}>
-                  Rating
-                </Text>
-                <GetRating companyId={data.companyId} onprogress={(Rating) => { setRating(Rating); }} />
-                <Text style={{ color: '#CFCFCF', fontSize: 35, alignSelf: 'center', opacity: 0.5, }}>
-                  {rating}
-                </Text>
-                <View style={{ flexDirection: "row", justifyContent: "center", marginTop: 5 }}>
-                  {maxRating.map((item, key) => {
-                    return (
-                      <TouchableOpacity
-                        activeOpacity={0.7}
-                        key={item}
-                      >
-                        <Image
-                          style={styles.starImageStyle}
-                          source={item <= rating ? { uri: starImageFilled } : { uri: starImageCorner }}
-                        />
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-
-                <TouchableOpacity
-                  style={{
-                    height: 35,
-                    width: 130,
-                    backgroundColor: '#9F1D20',
-                    alignSelf: 'center',
-                    marginTop: 20,
-                    borderRadius: 5,
-                  }}
-                  onPress={() => {
-                    navigation.navigate('RateandReview', { detail: data, type: 2 });
-                  }}>
-                  <Text style={{ alignSelf: 'center', marginTop: 8, color: '#FFFFFF', fontSize: 15 }}>
-                    Give Rating
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-
-          <View style={{}}>
-            <View style={styles.main4}>
-              <View>
-                <Text style={{ color: '#9F1D20', fontSize: 21, padding: 15 }}>
-                  Specials
-                </Text>
-                <FlatList
-                  ListEmptyComponent={EmptyListMessage('No special found')}
-                  data={specialdata}
-                  keyExtractor={(item, i) => i}
-                  renderItem={renderItemSpecial}
-                />
-              </View>
-            </View>
-          </View>
-
-          <View style={{ marginBottom: 30 }}>
-            <View style={styles.main5}>
-              <View>
-                <Text style={{ color: '#9F1D20', fontSize: 21, padding: 15 }}>
-                  Magazines
-                </Text>
-                <FlatList
-                  ListEmptyComponent={EmptyListMessage('No magazine found')}
-                  data={magazine}
-                  keyExtractor={(item, i) => i}
-                  renderItem={renderItem}
-                />
-              </View>
+        </View>
+        <View style={{}}>
+          <View style={styles.main}>
+            <View>
+              <Text style={{ color: '#9F1D20', fontSize: 21, padding: 15 }}>
+                {data.companyName}
+              </Text>
+              <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15 }}>
+                Address
+              </Text>
+              <Text
+                style={{ marginLeft: 80, marginTop: -20, color: '#C9C9C9' }}>
+                {data.compStreetAddress} {data.compCityName} {data.compCountryName}
+              </Text>
+              <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15, marginTop: 20 }}>
+                Registered Date
+              </Text>
+              <Text style={{ color: '#C9C9C9', marginLeft: 130, fontSize: 15, marginTop: -20 }}>
+                {datego}
+              </Text>
+              <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15, marginTop: 18 }}>
+                Status
+              </Text>
+              <Text style={{ color: '#2CD826', marginLeft: 75, fontSize: 15, marginTop: -20 }}>
+                {data.companyStatus}
+              </Text>
             </View>
           </View>
         </View>
-      </ScrollView>
-    </SafeAreaView>
+
+        <View style={{ marginTop: 10 }}>
+          <View style={styles.main2}>
+            <View>
+              <Text style={{ color: '#9F1D20', fontSize: 21, padding: 15 }}>
+                Contact Information
+              </Text>
+              <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15 }}>
+                Phone
+              </Text>
+              <Text
+                style={{ marginLeft: 80, marginTop: -20, color: '#C9C9C9' }}>
+                {data.compPhone}
+              </Text>
+              <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15, marginTop: 20 }}>
+                Fax
+              </Text>
+              <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15, marginTop: 18 }}>
+                Website
+              </Text>
+              <Text
+                style={{ marginLeft: 80, marginTop: -20, color: '#C9C9C9' }}>
+                {data.compWebSite}
+              </Text>
+              <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15, marginTop: 18 }}>
+                Email
+              </Text>
+              <Text
+                style={{ marginLeft: 80, marginTop: -20, color: '#C9C9C9' }}>
+                {data.compEmailId}
+              </Text>
+              <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15, marginTop: 18 }}>
+                Helpline Number
+              </Text>
+              <Text
+                style={{ marginLeft: 150, marginTop: -20, color: '#C9C9C9' }}>
+                {data.compHelpDeskNumber}
+              </Text>
+              <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15, marginTop: 18 }}>
+                Help Desk
+              </Text>
+              <TouchableOpacity 
+                onPress={() => { nagotiatePrice(data); }}
+                style={{ height: 35, width: 130, backgroundColor: '#9F1D20', alignSelf: 'center', marginTop: 25, borderRadius: 5 }}
+              >
+                <Text style={{ alignSelf: 'center', marginTop: 8, color: '#FFFFFF', fontSize: 15, }}>
+                  Contact Now
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+
+        <View style={{}}>
+          <View style={styles.main3}>
+            <View>
+              <Text style={{ color: '#9F1D20', fontSize: 21, alignSelf: 'center', marginTop: 10 }}>
+                Rating
+              </Text>
+              <GetRating companyId={data.companyId} onprogress={(Rating) => { setRating(Rating); }} />
+              <Text style={{ color: '#CFCFCF', fontSize: 35, alignSelf: 'center', opacity: 0.5, }}>
+                {rating}
+              </Text>
+              <View style={{ flexDirection: "row", justifyContent: "center", marginTop: 5 }}>
+                {maxRating.map((item, key) => {
+                  return (
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      key={item}
+                    >
+                      <Image
+                        style={styles.starImageStyle}
+                        source={item <= rating ? { uri: starImageFilled } : { uri: starImageCorner }}
+                      />
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+
+              <TouchableOpacity
+                style={{
+                  height: 35,
+                  width: 130,
+                  backgroundColor: '#9F1D20',
+                  alignSelf: 'center',
+                  marginTop: 20,
+                  borderRadius: 5,
+                }}
+                onPress={() => {
+                  navigation.navigate('RateandReview', { detail: data, type: 2 });
+                }}>
+                <Text style={{ alignSelf: 'center', marginTop: 8, color: '#FFFFFF', fontSize: 15 }}>
+                  Give Rating
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+
+        <View style={{}}>
+          <View style={styles.main4}>
+            <View>
+              <Text style={{ color: '#9F1D20', fontSize: 21, padding: 15 }}>
+                Specials
+              </Text>
+              <FlatList
+                ListEmptyComponent={EmptyListMessage('No special found')}
+                data={specialdata}
+                keyExtractor={(item, i) => i}
+                renderItem={renderItemSpecial}
+              />
+            </View>
+          </View>
+        </View>
+
+        <View style={{ marginBottom: 30 }}>
+          <View style={styles.main5}>
+            <View>
+              <Text style={{ color: '#9F1D20', fontSize: 21, padding: 15 }}>
+                Magazines
+              </Text>
+              <FlatList
+                ListEmptyComponent={EmptyListMessage('No magazine found')}
+                data={magazine}
+                keyExtractor={(item, i) => i}
+                renderItem={renderItem}
+              />
+            </View>
+          </View>
+        </View>
+      </View>
+    </ScrollView>
   );
 };
 
