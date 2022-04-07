@@ -440,8 +440,9 @@ class HomeScreen extends Component {
           mutation: CREATE_FAVOURITES_PRODUCT,
           fetchPolicy: 'no-cache',
           variables: {
-            pid: item,
-            userid: Number(this.state.userInfo.id)
+            productId: item,
+            createDate: moment().format(),
+            userId: Number(this.state.userInfo.id)
           },
           context: {
             headers: {

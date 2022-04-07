@@ -1205,15 +1205,15 @@ query GetProductRating($id: Int){
 }`;
 
 export const GET_SPECIAL = gql`
-query GetSpecialList($size: Int!){
+query GetSpecialList($size: Int!, $categoryIds: String , $specialName: String){
   getMstSpecialList(
     specialId: null,
-    specialName: null,
+    specialName: $specialName,
     franchiseId: null,
     statusIds: null,
     distance: null,
     companyIds: null,
-    categoryIds: null,
+    categoryIds: $categoryIds,
     provinceIds: null,
     cityIds: null,
     suburbIds: null,
@@ -1682,51 +1682,53 @@ export const UPDATE_SHOPPING_CART = gql`
 `;
 
 export const GET_ALL_MAGAZINE_LIST = gql`
-query GetAllMag($size: Int!){
+query GetAllMag($size: Int!, $name: String, $categories: String){
   getMagazinesList(
   franchiseId: null,
   eflyerId: null,
-  magazineName: null,
+  magazineName: $name,
   statusIds: null,
   companyIds: null,
-  categoryIds: null,
+  categoryIds: $categories,
   provinceIds: null,
   cityIds: null,
   suburbIds: null,
   page: 1,
   size: $size
   ){
-  result{
-  eflyerId,
-  magazineName,
-  eFlyerDescription,
-  categoryID,
-  categoryName,
-  startDate,
-  endDate,
-  statusId,
-  statusName,
-  companyId,
-  companyName,
-  companyDescription,
-  isMenu,
-  streetAddress,
-  countryID,
-  countryName,
-  provinceID,
-  provinceName,
-  cityID,
-  cityName,
-  suburbID,
-  suburb,
-  zipCode,
-  phone,
-  companyLocation
-  mapEflyersUploadDtos{
-  documentName
-  }
-  }
-  }
+    result{
+      eflyerId,
+      magazineName,
+      eFlyerDescription,
+      categoryID,
+      categoryName,
+      startDate,
+      endDate,
+      statusId,
+      statusName,
+      companyId,
+      companyName,
+      companyDescription,
+      isMenu,
+      streetAddress,
+      countryID,
+      countryName,
+      provinceID,
+      provinceName,
+      cityID,
+      cityName,
+      suburbID,
+      suburb,
+      zipCode,
+      phone,
+      companyLocation
+      mapEflyersUploadDtos{
+        documentName
+        filePath,
+        thumbNailImagePath
+        }
+      }
+    }
   }
 
 `;
@@ -2645,7 +2647,7 @@ export const CREATE_CONTACT_REQUEST = gql`
 `
 export const GET_RATING_LIST = gql`
 {
-  getRatingList(key:null,keyType:null,page:1,size:10){
+  getRatingList(key:null,keyType:null,page:1,size:50){
     count,
     currentPage,
     message,
@@ -2660,8 +2662,70 @@ export const GET_RATING_LIST = gql`
        name,
        ratingScore,
        dateofReview
-      
     }
   }
 }
+`
+export const GET_FAVORITES = gql`
+{
+  getMstFavouritesProductList(     
+     page:1, size:10){
+     count,
+     currentPage,    
+     message,
+     nextPage,
+     prevPage,
+     success,
+     totalPages,
+     result{
+       activeText,
+       categoryID,
+       categoryName,
+       description,
+       documentName,
+       documentPath,
+       isActive,
+       ratingScore,
+       productID,
+       productImage,
+       productName,
+       productNumber,
+       salesTypeId,
+       typeID,
+       inventory,
+       clickCount,
+       viewCount
+       unitCost,
+       length, 
+       width, 
+       height, 
+       volume, 
+       weight, 
+       googleSchema,
+       domainCategory, 
+       startDate,
+       endDate,
+       companyID,
+     mapProductImages{        
+         imageName,
+         imagePath
+       }   
+       prdBid{
+         bidId,
+         createdDate,
+         bidAmount,
+         userId
+       }
+       prdHire{
+         hireId, 
+         userId,
+         isAccepted,
+         fromDate, 
+         toDate,
+         returned
+       }
+      
+     }
+   }
+ }
 `

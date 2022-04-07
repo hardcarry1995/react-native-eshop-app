@@ -16,7 +16,7 @@ export default {
   contact_us: 'Catalogues',
   logout: 'Logout',
   login: 'Login',
-  about_us: 'Specials Maps',
+  about_us: 'Products Map',
   my_workout: 'MY WORKOUT',
   comments: 'Comments',
   faq: 'Specials',

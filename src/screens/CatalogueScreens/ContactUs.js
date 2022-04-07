@@ -1,27 +1,17 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  TextInput,
-  FlatList,
-  SafeAreaView,
-  ActivityIndicator,
-  ScrollView,
-} from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, FlatList, SafeAreaView, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import { GET_ALL_MAGAZINE_LIST } from '../../constants/queries';
 import client from '../../constants/client';
 import Moment from 'moment';
+import { Rating, Chip } from "react-native-elements";
+import ProductSearchInput from "../../components/ProductSearchInput";
+import CategorySelector from "../../components/CategorySelector";
 
 export default class FaqScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      faqs: '',
-      str: '',
       isLoading: true,
       offset: 10,
       cartLoading: false,
@@ -29,11 +19,10 @@ export default class FaqScreen extends React.Component {
       setAllcartcount: [],
       userInfo: [],
       userTokenData: '',
-      textnew: [],
-      // onEndReachedLength: 0.5
+      textnew: "",
+      categories: [],
+      showCategorySelector : false
     };
-
-    // this.intervalID = setInterval(this.fetchToken(), 5000);
   }
 
   componentDidMount() {
@@ -42,13 +31,17 @@ export default class FaqScreen extends React.Component {
 
 
   handleSearch = (text) => {
-    this.setState({
-      textnew: text,
-    });
-    let vdata = this.state.setAllcartcount.filter(i =>
-      i.magazineName.toLowerCase().includes(text.toLowerCase()))
-    this.setState({ data: vdata });
-    //  this.setState({ onEndReachedLength: 10 });
+    this.setState(
+      prevState => ({
+        ...prevState,
+        offset: 10,
+        textnew: text,
+        data: []
+      }),
+      () => {
+        this.getrequestItem();
+      },
+    );
   };
 
   async fetchToken() {
@@ -56,26 +49,9 @@ export default class FaqScreen extends React.Component {
     let userInfo = await AsyncStorage.getItem('userInfo');
     this.setState({
       userInfo: JSON.parse(userInfo),
-    });
-    this.setState({
       userTokenData: token
     });
     this.getShoppingCart(token);
-    console.log('token', token);
-  }
-
-
-  async fetchTokenNew() {
-    let token = await AsyncStorage.getItem('userToken');
-    let userInfo = await AsyncStorage.getItem('userInfo');
-    this.setState({
-      userInfo: JSON.parse(userInfo),
-    });
-    this.setState({
-      userTokenData: token
-    });
-    this.getrequestItem(token);
-    console.log('token', token);
   }
 
   fetchMoreUsers = () => {
@@ -94,35 +70,30 @@ export default class FaqScreen extends React.Component {
     client
       .query({
         query: GET_ALL_MAGAZINE_LIST,
-        // fetchPolicy: 'no-cache',
-        // variables: {
-        //   pid: id,
-        //   userId: this.state.userInfo.id,
-        // },
         context: {
           headers: {
             Authorization: `Bearer ${Token}`,
-            // 'Content-Length': 0,
           },
         },
         variables: {
-          size: this.state.offset
+          size: this.state.offset,
+          name: this.state.textnew === "" ? null : this.state.textnew,
+          categories : this.state.categories.length === 0 ? null : this.state.categories.join(",")
         },
       })
       .then(result => {
         this.setState({ cartLoading: false });
-        console.log("ccccccccccccccccccccccccccccccccccccccccccc", result)
-        // if (result.data.getMagazinesList.success) {
         this.setState({ data: result.data.getMagazinesList.result })
         this.setState({ setAllcartcount: result.data.getMagazinesList.result })
-        // ToastAndroid.show('Product added to cart', ToastAndroid.SHORT);
-        // }
+        console.log("Single Item:", result.data.getMagazinesList.result[0])
+
       })
       .catch(err => {
         this.setState({ cartLoading: false });
         console.log(err);
       });
   }
+
   getrequestItem() {
     if (!this.state.cartLoading) {
       this.setState({ cartLoading: true });
@@ -132,23 +103,19 @@ export default class FaqScreen extends React.Component {
           fetchPolicy: 'no-cache',
           variables: {
             size: this.state.offset,
+            name: this.state.textnew == "" ? null : this.state.textnew,
+            categories : this.state.categories.length == 0 ? null : this.state.categories.join(",")
           },
           context: {
             headers: {
               Authorization: `Bearer ${this.state.userTokenData}`,
-              // 'Content-Length': 0,
             },
           },
         })
         .then(result => {
           this.setState({ cartLoading: false });
-          console.log("ccccccccccccccccccccccccccccccccccccccccccc", result)
-          // if (result.data.getMagazinesList.success) {
-          // // this.setState({ offset: this.state.offset + 10 })
           this.setState({ data: result.data.getMagazinesList.result })
           this.setState({ setAllcartcount: result.data.getMagazinesList.result })
-          // ToastAndroid.show('Product added to cart', ToastAndroid.SHORT);
-          // }
         })
         .catch(err => {
           this.setState({ cartLoading: false });
@@ -157,111 +124,60 @@ export default class FaqScreen extends React.Component {
     }
   }
 
+  onPressFilterIcon = () => {
+    this.setState({ showCategorySelector: true })
+  }
+  _onSelectCategoryDone = (values) => {
+    this.setState(
+      prevState => ({
+        ...prevState,
+        offset: 10,
+        showCategorySelector: false, 
+        categories : values,
+        data: []
+      }),
+      () => {
+        this.getrequestItem();
+      },
+    );
+  }
+
+  _onPressSelectedCategory = (item) => {
+    const items = this.state.categories.filter((cat) => cat.categoryId != item.categoryId);
+    this.setState(
+      prevState => ({
+        ...prevState,
+        offset: 10,
+        showCategorySelector: false, 
+        categories : items,
+        data: []
+      }),
+      () => {
+        this.getrequestItem();
+      },
+    );
+  }
+
   renderItem = ({ item, index }) => (
-    <TouchableOpacity key={index}
-      onPress={() => {
-        this.props.navigation.navigate('CatalogueNew', { detail: item });
-      }}
-      activeOpacity={0.9}>
+    <TouchableOpacity 
+      key={index}
+      onPress={() => { this.props.navigation.navigate('CatalogueNew', { detail: item }); }}
+      activeOpacity={0.9}
+    >
       <View style={styles.main}>
-        <View>
-          <View
-            style={{
-              width: 1,
-              height: 80,
-              backgroundColor: '#D0D0D0',
-              marginLeft: 87,
-              marginTop: 10,
-            }}
-          />
+        <View style={{ borderRightWidth: 1, borderRightColor : "#c8c8c8"}}>
           <Image
             style={styles.image}
-            source={item.itemImagePath
-              ?
-              { uri: `${imagePrefix}${item.mapEflyersUploadDtos[0].documentName}` }
-              :
-              require('../../assets/NoImage.jpeg')}
+            source={item.itemImagePath ? { uri: `${imagePrefix}${item.mapEflyersUploadDtos[0].documentName}` } : require('../../assets/NoImage.jpeg')}
           />
         </View>
-        <View>
+        <View style={{ paddingLeft : 20}}>
           <Text style={styles.text} numberOfLines={1}>{item.magazineName}</Text>
-
-          <View
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              paddingTop: 5,
-              paddingBottom: 20,
-            }}>
-            <Image
-              style={{
-                width: 15,
-                height: 15,
-                marginLeft: 110,
-                marginRight: 2,
-                bottom: 70,
-              }}
-              source={require('../../assets/stargold.png')}
-            />
-            <Image
-              style={{
-                width: 15,
-                height: 15,
-                marginLeft: 2,
-                marginRight: 2,
-                bottom: 70,
-              }}
-              source={require('../../assets/stargold.png')}
-            />
-            <Image
-              style={{
-                width: 15,
-                height: 15,
-                marginLeft: 2,
-                marginRight: 2,
-                bottom: 70,
-              }}
-              source={require('../../assets/stargold.png')}
-            />
-            <Image
-              style={{
-                width: 15,
-                height: 15,
-                marginLeft: 2,
-                marginRight: 2,
-                bottom: 70,
-              }}
-              source={require('../../assets/stargold.png')}
-            />
-            <Image
-              style={{
-                width: 15,
-                height: 15,
-                marginLeft: 2,
-                marginRight: 2,
-                bottom: 70,
-              }}
-              source={require('../../assets/stargold.png')}
-            />
-          </View>
-
-          <Text
-            style={{
-              marginLeft: 110,
-              bottom: 70,
-              color: '#A8A8A8',
-              fontSize: 11,
-            }}>
-
+          <Rating  imageSize={16} readonly startingValue={5} style={{ alignItems: 'flex-start'}} />
+          <Text style={{ color: '#A8A8A8', fontSize: 11, marginVertical: 5 }}>
             {Moment(item.startDate).format('DD-MMM-YYYY')}
           </Text>
-          <Text numberOfLines={1}
-            style={{
-              marginLeft: 110,
-              bottom: 65,
-              color: '#323232',
-              fontSize: 11,
-            }}>
+          <Text  numberOfLines={1} style={{ color: '#323232', fontSize: 11, width: 260 }}>
             {item.eFlyerDescription}
           </Text>
         </View>
@@ -273,24 +189,29 @@ export default class FaqScreen extends React.Component {
     return (
       <View style={styles.container}>
         <SafeAreaView>
-
-          <View style={styles.SectionStyle}>
-            <Image
-              source={require('../../assets/search.png')}
-              style={styles.ImageStyle}
-            />
-
-            <TextInput
-              style={{ flex: 1 }}
-              placeholder="Search for a catalogue"
-              underlineColorAndroid="transparent"
-              onChangeText={queryText => this.handleSearch(queryText)}
-            />
-          </View>
-          {/* <ScrollView> */}
-          {/* <View style={{ backgroundColor: 'white' }}> */}
+          <ProductSearchInput 
+            onChangeText={this.handleSearch}
+            onPressFilterIcon={this.onPressFilterIcon}
+          />
+          {this.state.categories.length > 0 && <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom : 20, paddingHorizontal : 10}}>
+            {this.state.categories.map(item => (
+              <Chip 
+                title={item.categoryName}
+                icon={{
+                  name: 'close',
+                  type: 'font-awesome',
+                  size: 14,
+                  color: 'white',
+                }}
+                onPress={() => this._onPressSelectedCategory(item)}
+                iconRight
+                titleStyle={{ fontSize: 10 }}
+                buttonStyle={{ backgroundColor: '#F54D30', marginBottom: 5}}
+              />
+            ))}
+          </View>}
           <FlatList
-            // ListEmptyComponent={this.EmptyListMessage('data')}
+            ListEmptyComponent={<Text style={{ textAlign: 'center' }}>{this.state.cartLoading ? '' :  'There is no result!'}</Text>}
             ListFooterComponent={() => {
               return (
                 this.state.cartLoading ? (
@@ -305,11 +226,12 @@ export default class FaqScreen extends React.Component {
             renderItem={this.renderItem}
             onEndReached={this.fetchMoreUsers}
             onEndReachedThreshold={0.5}
-          // ListEmptyComponent={this.ListEmpty}
           />
-          {/* </View> */}
-          {/* </ScrollView> */}
         </SafeAreaView>
+        <CategorySelector 
+          visible={this.state.showCategorySelector} 
+          onDone={(values) => this._onSelectCategoryDone(values)}
+        />
       </View>
     );
   }
@@ -328,17 +250,17 @@ const styles = StyleSheet.create({
     marginLeft: 16,
     marginRight: 16,
     marginTop: 20,
+    flexDirection: 'row',
+    alignItems: 'center'
   },
   image: {
     height: 64,
     width: 64,
-    marginTop: -75,
     marginLeft: 10,
   },
   text: {
-    marginLeft: 110,
-    bottom: 70,
     color: '#323232',
+    marginBottom : 5
   },
   SectionStyle: {
     flexDirection: 'row',

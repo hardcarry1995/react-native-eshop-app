@@ -123,9 +123,7 @@ export default class Workout extends React.PureComponent {
       })
       .then(result => {
         this.setState({ cartLoading: false });
-        this.setState({
-          firstcartLoading: false
-        });
+        this.setState({ firstcartLoading: false});
         if (result?.data?.getPrdShoppingCart?.success && result?.data?.getPrdShoppingCart?.count > 0) {
           this.setState({ data: result.data.getPrdShoppingCart.result.prdShoppingCartDto })
           this.setState({ setAllcartcount: result.data.getPrdShoppingCart.count })

@@ -1,5 +1,5 @@
-import { View, Text, Image, StyleSheet, TouchableOpacity, TextInput } from 'react-native'
 import React from 'react'
+import { View, Image, StyleSheet, TouchableOpacity, TextInput } from 'react-native'
 
 const ProductSearchInput = ({ onChangeText, onPressFilterIcon }) => {
 

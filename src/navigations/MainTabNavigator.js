@@ -20,6 +20,7 @@ import MyRequestStack from "./MyRequestStack";
 import FaqStack from "./FaqStack";
 import WorkInProgress from "../screens/WorkInProgress";
 import ContactFrom from "../screens/ContactForm";
+import MyFavorites from "../screens/MyFavorites"
 
 import TabBar from "./BottomTabBar";
 // HomeStack Screens
@@ -124,6 +125,13 @@ const ReviewStack  = () => (
   </Stack.Navigator>
 )
 
+// MyFavorite Stack
+const FavoriteStack = () => (
+  <Stack.Navigator screenOptions={screenOptions}>
+    <Stack.Screen name="MyFavorite" component={MyFavorites} />
+  </Stack.Navigator>
+)
+
 // Define TabBar
 const TabBarNavigator = () => (
   <Tab.Navigator
@@ -151,6 +159,7 @@ const TabBarNavigator = () => (
     <Tab.Screen name={Constants.share_app} component={WorkInProgress}  />
     <Tab.Screen name="RequestStack" component={RequestStack}  />
     <Tab.Screen name="ContactStack" component={ContactStack}  />
+    <Tab.Screen name={Constants.my_Favirity} component={FavoriteStack} />
   </Tab.Navigator>
 )
 

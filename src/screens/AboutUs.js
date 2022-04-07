@@ -29,8 +29,8 @@ const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
 const Map33 = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [currentLatitude, setCurrentLatitude] = useState('');
-  const [currentLongitude, setCurrentLongitude] = useState('');
+  const [currentLatitude, setCurrentLatitude] = useState(-28.4793);
+  const [currentLongitude, setCurrentLongitude] = useState(24.6727);
   const [specialData, setSpecialData] = useState([]);
   const [selectedSpecialData, setSelectedSpecialData] = useState({});
   const [platformType, setPlatformType] = useState('');
@@ -77,7 +77,6 @@ const Map33 = ({ navigation }) => {
         if (result?.data?.getMstSpecialList?.success) {
           setSpecialData(result?.data?.getMstSpecialList.result);
         } else {
-          // console.log(result.data.getMstSpecialList.message);
         }
       })
       .catch(err => {
@@ -114,13 +113,18 @@ const Map33 = ({ navigation }) => {
             latitudeDelta: LATITUDE_DELTA,
             longitudeDelta: LONGITUDE_DELTA,
           }}
+          region={{
+            latitude: parseFloat(currentLatitude),
+            longitude: parseFloat(currentLongitude),
+            latitudeDelta: LATITUDE_DELTA,
+            longitudeDelta: LONGITUDE_DELTA,
+          }}
           customMapStyle={mapStyle}>
           {specialData.length > 0 &&
             specialData.map((marker, index) => {
               let markerImage = '';
               if (marker.mapSpecialUpload.length > 0) {
                 markerImage = marker.mapSpecialUpload[0].thumbNailPath;
-                // console.log('imagege', imagege)
               } else {
                 markerImage = '';
               }
