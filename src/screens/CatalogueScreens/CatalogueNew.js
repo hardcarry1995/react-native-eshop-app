@@ -12,7 +12,6 @@ import { SliderBox } from "react-native-image-slider-box";
 import FontawesomeIcon from "react-native-vector-icons/FontAwesome";
 import RNFS from "react-native-fs";
 import FileViewer from "react-native-file-viewer";
-import { Platform } from "react-native";
 
 const Catalogue36 = ({ navigation, route }) => {
   const detailData = route.params.detail;

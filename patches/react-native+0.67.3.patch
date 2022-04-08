@@ -1,0 +1,15 @@
+diff --git a/node_modules/react-native/React/CoreModules/RCTActionSheetManager.mm b/node_modules/react-native/React/CoreModules/RCTActionSheetManager.mm
+index 5cd782e..d60e510 100644
+--- a/node_modules/react-native/React/CoreModules/RCTActionSheetManager.mm
++++ b/node_modules/react-native/React/CoreModules/RCTActionSheetManager.mm
+@@ -94,8 +94,8 @@ RCT_EXPORT_METHOD(showActionSheetWithOptions
+   UIViewController *controller = RCTPresentedViewController();
+   NSNumber *anchor = [RCTConvert NSNumber:options.anchor() ? @(*options.anchor()) : nil];
+   UIColor *tintColor = [RCTConvert UIColor:options.tintColor() ? @(*options.tintColor()) : nil];
+-  UIColor *cancelButtonTintColor =
+-      [RCTConvert UIColor:options.cancelButtonTintColor() ? @(*options.cancelButtonTintColor()) : nil];
++  UIColor *cancelButtonTintColor = [RCTConvert UIColor:options.tintColor() ?
++      @(*options.tintColor()) : nil];
+ 
+   if (controller == nil) {
+     RCTLogError(

@@ -8,12 +8,16 @@ import client from '../../constants/client';
 
 const Request25 = ({ navigation, route }) => {
   const data = route.params.data;
+  console.log(data);
+
   const dateDMY = Moment(data.itemRequestDate).format('DD-MMM-YYYY');
   const [vehicleData, setVehicleData] = useState([]);
   const [name_address, setname_address] = useState('');
+
   useEffect(() => {
     getRequestItem();
   });
+  
   const getRequestItem = async () => {
     let IsLogin = await AsyncStorage.getItem('IsLogin');
     if (IsLogin !== 'true') {

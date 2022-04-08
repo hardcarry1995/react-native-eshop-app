@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Alert, ToastAndroid, FlatList, SafeAreaView, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Alert, ToastAndroid, FlatList, TextInput, ScrollView, ActivityIndicator } from 'react-native';
 import moment from 'moment';
 import AsyncStorage from '@react-native-community/async-storage';
 import { imagePrefix } from '../../constants/utils';
@@ -12,6 +12,9 @@ const WhiteHouse = ({ navigation, route }) => {
   const [maxRating, setMaxRating] = useState([1, 2, 3, 4, 5]);
   const [magazine, setMagazine] = useState([]);
   const [specialdata, setSpecial] = useState([]);
+  const [enquiryTitle, setEnquiryTitle] = useState("");
+  const [enquiryDescription, setEnquiryDescription] = useState("");
+  const [contactLoading, setContactLoading] = useState(false);
   const data = route.params.detail;
   const datego = moment(data.joinDate).format('DD MMM YYYY');
 
@@ -57,7 +60,6 @@ const WhiteHouse = ({ navigation, route }) => {
       })
 
       .then(result => {
-        console.log(result);
         setSpecial(result.data.getMstSpecialList.result)
       })
       .catch(err => {
@@ -87,6 +89,12 @@ const WhiteHouse = ({ navigation, route }) => {
   }
 
   const nagotiatePrice = async (item) => {
+    if(contactLoading) return;
+    if(enquiryTitle === "" || enquiryDescription === ""){
+      alert("Please enter contact information!");
+      return;
+    }
+    setContactLoading(true);
     let token = await AsyncStorage.getItem('userToken');
     client
       .mutate({
@@ -98,8 +106,8 @@ const WhiteHouse = ({ navigation, route }) => {
         },
         variables: {
           companyId: item.companyId,
-          enquiryDescription: item.compCityName,
-          title: item.companyName,
+          enquiryDescription: enquiryDescription,
+          title: enquiryTitle,
         },
       })
       .then(result => {
@@ -111,9 +119,11 @@ const WhiteHouse = ({ navigation, route }) => {
             ToastAndroid.SHORT,
           );
         }
+        setContactLoading(false);
       })
       .catch(err => {
         console.log(err);
+        setContactLoading(false);
       });
 
   }
@@ -293,13 +303,32 @@ const WhiteHouse = ({ navigation, route }) => {
               <Text style={{ color: '#232323', marginLeft: 15, fontSize: 15, marginTop: 18 }}>
                 Help Desk
               </Text>
+              <View style={{ paddingHorizontal: 15, marginTop : 10}}>
+                <Text>Enquiry Title</Text>
+                <TextInput  
+                  style={{ backgroundColor: "#fff", height: 40, paddingHorizontal: 10, borderWidth: 1, borderColor: "#8e8e8e", borderRadius: 5, marginTop: 5}}
+                  onChangeText={(text) => setEnquiryTitle(text) }
+                />
+              </View>
+              <View style={{ paddingHorizontal: 15, marginTop : 10}}>
+                <Text>Enquiry Description</Text>
+                <TextInput  
+                  multiline
+                  style={{ backgroundColor: "#fff", height: 40, paddingHorizontal: 10, borderWidth: 1, borderColor: "#8e8e8e", borderRadius: 5, height : 100, marginTop: 5}}
+                  onChangeText={(text) => setEnquiryDescription(text)}
+                />
+              </View>
               <TouchableOpacity 
                 onPress={() => { nagotiatePrice(data); }}
-                style={{ height: 35, width: 130, backgroundColor: '#9F1D20', alignSelf: 'center', marginTop: 25, borderRadius: 5 }}
+                style={{ height: 40, width: 130, backgroundColor: '#9F1D20', alignSelf:'center', justifyContent: 'center', alignItems:'center', marginTop: 25, borderRadius: 5 }}
               >
-                <Text style={{ alignSelf: 'center', marginTop: 8, color: '#FFFFFF', fontSize: 15, }}>
-                  Contact Now
-                </Text>
+                {contactLoading ? <ActivityIndicator  /> 
+                  :
+                  <Text style={{ color: '#FFFFFF', fontSize: 15, }}>
+                    Contact Now
+                  </Text>
+                }
+               
               </TouchableOpacity>
             </View>
           </View>
@@ -331,15 +360,8 @@ const WhiteHouse = ({ navigation, route }) => {
                 })}
               </View>
 
-              <TouchableOpacity
-                style={{
-                  height: 35,
-                  width: 130,
-                  backgroundColor: '#9F1D20',
-                  alignSelf: 'center',
-                  marginTop: 20,
-                  borderRadius: 5,
-                }}
+              <TouchableOpacity 
+                style={{ height: 40, width: 130, backgroundColor: '#9F1D20', alignSelf: 'center', marginTop: 20, borderRadius: 5, }}
                 onPress={() => {
                   navigation.navigate('RateandReview', { detail: data, type: 2 });
                 }}>
@@ -412,7 +434,6 @@ const styles = StyleSheet.create({
     color: '#323232',
   },
   main2: {
-    height: 360,
     backgroundColor: 'white',
     borderRadius: 15,
     shadowRadius: 20,
@@ -420,6 +441,7 @@ const styles = StyleSheet.create({
     marginLeft: 16,
     marginRight: 16,
     marginTop: 20,
+    paddingVertical: 20
   },
   main3: {
     height: 215,

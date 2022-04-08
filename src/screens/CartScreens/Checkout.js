@@ -21,11 +21,15 @@ export default class CheckOut extends React.Component {
       checkoutLoading:false,
       userTokenData: '',
       userInfo: [],
+      totalPrice : 0
     };
   }
   componentDidMount() {
     const { data, dataAll} = this.props.route.params;
-    this.setState({totalCount: data.length});
+    this.setState({
+      totalCount: data.length,
+      totalPrice: dataAll.amountExlVat
+    });
     this.interval = setInterval(() => this.getAddressUserInter(), 5000);
     this.getAddressUser();
     this.fetchToken();
@@ -140,8 +144,8 @@ export default class CheckOut extends React.Component {
   }
 
   alluserAddressSelectionView() {
-    if(!this.state.alluserAddress.length > 0){
-       return <ActivityIndicator size="large" color="#000" />;
+    if(this.state.alluserAddress.length == 0){
+       return <Text>No Address</Text>;
     }
     return this.state.alluserAddress.map((item, i) => {
       return (
@@ -251,13 +255,12 @@ export default class CheckOut extends React.Component {
           />
 
           <View>
-            <Text style={{alignSelf: 'flex-end', marginRight: 60, bottom: 12}}>
-              {this.state.totalCount} Item(s), Total: &nbsp;
+            <Text style={{alignSelf: 'flex-end', marginRight: 20, bottom: 12}}>
+              {this.state.totalCount} Item(s), Total:  <Text style={{ alignSelf: 'flex-end', marginRight: 20, bottom: 29, color: '#DB3236', }}>
+              R{this.state.totalPrice.toFixed(2)}
+              </Text>
             </Text>
-            <Text style={{ alignSelf: 'flex-end', marginRight: 20, bottom: 29, color: '#DB3236', }}>
-              &nbsp;R{dataAll.amountExlVat.toFixed(2)}
-            </Text>
-            <Text style={{alignSelf: 'flex-end', marginRight: 20, bottom: 25}}>
+            <Text style={{alignSelf: 'flex-end', marginRight: 20, bottom: 10}}>
               Price dropped, Saved: R00.00
             </Text>
           </View>

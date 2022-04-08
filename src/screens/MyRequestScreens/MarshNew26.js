@@ -43,6 +43,8 @@ const Marsh26 = ({ navigation, route }) => {
       ToastAndroid.show('write something first', ToastAndroid.SHORT);
       return;
     }
+    alert(requestData.itemRequestID);
+
     setLoading(true)
     client
       .mutate({
@@ -61,7 +63,8 @@ const Marsh26 = ({ navigation, route }) => {
         },
       })
       .then(async result => {
-        if (result.data.postMstItemResponse.success) {
+        console.log(result.data.postMstItemResponse);
+        // if (result.data.postMstItemResponse.success) {
           setname_address('')
           setmsgDataNew([])
           let tdata = {
@@ -106,9 +109,9 @@ const Marsh26 = ({ navigation, route }) => {
 
           setmsgData(msgDataNew)
           setLoading(false)
-        } else {
-          Alert.alert('Failed', result.data.postMstItemResponse.message)
-        }
+        // } else {
+          // Alert.alert('Failed', result.data.postMstItemResponse.message)
+        // }
       })
       .catch(err => {
         console.log(err);
@@ -119,6 +122,7 @@ const Marsh26 = ({ navigation, route }) => {
   }
   const getRequestItemNext = () => {
     let id = requestData.itemRequestID
+    alert(id);
     client
       .query({
         query: GET_RESPONSE_ITEMS,
@@ -132,6 +136,7 @@ const Marsh26 = ({ navigation, route }) => {
         },
       })
       .then(async result => {
+        console.log("REsult:", result.data);
         if (result.data.getResponseItems) {
           setmsgData(result.data.getResponseItems);
         } else {
@@ -264,6 +269,7 @@ const Marsh26 = ({ navigation, route }) => {
             <Image
               style={{ height: 24, width: 17, marginRight: 10 }}
               source={require('../../assets/M26_1.png')}
+              resizeMode="contain"
             />
           </TouchableOpacity>
 
@@ -271,6 +277,7 @@ const Marsh26 = ({ navigation, route }) => {
             <Image
               style={{ height: 22, width: 15, marginRight: 19 }}
               source={require('../../assets/M26_2.png')}
+              resizeMode="contain"
             />
           </TouchableOpacity>
         </View>
@@ -285,6 +292,7 @@ const Marsh26 = ({ navigation, route }) => {
             <Image
               source={require('../../assets/M26_3.png')}
               style={styles.iconSend}
+              resizeMode="contain"
             />
           )}
         </TouchableOpacity>

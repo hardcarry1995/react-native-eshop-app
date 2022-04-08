@@ -8,10 +8,9 @@ import { gql } from '@apollo/client';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import DocumentPicker from 'react-native-document-picker';
 import DatePicker from 'react-native-datepicker';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { Alert } from 'react-native';
 import { ActivityIndicator, RadioButton } from 'react-native-paper';
-import { launchCamera } from 'react-native-image-picker';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import url from '../../constants/api';
 import RBSheet from "react-native-raw-bottom-sheet";
 import { imagePrefix } from '../../constants/utils';
@@ -59,7 +58,6 @@ export const REQUEST_ITEMS = gql
 
 const Request = (props) => {
   const { navigation, route } = props;
-  const format2 = "HH:mm";
   const format3 = "DD-MM-YYYY";
   let DataObject = {};
   if (Object.keys(route.params.refered_data ?? {}).length > 0) {
@@ -184,7 +182,7 @@ const Request = (props) => {
     if (IsLogin !== 'true') {
       const referData = { 'name': 'CreateFeed', 'data': { 'title': title, 'desc': desc, 'startdate': startdate, 'categoryId': categoryId, 'subCategoryId': subCategoryId, 'setcatId': setcatId, 'pushsetcatId': pushsetcatId, 'setPDF': setPDF, 'setImagesUpload': setImagesUpload, 'subCategoryName': subCategoryName } };
       props.setRefered_by(JSON.stringify(referData));
-      navigation.navigate('Auth');
+      navigation.navigate('AuthStack');
     } else {
       let resultdata = await AsyncStorage.getItem('userInfo');
       let jsondata = JSON.parse(resultdata);
@@ -201,7 +199,7 @@ const Request = (props) => {
       allFiles.map((data) => {
         const file = {
           uri: data.uri,
-          name: data.name,
+          name: data.name ?? data.fileName,
           type: data.type,
         };
         allFilesData.push(file);
@@ -387,6 +385,16 @@ const Request = (props) => {
     }
   };
 
+  const chooseImage = async () => {
+    const result = await launchImageLibrary({selectionLimit : 0}, null);
+    if(result.didCancel){
+      return ;
+    }
+    const images = result.assets;
+    console.log(images);
+    setImagesUploadData(prevState => [...prevState, ...images]) ;
+  }
+
   const chooseFile = async value => {
     try {
       const results = await DocumentPicker.pickMultiple({
@@ -404,9 +412,7 @@ const Request = (props) => {
         setImagesUploadData(allImageDoc);
       }
     } catch (err) {
-
       if (DocumentPicker.isCancel(err)) {
-        // alert('Canceled');
         console.log("Cancelled");
       } else {
         alert('Unknown Error: ' + JSON.stringify(err));
@@ -499,13 +505,13 @@ const Request = (props) => {
     setDesc(dataofvehicle)
   }
   const addTimeOnDescription = (value) => {
-    // if (date && value?.type !== 'dismissed') {
       let dataofvehicle = desc + '\nTime  : ' + startdate.toString() + ' T ' + value;
       setDesc(dataofvehicle)
-    // }
   }
+
   const selectFileDoc = async value => {
     try {
+      console.log([DocumentPicker.types.pdf, DocumentPicker.types.doc, DocumentPicker.types.xls, DocumentPicker.types.docx]);
       const results = await DocumentPicker.pickMultiple({
         type: [DocumentPicker.types.pdf, DocumentPicker.types.doc, DocumentPicker.types.xls, DocumentPicker.types.docx],
       });
@@ -513,7 +519,6 @@ const Request = (props) => {
       setAllPDF(allFileDoc);
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
-        alert('Canceled');
       } else {
         alert('Unknown Error: ' + JSON.stringify(err));
         throw err;
@@ -557,7 +562,7 @@ const Request = (props) => {
               Schedule Appointment
             </Text>
             <View style={{ flexDirection: 'row', padding: 10 }}>
-              <View style={{ height: 40, width: 150, borderRadius: 5, borderColor: '#DEDEDE', borderWidth: 1, alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ height: 40, width: 150, alignItems: 'center', justifyContent: 'center' }}>
                 <DatePicker
                   date={startdate}
                   mode="date"
@@ -566,10 +571,10 @@ const Request = (props) => {
                   maxDate="01-06-2050"
                   confirmBtnText="Confirm"
                   cancelBtnText="Cancel"
+                  theme="dark"
+                  textColor="#333333"
                   customStyles={{
                     dateIcon: { position: 'absolute', left: 0, top: 4, height: 0, width: 0, marginLeft: 0 },
-                    dateInput: {
-                    }
                   }}
                   onDateChange={value => {
                     addDateOnDescription(value)
@@ -578,7 +583,7 @@ const Request = (props) => {
                 />
               </View>
 
-              <View style={{ height: 40, width: 150, borderRadius: 5, borderColor: 'lightgray', borderWidth: 1, alignItems: 'center', justifyContent: 'center', marginLeft: 20 }}>
+              <View style={{ height: 40, width: 150, alignItems: 'center', justifyContent: 'center', marginLeft: 20 }}>
                 <TouchableOpacity onPress={showTimepicker}>
                     <DatePicker
                       date={startdate}
@@ -597,17 +602,6 @@ const Request = (props) => {
                         onChange(value)
                       }}
                     />
-                    {/* <DateTimePicker
-                    //   testID="dateTimePicker"
-                    //   value={ntime}
-                    //   mode={mode}
-                    //   is24Hour={true}
-                    //   display="default"
-                    //   onChange={(value, date) => {
-                    //     addTimeOnDescription(value, date)
-                    //     onChange(value, date)
-                    //   }}
-                    // /> */}
                 </TouchableOpacity>
               </View>
             </View>
@@ -635,20 +629,23 @@ const Request = (props) => {
                             style={{ backgroundColor: 'gainsboro', height: 60, width: 60, resizeMode: 'center'}}
                             source={{ uri: e.uri }}
                             defaultSource={require('../../assets/image_placeholder1.png')}
+                            resizeMode="contain"
                           />
                           <Image
                             style={{ height: 20, width: 20, position: 'absolute', top: 2, right: 0 }}
                             source={require('../../assets/remove.png')}
+                            resizeMode="contain"
                           />
                         </TouchableOpacity>
                       </View>
                     </View>
                   )}
 
-                  <TouchableOpacity onPress={() => chooseFile('photo', '1')}>
+                  <TouchableOpacity onPress={() => chooseImage()}>
                     <Image
                       style={{ height: 60, width: 60, resizeMode: 'center', marginLeft: 23, }}
                       source={require('../../assets/uploadimg.png')}
+                      resizeMode="contain"
                     />
                     <Text style={{ color: '#DB3236', marginLeft: 4 }}>UPLOAD IMAGE</Text>
                   </TouchableOpacity>
@@ -659,46 +656,52 @@ const Request = (props) => {
                   {setPDF.map(e =>
                     <View>
                       <View>
-                        {e.type == "application/pdf" &&
+                        {(e.type == "application/pdf" || e.type == DocumentPicker.types.pdf) &&
                           <View>
                             <TouchableOpacity style={{ marginLeft: 10, marginTop: 10, height: 65, width: 65 }} onPress={() => removePeople(e)}>
                               <Image
                                 style={{ height: 60, width: 60, resizeMode: 'center' }}
                                 source={require('../../assets/pdf.png')}
+                                resizeMode="contain"
                               />
                               <Image
                                 style={{ height: 20, width: 20, position: 'absolute', top: 2, right: 0 }}
                                 source={require('../../assets/remove.png')}
+                                resizeMode="contain"
                               />
                             </TouchableOpacity>
                           </View>
                         }
                       </View>
                       <View>
-                        {e.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document" &&
+                        {(e.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || e.type == DocumentPicker.types.docx) &&
                           <View>
                             <TouchableOpacity style={{ marginLeft: 10, marginTop: 10, height: 65, width: 65 }} onPress={() => removePeople(e)}>
                               <Image
                                 style={{ height: 60, width: 60, resizeMode: 'center' }}
                                 source={require('../../assets/docx.png')}
+                                resizeMode="contain"
                               />
                               <Image
                                 style={{ height: 20, width: 20, position: 'absolute', top: 2, right: 0 }}
                                 source={require('../../assets/remove.png')}
+                                resizeMode="contain"
                               />
                             </TouchableOpacity>
                           </View>
                         }
                       </View>
                       <View>
-                        {e.type == "application/msword" &&
+                        {(e.type == "application/msword" || e.type == DocumentPicker.types.doc) &&
                           <View>
                             <TouchableOpacity style={{ marginLeft: 10, marginTop: 10, height: 65, width: 65 }} onPress={() => removePeople(e)}>
                               <Image style={{ height: 60, width: 60, resizeMode: 'center' }}
                                 source={require('../../assets/doc.png')}
+                                resizeMode="contain"
                               />
                               <Image
                                 style={{ height: 20, width: 20, position: 'absolute', top: 2, right: 0 }}
+                                resizeMode="contain"
                                 source={require('../../assets/remove.png')}
                               />
                             </TouchableOpacity>
@@ -706,26 +709,30 @@ const Request = (props) => {
                         }
                       </View>
                       <View>
-                        {e.type == "application/vnd.ms-excel" &&
+                        {(e.type == "application/vnd.ms-excel" || e.type == DocumentPicker.types.xls || e.type == DocumentPicker.types.xlsx || e.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") &&
                           <View>
                             <TouchableOpacity style={{ marginLeft: 10, marginTop: 10, height: 65, width: 65 }} onPress={() => removePeople(e)}>
                               <Image
                                 style={{ height: 60, width: 60, resizeMode: 'center', }}
+                                resizeMode="contain"
                                 source={require('../../assets/xls.png')}
                               />
                               <Image
                                 style={{ height: 20, width: 20, position: 'absolute', top: 2, right: 0 }}
+                                resizeMode="contain"
                                 source={require('../../assets/remove.png')}
                               />
                             </TouchableOpacity>
                           </View>
                         }
                       </View>
+                      
                     </View>
                   )}
                   <TouchableOpacity onPress={() => selectFileDoc()}>
                     <Image
                       style={{ height: 60, width: 60, resizeMode: 'center', marginLeft: 23, marginTop: 10 }}
+                      resizeMode="contain"
                       source={require('../../assets/Group12.png')}
                     />
                     <Text style={{ color: '#DB3236', marginLeft: 10 }}>UPLOAD FILE</Text>
@@ -840,35 +847,6 @@ const Request = (props) => {
           }
         </View>
       </ScrollView>
-      <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            setModalVisible(!modalVisible);
-          }}>
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              <View style={{ marginLeft: 230, marginTop: -20 }}>
-              </View>
-              <Text style={styles.modalText}>Select Image</Text>
-              <View
-                style={{ padding: 5 }}>
-                <TouchableOpacity onPress={() => chooselaunchCamera()}>
-                  <Text style={styles.textStyle}>Take Photo</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={() => chooseFile()}>
-                  <Text style={styles.textStyle}>Choose from Library</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={() => setModalVisible(!modalVisible)}>
-                  <Text style={{ color: '#000', fontSize: 15, fontWeight: "700", textAlign: "right", marginTop: 20 }}>CANCEL</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-      </Modal>
     </SafeAreaView>
   );
 };

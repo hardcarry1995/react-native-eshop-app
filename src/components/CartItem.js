@@ -47,7 +47,6 @@ const CartItem = ({ item }) => {
         },
       }).then(result => {
         if (result?.data?.postPrdShoppingCartOptimized?.success) {
-          // ToastAndroid.show('Product added to cart', ToastAndroid.SHORT);
           console.log("Success!");
         }
       })

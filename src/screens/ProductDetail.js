@@ -23,7 +23,7 @@ export default class ProductDetail extends React.Component {
   }
 
   async componentDidMount() {
-    console.log(this.props.route.params.data.productID);
+    console.log("Sale:", this.props.route.params.data.salesTypeId);
     let token = await AsyncStorage.getItem('userToken');
     client.query({
       query: GET_PRODUCT_RATING,
@@ -37,7 +37,6 @@ export default class ProductDetail extends React.Component {
       },
     })
     .then(result => {
-      console.log(result.data.getMstRatingScoreList.result)
       if (result.data.getMstRatingScoreList.success) {
 
       } 
@@ -275,7 +274,7 @@ export default class ProductDetail extends React.Component {
           </View>
 
           {/* Product Bid */}
-          <View style={{ marginTop : 20}}>
+          { this.props.route.params.data.salesTypeId == 2 && <View style={{ marginTop : 20}}>
             <Text style={{ fontSize: 20,}}>All Bids</Text>
             {data.prdBid.length > 0 ? <ScrollView style={{ height: 300, width: "100%", marginTop : 10}}>
               {data.prdBid.map((bid, index) => (
@@ -288,7 +287,7 @@ export default class ProductDetail extends React.Component {
             </ScrollView> :
             <Text style={{ marginTop : 5, textAlign: 'center' }}>There is no bid yet</Text>
             }
-          </View>
+          </View> }
         </View>
       </ScrollView>
     );

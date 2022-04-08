@@ -1476,31 +1476,48 @@ query GetRespons($id: ID!)
   getResponseItems(
    id: $id
  ){
-     comment,
-     companyId,
-     createdBy,
-     createdDate,
-     isAccepted,
-     isActive,
-     isRejected,
-     itemRequestId,
-     itemResponseId,
-     mapItemResponseUpload{
-       createdBy,
-       createdDate,
-       documentName,
-       irUploadId,
-       isActive,
-       itemResponseId,
-       modifiedBy,
-       modifiedDate,
-       uploadPath
-     }
-     modifiedBy,
-     modifiedDate,
-     replyToId,
-     responseDate,
-     userId
+  comment,
+  companyId,
+  createdBy,
+  createdDate,
+  isAccepted,
+  isActive,
+  isRejected,
+  itemRequestId,
+  itemResponseId,
+  modifiedBy,
+  modifiedDate,
+  replyToId,
+  responseDate,
+  userId
+  mapItemResponseUpload{
+      createdBy,
+      createdDate,
+      documentName,
+      irUploadId,
+      isActive,
+      itemResponseId,
+      modifiedBy,
+      modifiedDate,
+      uploadPath
+  }
+  replyTo{
+      comment,
+      companyId,
+      createdBy,
+      createdDate,
+      isAccepted,
+      isActive,
+      isRejected,
+      itemRequestId,
+      itemResponseId,
+      modifiedBy,
+      modifiedDate,
+      replyToId,
+      responseDate,
+      userId,
+  }
+
    
    }
  }

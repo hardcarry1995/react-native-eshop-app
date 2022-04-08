@@ -15,6 +15,8 @@ Geocoder.init("AIzaSyCNjKB84RyfVRuvuU8sCcQT6uWB_wVY03s") //rescue
 const RequestItem = ({ navigation, route }) => {
   const [switchValue, setSwitchValue] = useState(false);
   const [province, setProvince] = useState([]);
+  const [allCities, setAllCities] = useState([]);
+  const [allSubs, setAllSubs] = useState([]);
   const [selectProvince, setSelectProvince] = useState(null);
   const [city, setCity] = useState([]);
   const [selectCity, setSelectCity] = useState(null);
@@ -24,7 +26,6 @@ const RequestItem = ({ navigation, route }) => {
   const [currentLongitude, setCurrentLongitude] = useState(24.6727);
   const [locationStatus, setLocationStatus] = useState('');
   const [mapstate, setMapState] = useState('');
-  const [dataEMP, setAllProvince] = useState([]);
   const [initialRegion, setinitialRegion] = useState();
   const [showCategorySelector, setShowCategorySelector] = useState(false);
   const [categoryId, setCategoryId] = useState('');
@@ -52,9 +53,9 @@ const RequestItem = ({ navigation, route }) => {
     }
   };
 
-
-
   useEffect(() => {
+    fetchAllCity();
+    fetchAllSub();
     fetchProvince();
     setTheAllData();
   }, []);
@@ -104,9 +105,13 @@ const RequestItem = ({ navigation, route }) => {
       Geocoder.from(position.coords.latitude, position.coords.longitude).then(json => {
         var addressComponent = json.results[0].address_components;
         setMapState(addressComponent[3].long_name);
-        setSelectProvince(addressComponent[addressComponent.length-3].long_name)
-        setSelectCity(addressComponent[addressComponent.length-4].long_name)
-        setSelectSub(addressComponent[addressComponent.length-5].long_name)
+        const searchProvince = province.find((p) => p.provinceName === addressComponent[addressComponent.length-3].long_name);
+        setSelectProvince(searchProvince ? searchProvince.provinceId : null);
+        const searchCity = allCities.find((p) => p.cityName === addressComponent[addressComponent.length-4].long_name);
+        setSelectCity(searchCity ? searchCity.cityId : null);
+        const searchSub = allSubs.find((p) => p.suburbName === addressComponent[addressComponent.length-5].long_name);
+        setSelectSub(searchSub ? searchSub.suburbId : null);
+        
       }).catch(error => console.warn(error));
     }, (error) => {
       console.log(error.code, error.message);
@@ -203,71 +208,6 @@ const RequestItem = ({ navigation, route }) => {
       },
     );
   };
-  const fetchAllState = async () => {
-    let token = await AsyncStorage.getItem('userToken');
-    client
-      .query({
-        query: GET_ALL_STATE,
-        context: {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      })
-      .then(async result => {
-        if (result.data.getProvince.success) {
-          fetchAllCity(token);
-          setAllProvince(result.data.getProvince.result);
-        } else {
-        }
-      })
-      .catch(err => {
-        console.log('err', err);
-      });
-  };
-  const fetchAllCity = async (token) => {
-    client
-      .query({
-        query: GET_ALL_CITY_NEW,
-        context: {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      })
-      .then(async result => {
-        if (result.data.getCity.success) {
-          fetchAllSub();
-        } else {
-        }
-      })
-      .catch(err => {
-        console.log('err', err);
-      });
-  };
-  const fetchAllSub = async () => {
-    let token = await AsyncStorage.getItem('userToken');
-    client
-      .query({
-        query: GET_ALL_SUBURB,
-        context: {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Length': 0,
-          },
-        },
-      })
-      .then(async result => {
-        if (result.data.getSuburb.success) {
-          //setAllSub(result.data.getSuburb.result);
-        } else {
-        }
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  };
-
 
   const fetchProvince = async () => {
     let token = await AsyncStorage.getItem('userToken');
@@ -282,7 +222,6 @@ const RequestItem = ({ navigation, route }) => {
       })
       .then(async result => {
         if (result.data.getProvince.success) {
-          fetchAllState();
           const updateProvinces = result.data.getProvince.result.map((item ) => {
             return {
               ...item,
@@ -387,9 +326,66 @@ const RequestItem = ({ navigation, route }) => {
 
   }
 
+  useEffect(() => {
+    fetchCity(selectProvince);
+  }, [selectProvince]);
+  
+  useEffect(() => {
+    fetchSuburb(selectCity);
+  }, [selectCity]);
+
+
+  const fetchAllCity = async () => {
+    let token = await AsyncStorage.getItem('userToken');
+    client
+      .query({
+        query: GET_ALL_CITY_NEW,
+        context: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      })
+      .then(async result => {
+        if (result.data.getCity.success) {
+          setAllCities(result.data.getCity.result);
+        } else {
+        }
+      })
+      .catch(err => {
+        console.log('err', err);
+      });
+  };
+  const fetchAllSub = async () => {
+    let token = await AsyncStorage.getItem('userToken');
+    client
+      .query({
+        query: GET_ALL_SUBURB,
+        context: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Length': 0,
+          },
+        },
+      })
+      .then(async result => {
+        if (result.data.getSuburb.success) {
+          setAllSubs(result.data.getSuburb.result);
+          //setAllSub(result.data.getSuburb.result);
+        } else {
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+
+
+
+
   return (
-    <View style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={{ flex: 1 }}>
+    <View style={{ flex: 1}}>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.con}>
           <Switch
             onValueChange={toggleSwitch}
@@ -399,7 +395,7 @@ const RequestItem = ({ navigation, route }) => {
             Set Location
           </Text>
         </View>
-        <View style={{ height: '35%', margin: 20, }}>
+        <View style={{ height: 200, margin: 20, }}>
           <MapView
             style={styles.mapStyle}
             initialRegion={initialRegion}
@@ -416,16 +412,16 @@ const RequestItem = ({ navigation, route }) => {
             />
           </MapView>
         </View>
+
         <TouchableOpacity style={styles.categorySelectorButton} onPress={() => setShowCategorySelector(true)}>
           <Text style={styles.categoryButtonText}>{ subCategoryName === "" ? `Select a category` : subCategoryName }</Text>
         </TouchableOpacity>
 
-        <View style={{ borderRadius: 10, borderColor: '#DBDBDB', borderWidth: 1, height: 50, width: '90%', alignSelf: 'center', margin: 20, }}>
+        <View style={{ borderRadius: 10,height: 50, paddingHorizontal: 20, marginTop: 10 }}>
           <RNPickerSelect
             value={selectProvince}
             onValueChange={(itemValue, itemIndex) => {
               setSelectProvince(itemValue);
-              fetchCity(itemValue);
             }}
             items={province}
             textInputProps={styles.pickerContainer}
@@ -433,20 +429,11 @@ const RequestItem = ({ navigation, route }) => {
           />
         </View>
 
-        <View
-          style={{
-            borderRadius: 10,
-            borderColor: '#DBDBDB',
-            borderWidth: 1,
-            width: '90%',
-            alignSelf: 'center',
-            margin: 5,
-          }}>
+        <View style={{ borderRadius: 10, paddingHorizontal: 20, marginTop : 10 }}>
           <RNPickerSelect
             value={selectCity}
             onValueChange={(itemValue, itemIndex) => {
               setSelectCity(itemValue);
-              fetchSuburb(itemValue);
             }}
             items={city}
             textInputProps={styles.pickerContainer}            
@@ -454,15 +441,7 @@ const RequestItem = ({ navigation, route }) => {
           />
         </View>
 
-        <View
-          style={{
-            borderRadius: 10,
-            borderColor: '#DBDBDB',
-            borderWidth: 1,
-            width: '90%',
-            alignSelf: 'center',
-            margin: 15,
-          }}>
+        <View style={{ borderRadius: 10, paddingHorizontal: 20, marginTop : 10 }}>
             <RNPickerSelect
               value={selectSub}
               onValueChange={(itemValue, itemIndex) => {
@@ -474,22 +453,9 @@ const RequestItem = ({ navigation, route }) => {
           />
         </View>
         <TouchableOpacity
-          style={{
-            height: 35,
-            width: 150,
-            backgroundColor: '#DE5246',
-            borderRadius: 5,
-            borderWidth: 1,
-            borderColor: '#DE5246',
-            alignSelf: 'center',
-          }}
-          onPress={() => {
-
-            AddCreateFeed()
-          }}>
-          <Text style={{ color: '#FAFAFA', alignSelf: 'center', marginTop: 7 }}>
-            PROCEED
-          </Text>
+          style={{ height: 40, width: 150, backgroundColor: '#DE5246', justifyContent: 'center', alignItems: 'center', borderRadius: 5, marginTop: 10, alignSelf: 'center', marginBottom: 40 }}
+          onPress={() => AddCreateFeed() }>
+          <Text style={{ color: '#FAFAFA' }}> PROCEED </Text>
         </TouchableOpacity>
       </ScrollView>
       <CategorySelector visible={showCategorySelector} multiple={false} onDone={setCategory} />
@@ -516,14 +482,6 @@ const mapStyle = [
 ];
 
 const styles = StyleSheet.create({
-  container: {
-    position: 'absolute',
-    top: 60,
-    marginLeft: 16,
-    bottom: 10,
-    width: '90%',
-    alignItems: 'center',
-  },
   mapStyle: {
     position: 'absolute',
     top: 0,
@@ -547,11 +505,10 @@ const styles = StyleSheet.create({
     fontSize: 18
   },
   categorySelectorButton : {
-    borderRadius: 10, 
+    borderRadius: 5, 
     borderColor: '#DBDBDB', 
-    borderWidth: 3, 
+    borderWidth: 2, 
     height: 50, 
-    width: '90%', 
     marginHorizontal: 20,
     justifyContent: 'center',
     alignItems: 'center',

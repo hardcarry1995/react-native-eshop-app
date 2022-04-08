@@ -21,6 +21,7 @@ import FaqStack from "./FaqStack";
 import WorkInProgress from "../screens/WorkInProgress";
 import ContactFrom from "../screens/ContactForm";
 import MyFavorites from "../screens/MyFavorites"
+import AddAddress from "../screens/CartScreens/AddAddress";
 
 import TabBar from "./BottomTabBar";
 // HomeStack Screens
@@ -100,6 +101,7 @@ const CartStack = () => (
   <Stack.Navigator >
     <Stack.Screen name="MyCart" component={MyCartScreen} options={screenOptions} />
     <Stack.Screen name="Checkout" component={Checkout} options={ScreenOptionsWithBack}/>
+    <Stack.Screen name="AddAddress" component={AddAddress} options={ScreenOptionsWithBack}  />
   </Stack.Navigator>
 )
 
@@ -140,7 +142,7 @@ const TabBarNavigator = () => (
   >
     <Tab.Screen name="HomeStack" component={HomeStack} />
     <Tab.Screen name="ProductStack" component={ProductStack} />
-    <Tab.Screen name="CategoryStack" component={CategoryStack}  />
+    <Tab.Screen name="CategoryStack" component={RequestStack}  />
     <Tab.Screen name="CartStack" component={CartStack}  />
     <Tab.Screen name="WishStack" component={WishStack}  />
     <Tab.Screen name={Constants.feed} component={FeedStack}  />
