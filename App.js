@@ -1,7 +1,6 @@
-import React from 'react';
-import { SafeAreaView, StatusBar, Platform, StyleSheet, View } from 'react-native';
+import React, { useEffect } from 'react';
+import { StatusBar, View } from 'react-native';
 import { ApolloProvider } from '@apollo/client';
-import AsyncStorage from '@react-native-community/async-storage';
 import { Provider } from 'react-redux';
 import store from './src/redux/store';
 import client from './src/constants/client';

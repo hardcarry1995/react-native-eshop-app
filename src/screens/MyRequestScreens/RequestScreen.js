@@ -7,7 +7,6 @@ import client from '../../constants/client';
 import { GetRating } from '../../components/GetRating';
 import Moment from 'moment';
 import fileExtention from "file-extension";
-import { SliderBox } from "react-native-image-slider-box";
 
 const Request24 = ({ navigation }) => {
   const [data, setData] = useState([])

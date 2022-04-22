@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, SafeAreaView, ScrollView, Alert, ToastAndroid } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, ScrollView, ActivityIndicator } from 'react-native';
 import Moment from 'moment';
 import { imagePrefix } from '../../constants/utils';
-import { GET_MAGAZINES_LIST, ADD_CUSTOMER_ENQUIRY } from '../../constants/queries';
+import { GET_MAGAZINES_LIST, ADD_CUSTOMER_ENQUIRY, REQUEST_ITEM } from '../../constants/queries';
 import AsyncStorage from '@react-native-community/async-storage';
 import client from '../../constants/client';
 import { GetRating } from '../../components/GetRating';
@@ -12,8 +12,10 @@ import { SliderBox } from "react-native-image-slider-box";
 import FontawesomeIcon from "react-native-vector-icons/FontAwesome";
 import RNFS from "react-native-fs";
 import FileViewer from "react-native-file-viewer";
+import { connect } from "react-redux";
+import Toast from "react-native-toast-message";
 
-const Catalogue36 = ({ navigation, route }) => {
+const Catalogue36 = ({ navigation, route, ...props }) => {
   const detailData = route.params.detail;
   const [magazinData, setMagazine] = useState([]);
   const [rating, setRating] = useState('2');
@@ -22,6 +24,8 @@ const Catalogue36 = ({ navigation, route }) => {
   const [starImageCorner, setstarImageCorner] = useState('https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png');
   const [images, setImages ] = useState([]);
   const [documents, setDocuments] = useState([]);
+  const [loadingForRequest, setLoadingForRequest ] = useState(false);
+  const [loadingForNegotition, setLoadingForNegotition] = useState(false)
 
   useEffect(() => {
     const files = detailData.mapEflyersUploadDtos;
@@ -68,8 +72,8 @@ const Catalogue36 = ({ navigation, route }) => {
   }
 
   const nagotiatePrice = async (item) => {
-    let token = await AsyncStorage.getItem('userToken');
-    console.log('item', item)
+    const { token } = props.user;
+    setLoadingForNegotition(true);
     client
       .mutate({
         mutation: ADD_CUSTOMER_ENQUIRY,
@@ -86,16 +90,77 @@ const Catalogue36 = ({ navigation, route }) => {
       })
       .then(result => {
         if (result.data.addCustomerEnquiry.success) {
-          Alert.alert('Success', result.data.addCustomerEnquiry.message)
+          Toast.show({
+            type: "success",
+            text1: "Success", 
+            text2: result.data.addCustomerEnquiry.message
+          })
         } else {
-          ToastAndroid.show(
-            result.data.getMstSpecialList.message,
-            ToastAndroid.SHORT,
-          );
+          Toast.show({
+            type: "error",
+            text1: "Failed", 
+            text2: result.data.addCustomerEnquiry.message
+          })
         }
+        setLoadingForNegotition(false);
       })
       .catch(err => {
-        console.log(err);
+        console.log("Error:", err);
+        Toast.show({
+          type: "error",
+          text1: "Failed", 
+          text2: "Something went wrong. Please try again later!"
+        });
+        setLoadingForNegotition(false);
+      });
+
+  }
+
+  const postItemRequest = async (item) => {
+    const { token, id} = props.user;
+    setLoadingForRequest(true);
+    let variables = {
+      title: item.magazineName,
+      desc: item.eFlyerDescription,
+      suburbId: item.suburbID,
+      date: new Date().toISOString(),
+      catId: item.categoryID,
+      userId: Number(id),
+    }
+    console.log(variables);
+    client
+      .mutate({
+        mutation: REQUEST_ITEM,
+        context: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+        variables: variables,
+      })
+      .then(result => {
+        if (result.data.postMstItemRequest.success) {
+          Toast.show({
+            type: 'success',
+            text1: "Success",
+            text2: result.data.postMstItemRequest.message
+          });
+        } else {
+          Toast.show({
+            type: 'error',
+            text1: "Failed",
+            text2: result.data.postMstItemRequest.message
+          });
+        }
+        setLoadingForRequest(false);
+      })
+      .catch(err => {
+        Toast.show({
+          type: 'error',
+          text1: "Failed",
+          text2: "Something went wrong. Please try again later!"
+        });
+        setLoadingForRequest(false);
       });
 
   }
@@ -242,20 +307,20 @@ const Catalogue36 = ({ navigation, route }) => {
                 {documents.map((file) => {
                   if(file.ext == 'pdf') {
                     return (
-                    <TouchableOpacity onPress={() => onPressDownloadFile(file)}>
+                    <TouchableOpacity style={{ marginLeft : 10}} onPress={() => onPressDownloadFile(file)}>
                       <FontawesomeIcon name="file-pdf-o" color="red" size={36} />
                     </TouchableOpacity> )
                   }
                   if(file.ext == "doc" || file.ext == 'docx'){
                     return (
-                      <TouchableOpacity onPress={() => onPressDownloadFile(file)}>
+                      <TouchableOpacity  style={{ marginLeft : 10}} onPress={() => onPressDownloadFile(file)}>
                         <FontawesomeIcon name="file-word-o" color="blue" size={36}  />
                       </TouchableOpacity>
                     )
                   }
                   if(file.ext == 'xls' || file.ext === 'xlsx'){
                     return (
-                    <TouchableOpacity onPress={() => onPressDownloadFile(file)}>
+                    <TouchableOpacity style={{ marginLeft : 10}} onPress={() => onPressDownloadFile(file)}>
                       <FontawesomeIcon name="file-excel-o" color="green" size={36} />
                     </TouchableOpacity>)
                   }
@@ -267,24 +332,20 @@ const Catalogue36 = ({ navigation, route }) => {
 
         <View style={styles.main2}>
           <TouchableOpacity
-            onPress={() => {
-              nagotiatePrice(detailData);
-            }}
+            onPress={() => { postItemRequest(detailData); }}
             style={{ height: 40, width: 240, backgroundColor: '#9F1D20', marginBottom: 25, borderRadius: 5, alignItems: 'center', justifyContent: 'center'}}
           >
             <Text style={{ color: '#FFFFFF', fontSize: 15, fontWeight: '700', letterSpacing: 1 }}>
-              Contact Business
+              {loadingForRequest ? <ActivityIndicator size={12} /> :  'Contact Business' }
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => {
-              nagotiatePrice(detailData);
-            }}
+            onPress={() => {nagotiatePrice(detailData); 0}}
             style={{ height: 40, width: 240, backgroundColor: '#9F1D20', marginBottom: 25, borderRadius: 5, justifyContent: 'center', alignItems: 'center'}}
           >
             <Text style={{ color: '#FFFFFF', fontSize: 15, fontWeight: '700', letterSpacing: 1 }}>
-              Negotiate Price
+              {loadingForNegotition ? <ActivityIndicator size={12} /> :  'Negotiate Price' }
             </Text>
           </TouchableOpacity>
         </View>
@@ -420,4 +481,9 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Catalogue36;
+
+const mapStateToProps = state => ({
+  user : state.user
+})
+
+export default connect(mapStateToProps, null)(Catalogue36);

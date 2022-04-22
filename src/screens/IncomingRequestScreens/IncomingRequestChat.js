@@ -4,6 +4,7 @@ import DocumentPicker from 'react-native-document-picker';
 import { REQUEST_ITEM_POST_RESPONSE, GET_RESPONSE_ITEMS } from '../../constants/queries';
 import AsyncStorage from '@react-native-community/async-storage';
 import client from '../../constants/client';
+import { decode } from 'base-64';
 
 const Marsh26 = ({ navigation, route }) => {
   const [msgData, setmsgData] = useState([]);
@@ -11,7 +12,7 @@ const Marsh26 = ({ navigation, route }) => {
   const [name_address, setname_address] = useState('');
   const [modalVisible, setmodalVisibler] = useState(false);
   const [token, SetToken] = useState('');
-  const [resultdata, setUserInfo] = useState([]);
+  const [userInfo, setUserInfo] = useState([]);
   const [jsondata, Setjsondata] = useState('');
   const [idTo, setIdData] = useState('');
   const [loading, setLoading] = useState(false);
@@ -19,21 +20,18 @@ const Marsh26 = ({ navigation, route }) => {
   const [fileName, setFileName] = useState(null)
 
   useEffect(() => {
-    const _subscribe = navigation.addListener('focus', () => {
       getToken();
-    })
-
-    return () => _subscribe();
   }, []);
 
   const setModalVisible = visible => {
     setmodalVisibler(visible);
   };
   const getToken = async () => {
-    let resultdata = await AsyncStorage.getItem('userInfo');
-    setUserInfo(resultdata);
-    let jsondata = JSON.parse(resultdata);
-    let token = await AsyncStorage.getItem('userToken');
+    const resultdata = await AsyncStorage.getItem('userInfo');
+    const token = await AsyncStorage.getItem('userToken');
+    const jsondata = JSON.parse(resultdata);
+    const decoded = JSON.parse(decode(token.split('.')[1]));
+    setUserInfo({...jsondata, ...decoded});
     SetToken(token)
     Setjsondata(jsondata)
     getRequestItemNext();
@@ -52,19 +50,20 @@ const Marsh26 = ({ navigation, route }) => {
         context: {
           headers: {
             Authorization: `Bearer ${token}`,
-            
           },
         },
         variables: {
           title: name_address,
           itemRequestId: route.params.requestData.itemRequestID,
           userId: Number(jsondata.id),
+          companyId: parseInt(userInfo.companyId),
           filePath: filePath,
           fileName: fileName
         },
       })
       .then(async result => {
           setname_address('')
+          setmsgDataNew([])
           let tdata = {
             comment: name_address,
             companyId: null,
@@ -95,8 +94,21 @@ const Marsh26 = ({ navigation, route }) => {
             responseDate: "2015-06-23T17:35:44.68",
             userId: null
           };
-          setmsgData((prevState) => [...prevState, tdata] )
+          if (msgData.length > 0) {
+            let i = -1;
+            let j = msgData.length - 1;
+            while (i != j) {
+              i++;
+              msgDataNew.push(msgData[i])
+            }
+          }
+          msgDataNew.push(tdata)
+
+          setmsgData(msgDataNew)
           setLoading(false)
+        // } else {
+          // Alert.alert('Failed', result.data.postMstItemResponse.message)
+        // }
       })
       .catch(err => {
         console.log(err);
@@ -106,7 +118,8 @@ const Marsh26 = ({ navigation, route }) => {
     navigation.navigate('ShowPDF', { pdfPath: item });
   }
   const getRequestItemNext = () => {
-    let id = route.params.requestData.itemRequestID;
+    let id = route.params.requestData.itemRequestID
+    console.log(id)
     client
       .query({
         query: GET_RESPONSE_ITEMS,
@@ -120,6 +133,7 @@ const Marsh26 = ({ navigation, route }) => {
         },
       })
       .then(async result => {
+        console.log("REsult:", result.data);
         if (result.data.getResponseItems) {
           setmsgData(result.data.getResponseItems);
         } else {
@@ -169,7 +183,13 @@ const Marsh26 = ({ navigation, route }) => {
                 onPress={() => setModalVisible(false)}>
                 <Text style={styles.textStyle}>Purchase</Text>
                 <Image
-                  style={{ resizeMode: 'center', height: 15, width: 15, marginTop: -17, marginLeft: 10, }}
+                  style={{
+                    resizeMode: 'center',
+                    height: 15,
+                    width: 15,
+                    marginTop: -17,
+                    marginLeft: 10,
+                  }}
                   source={require('../../assets/noun_Check.png')}
                 />
               </TouchableOpacity>
@@ -178,7 +198,14 @@ const Marsh26 = ({ navigation, route }) => {
                 onPress={() =>
                   navigation.goBack()}>
                 <Text style={styles.textSty}>Decline</Text>
-                <Image style={{ resizeMode: 'center', height: 15, width: 15, marginTop: -17, marginLeft: 10, }}
+                <Image
+                  style={{
+                    resizeMode: 'center',
+                    height: 15,
+                    width: 15,
+                    marginTop: -17,
+                    marginLeft: 10,
+                  }}
                   source={require('../../assets/cros.png')}
                 />
               </TouchableOpacity>
@@ -191,15 +218,15 @@ const Marsh26 = ({ navigation, route }) => {
         style={styles.list}
         data={msgData}
         keyExtractor={item => {
-          return item.index;
+          return item.id;
         }}
         renderItem={comment => {
           const item = comment.item;
           let inMessage = '';
           let itemStyle = inMessage ? styles.itemIn : styles.itemOut;
           return (
-            <View key={comment.index}>
-              <View style={itemStyle}>
+            <View>
+              <View style={styles.itemOut}>
                 <View style={styles.balloon}>
                   <Text>{item.comment}</Text>
                 </View>

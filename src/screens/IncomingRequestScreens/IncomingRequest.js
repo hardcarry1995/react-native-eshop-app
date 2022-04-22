@@ -1,20 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-  Image,
-  TouchableOpacity,
-  SafeAreaView,
-  FlatList
-} from 'react-native';
-import { imagePrefix } from '../constants/utils';
-import { REQUEST_ITEM_GET_INCOMING } from '../constants/queries';
+import { View, Text, StyleSheet, ActivityIndicator, Image, TouchableOpacity, SafeAreaView, FlatList } from 'react-native';
+import { imagePrefix } from '../../constants/utils';
+import { REQUEST_ITEM_GET_INCOMING } from '../../constants/queries';
 import AsyncStorage from '@react-native-community/async-storage';
-import client from '../constants/client';
-import { GetRating } from '../components/GetRating';
+import client from '../../constants/client';
+import { GetRating } from '../../components/GetRating';
 import Moment from 'moment';
+import fileExtention from "file-extension";
 
 const IncomingRequest = ({ navigation }) => {
   const [data, setData] = useState([])
@@ -24,20 +16,15 @@ const IncomingRequest = ({ navigation }) => {
   const [isListEnd, setIsListEnd] = useState(false);
   const [offset, setOffset] = useState(10);
 
-  const starImageFilled =
-    'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png';
-  const starImageCorner =
-    'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png';
+  const starImageFilled = 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png';
+  const starImageCorner = 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png';
+
   useEffect(() => {
     getrequestItem();
   }, []);
 
-  // const dateDMY = Moment(data.itemRequestDate).format('DD-MM-YYYY');
   const getrequestItem = async () => {
-    let resultdata = await AsyncStorage.getItem('userInfo');
-    let jsondata = JSON.parse(resultdata);
     let token = await AsyncStorage.getItem('userToken');
-    console.log('token>>>>>>>>>>', token);
     if (!loading && !isListEnd) {
       setLoading(true);
       client
@@ -46,7 +33,6 @@ const IncomingRequest = ({ navigation }) => {
           context: {
             headers: {
               Authorization: `Bearer ${token}`,
-              // 'Content-Length': 0,
             },
           },
           variables: {
@@ -54,7 +40,6 @@ const IncomingRequest = ({ navigation }) => {
           },
         })
         .then(result => {
-          console.log('result>>>>>>>>>............', result)
           if (result.data.getIncomingItemRequestList.success) {
             setData(result.data.getIncomingItemRequestList.result)
             setOffset(offset + 10);
@@ -72,7 +57,6 @@ const IncomingRequest = ({ navigation }) => {
 
   const renderFooter = () => {
     return (
-      // Footer View with Loader
       <View style={styles.footer}>
         {loading ? (
           <ActivityIndicator
@@ -84,41 +68,36 @@ const IncomingRequest = ({ navigation }) => {
   };
 
 
-  const renderItem = ({ item, index }) => (
+  const renderItem = ({ item, index }) => { 
+    const uploadedFiles = item.mapItemRequestUploadDto;
+    let imagePath = item.itemImagePath;
+    if(item.itemImagePath == null && uploadedFiles){
+      let images = uploadedFiles.map(file => {
+        const extOfFile = fileExtention(file.filePath);
+        if(extOfFile == 'jpg' || extOfFile == 'jpeg' || extOfFile == 'png' || extOfFile == 'gif'){
+          return file.uploadPath;
+        } 
+      });
+      images = images.filter(url => url !== null);
+      imagePath = images[0];
+    }
+    return (
     <View>
       <TouchableOpacity
         activeOpacity={0.9}
-        onPress={() => {
-          //   navigation.push('RequestNew25', { data: item });
-        }}>
+        onPress={() => { navigation.navigate('IncomingRequestDetail', { data: item }); }}>
         <View style={styles.main}>
           <View style={{ width: "22%", justifyContent: "center" }}>
-
-            {/* <Image
-              style={styles.image}
-              source={require('../assets/S32.png')}
-            /> */}
             <Image
               style={styles.image}
-              source={item.itemImagePath
-                ?
-                { uri: `${imagePrefix}${item.itemImagePath}` }
-                :
-                require('../assets/NoImage.jpeg')}
+              source={imagePath ? { uri: `${imagePrefix}${imagePath}` } : require('../../assets/NoImage.jpeg')}
+              resizeMode="contain"
             />
           </View>
 
-          <View
-            style={{
-              width: "0.5%",
-              backgroundColor: '#D0D0D0',
-              height: "80%",
-              alignSelf: "center"
-            }}
-          />
+          <View style={{ width: "0.5%", backgroundColor: '#D0D0D0', height: "80%", alignSelf: "center" }} />
 
           <View style={{ width: "77%" }}>
-
             <Text style={styles.text}>
               {item.itemRequestTitle}
             </Text>
@@ -126,45 +105,27 @@ const IncomingRequest = ({ navigation }) => {
             <View style={{ flexDirection: "row", margin: 10 }}>
               {maxRating.map((item, key) => {
                 return (
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    key={item}
-                  >
+                  <TouchableOpacity activeOpacity={0.7} key={item} >
                     <Image
                       style={styles.starImageStyle}
-                      source={
-                        item <= rating
-                          ? { uri: starImageFilled }
-                          : { uri: starImageCorner }
-                      }
+                      source={ item <= rating ? { uri: starImageFilled } : { uri: starImageCorner } }
                     />
                   </TouchableOpacity>
                 );
               })}
             </View>
 
-            <Text
-              style={{
-                color: '#A8A8A8',
-                fontSize: 11,
-                marginLeft: 10
-              }}>
+            <Text style={{ color: '#A8A8A8', fontSize: 11, marginLeft: 10 }}>
               {Moment(item.itemRequestDate).format('DD-MMM-YYYY')}
             </Text>
-            <Text numberOfLines={1}
-              style={{
-                color: '#323232',
-                fontSize: 11,
-                marginLeft: 10
-              }}>
+            <Text numberOfLines={1} style={{ color: '#323232', fontSize: 11, marginLeft: 10 }}>
               {item.itemRequestDescription}
             </Text>
           </View>
         </View>
       </TouchableOpacity>
     </View>
-  );
-
+  )};
 
   return (
     <SafeAreaView>

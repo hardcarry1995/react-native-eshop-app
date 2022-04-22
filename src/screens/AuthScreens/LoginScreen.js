@@ -65,8 +65,8 @@ function LoginScreen(props) {
   `;
 
   const SOCIAL_LOGIN = gql`
-    query {
-      oAuth {
+    query socialAuth($jti: String){
+      oAuth(jti: $jti) {
         count
         currentPage
         message
@@ -175,8 +175,11 @@ function LoginScreen(props) {
       setPhoneModal(true);
     }
   };
+
+ 
   const submit = async () => {
     let token = await AsyncStorage.getItem('userToken');
+    console.log(decode(token.split('.')[1]));
     let rjx = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     let isValid = rjx.test(email.trim());
     // console.warn(isValid);
@@ -224,7 +227,10 @@ function LoginScreen(props) {
           props.setUserToken(result.data.sSOLogin.result.token);
           props.setUserData(userInfo);
           props.setUserRole(decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']);
-          props.navigation.navigate('Main');
+          props.navigation.reset({
+            index: 0,
+            routes: [{ name : 'Main'}]
+          });
         } else {
           if(Platform.OS === 'android'){
             ToastAndroid.show(result.data.sSOLogin.message, ToastAndroid.SHORT);
@@ -240,6 +246,9 @@ function LoginScreen(props) {
   };
 
   const sociallogin = async () => {
+    let token = await AsyncStorage.getItem('userToken');
+    const decodedJWT = JSON.parse(decode(token.split('.')[1]));
+    const jti = decodedJWT.jti;
     setLoading(true);
     client
       .query({
@@ -250,12 +259,13 @@ function LoginScreen(props) {
             Authorization: `Basic ${encode(socialId + ':' + track)}`,
             'Content-Length': 0,
           },
+          variables: {
+            tokenData: jti,
+          },
         },
       })
       .then(async result => {
-        console.log('result', result);
         setLoading(false);
-
         if (result.data.oAuth.success) {
           await AsyncStorage.setItem(
             'userToken',
@@ -272,6 +282,7 @@ function LoginScreen(props) {
           props.setUserToken(result.data.oAuth.result.token);
           props.navigation.navigate('Main');
         } else {
+          console.log(result.data.oAuth.message);
           if(Platform.OS === 'android'){
             ToastAndroid.show(result.data.oAuth.message, ToastAndroid.SHORT);
           } else {
@@ -309,6 +320,7 @@ function LoginScreen(props) {
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
+      console.log(userInfo);
       const getToken = await GoogleSignin.getTokens();
       setSocialId(userInfo.user.id);
       setTrack(4);

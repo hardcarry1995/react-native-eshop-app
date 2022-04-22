@@ -78,13 +78,20 @@ const RequestItem = ({ navigation, route }) => {
   }
 
   const AddCreateFeed = () => {
-    if(selectProvince == ''){
-      Alert.alert('Error','Select Province/State ');
+    if(categoryId === '' || subCategoryId === ''){
+      Alert.alert("Error", 'Please select the category!');
+      return;
     }
-    else if(selectCity == ''){
+    if(selectProvince == '' || selectProvince == null){
+      Alert.alert('Error','Select Province/State ');
+      return;
+    }
+    else if(selectCity == '' || selectCity == null){
       Alert.alert('Error','Select City');
-    }else if(selectSub == ''){
+      return;
+    }else if(selectSub == '' || selectSub == null){
       Alert.alert('Error','Select Saburb');
+      return;
     }else{
     navigation.navigate('CreateFeed', {
       categoryId: categoryId,

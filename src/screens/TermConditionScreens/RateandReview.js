@@ -6,8 +6,6 @@ import {
   Image,
   TouchableOpacity,
   TextInput,
-  SafeAreaView,
-  ScrollView,
   ToastAndroid
 } from 'react-native';
 import { GIVE_BUSINESS_RATING } from '../../constants/queries';
@@ -23,6 +21,7 @@ const RateandReview = ({ navigation, route }) => {
   const [maxRating, setMaxRating] = useState([1, 2, 3, 4, 5]);
   const data = route.params.detail;
   const type = route.params.type;
+  console.log(type);
 
   const starImageFilled = 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png';
   const starImageCorner = 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png';
@@ -80,7 +79,6 @@ const RateandReview = ({ navigation, route }) => {
       .then(result => {
         if (result.data.postMstRating.success) {
           Alert.alert("Success", result.data.postMstRating.message)
-          // navigation.goBack();
         } else {
           ToastAndroid.show(
             result.data.postMstRating.message,
@@ -94,10 +92,11 @@ const RateandReview = ({ navigation, route }) => {
   }
   return (
     <View>
-        <Image
-          style={{ height: 190, width: 360, alignSelf: 'center' }}
-          source={require('../../assets/home29.png')}
-        />
+      <Image
+        style={styles.image1}
+        source={data.logoPath ? { uri: `${imagePrefix}${data.logoPath}` } : require('../../assets/NoImage.jpeg')}
+        resizeMode="cover"
+      />
       <View>
         {type === 1 &&
           <Text style={{ color: '#9F1D20', fontSize: 21, padding: 25, alignSelf: 'center', }}>
@@ -106,7 +105,7 @@ const RateandReview = ({ navigation, route }) => {
         }
         {type === 2 &&
           <Text style={{ color: '#9F1D20', fontSize: 21, padding: 25, alignSelf: 'center', }}>
-            {data.companyNam}
+            {data.companyName}
           </Text>
         }
         {type === 3 &&
@@ -160,6 +159,12 @@ const styles = StyleSheet.create({
     marginLeft: 16,
     marginRight: 16,
     marginTop: 50,
+  },
+  image1: {
+    height: 200,
+    width: '100%',
+    alignContent: 'center',
+    alignSelf: 'center',
   },
   starImageStyle: {
     width: 40,

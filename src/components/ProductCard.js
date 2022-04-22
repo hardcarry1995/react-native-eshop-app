@@ -29,7 +29,7 @@ const ProductCard = ({ item, navigation, addToFavourites, addToCart }) => {
               <Rating imageSize={12} readonly startingValue={item.ratingScore} />
             </View>
             <Text style={styles.price}>
-              R{item.unitCost}
+              R {item.unitCost.toFixed(2)}
             </Text>
             <Text numberOfLines={2} style={{ color: '#BBB' }}>
               {item.description}

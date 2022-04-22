@@ -17,6 +17,7 @@ import ProductCard from '../components/ProductCard';
 import ProductSearchInput from '../components/ProductSearchInput';
 import CategorySelector from "../components/CategorySelector";
 import { Chip } from "react-native-elements";
+import Toast from "react-native-toast-message";
 
 class HomeScreen extends Component {
   constructor(props) {
@@ -28,7 +29,7 @@ class HomeScreen extends Component {
       data: [],
       isproductID: '',
       special_data: [],
-      loading: false,
+      loading: true,
       userInfo: {},
       cartLoading: false,
       textnew: "",
@@ -196,6 +197,7 @@ class HomeScreen extends Component {
         console.log(err);
       });
   }
+  
   async addCounrty(deta) {
     let countryData = deta;
     let countryQuery = "INSERT INTO ezyFindProductDetail( activeText , categoryID , categoryName,unitCost  ,description ,documentName ,documentPath,isActive ,productID ,productImage ,productName, productNumber) VALUES";
@@ -280,9 +282,8 @@ class HomeScreen extends Component {
 
   EmptyListMessage = ({ item }) => {
     return (
-      <Text
-        style={styles.emptyListStyle}>
-        No Data Found
+      <Text style={styles.emptyListStyle}>
+        {this.state.loading ? "Loading" :  "No records found" }
       </Text>
     );
   };
@@ -330,6 +331,7 @@ class HomeScreen extends Component {
         },
       })
       .then(result => {
+        console.log(result);
         if (result.data.getPrdProductList.result.length > 0) {
           this.setState({ dataEMP: result.data.getPrdProductList.result });
           let data = result.data.getPrdProductList.result ;
@@ -420,11 +422,9 @@ class HomeScreen extends Component {
         },
       })
       .then(result => {
-        if (result.data.getMstSpecialList.success) {
-          this.setState({ special_data: result.data.getMstSpecialList.result });
-          this.setState({ specialData: result.data.getMstSpecialList.result });
-        } else {
-        }
+        console.log(result.data.getPrdProductList.result);
+        this.setState({ special_data: result.data.getPrdProductList.result });
+        this.setState({ specialData: result.data.getPrdProductList.result });
       })
       .catch(err => {
         console.log(err);
@@ -433,7 +433,7 @@ class HomeScreen extends Component {
   async addToFavourites(item) {
     let IsLogin = await AsyncStorage.getItem('IsLogin');
     if (IsLogin !== 'true') {
-      this.props.navigation.navigate('Auth');
+      this.props.navigation.navigate('AuthStack');
     } else {
       client
         .mutate({
@@ -452,15 +452,19 @@ class HomeScreen extends Component {
         })
         .then(result => {
           if (result.data.createMstFavourites.mstFavouriteId) {
-            if(Platform.OS == "android"){
-              ToastAndroid.show('Product added to Favourites', ToastAndroid.SHORT);
-            } else if(Platform.OS == "ios"){
-              alert('Product added to Favourites');
-            }
+            Toast.show({
+              type: "success",
+              text1 : "Success",
+              text2 : 'Special added to Favourites'
+            })
           }
         })
         .catch(err => {
-          console.log(err);
+          Toast.show({
+            type: "error",
+            text1 : "Error",
+            text2 : 'Something went wrong!'
+          })
         });
     }
   }
@@ -488,9 +492,19 @@ class HomeScreen extends Component {
         .then(result => {
           this.setState({ cartLoading: false });
           if (result.data.postPrdShoppingCartOptimized.success) {
-            ToastAndroid.show('Product added to cart', ToastAndroid.SHORT);
+            Toast.show({
+              type: "success",
+              text1 : "Success",
+              text2 : 'Product added to cart'
+            })
             this.setState({ isCartLoading: false })
             this.props.navigation.navigate('CartStack')
+          } else {
+            Toast.show({
+              type: "error",
+              text1 : "Oop!",
+              text2 : result.data.postPrdShoppingCartOptimized.message
+            })
           }
         })
         .catch(err => {
@@ -518,14 +532,29 @@ class HomeScreen extends Component {
         .then(result => {
           this.setState({ cartLoading: false });
           if (result.data.postPrdShoppingCartOptimized.success) {
-            ToastAndroid.show('Product added to cart', ToastAndroid.SHORT);
+            Toast.show({
+              type: "success",
+              text1 : "Success",
+              text2 : 'Product added to cart'
+            })
             this.setState({ isCartLoading: false })
             this.props.navigation.navigate('CartStack')
+          } else {
+            Toast.show({
+              type: "error",
+              text1 : "Oop!",
+              text2 : result.data.postPrdShoppingCartOptimized.message
+            })
           }
         })
         .catch(err => {
           this.setState({ isCartLoading: false })
           console.log(err);
+          Toast.show({
+            type: "error",
+            text1 : "Oop!",
+            text2 : "Something went wrong!"
+          })
         });
     }
   }

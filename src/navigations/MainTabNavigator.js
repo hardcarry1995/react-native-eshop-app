@@ -15,13 +15,19 @@ import SettingStack from "./SettingStack";
 import MyReviews from "../screens/MyReviews";
 import CatalogueStack from "./CatalogueStack";
 import AboutUs from "../screens/AboutUs";
-import IncomingRequest from "../screens/IncomingRequest";
+import IncomingRequest from "../screens/IncomingRequestScreens/IncomingRequest";
 import MyRequestStack from "./MyRequestStack";
 import FaqStack from "./FaqStack";
 import WorkInProgress from "../screens/WorkInProgress";
 import ContactFrom from "../screens/ContactForm";
 import MyFavorites from "../screens/MyFavorites"
 import AddAddress from "../screens/CartScreens/AddAddress";
+import RequestNew25 from "../screens/MyRequestScreens/RequestNew25";
+import MarshNew26 from "../screens/MyRequestScreens/MarshNew26";
+import IncomingRequestDetail from "../screens/IncomingRequestScreens/IncomingRequestDetail";
+import IncomingRequestChat from "../screens/IncomingRequestScreens/IncomingRequestChat";
+import Orders from "../screens/OrderScreens/Orders";
+import Order from "../screens/OrderScreens/Order";
 
 import TabBar from "./BottomTabBar";
 // HomeStack Screens
@@ -53,7 +59,7 @@ const screenOptions = ({ navigation }) => ({
   headerStyle: textHeader.header_style,
   headerTitle: () => (
     <Image
-      source={require('../assets/img/LoginIcon.png')}
+      source={require('../assets/logos/logo1.png')}
       style={{ width: 100, height: 45, resizeMode: 'contain' }}
     />
   ),
@@ -70,8 +76,9 @@ const HomeStack = () => (
         headerStyle: textHeader.header_style,
         headerRight: () => (
           <Image
-            style={{ height: 22, width: 25, padding: 5, resizeMode: 'center', alignSelf: 'flex-end' }}
+            style={{ height: 22, width: 25, padding: 5, alignSelf: 'flex-end' }}
             source={require('../assets/share.png')}
+            resizeMode="contain"
           />
         ),
         headerLeft: () => <HeaderBackLeft navigationProps={navigation} />,
@@ -133,6 +140,30 @@ const FavoriteStack = () => (
     <Stack.Screen name="MyFavorite" component={MyFavorites} />
   </Stack.Navigator>
 )
+// incoming RequestStack
+
+const IncomingRequestStack = () => (
+  <Stack.Navigator screenOptions={screenOptions}>
+    <Stack.Screen name="IncomingRequest" component={IncomingRequest} />
+    <Stack.Screen name="IncomingRequestDetail" component={IncomingRequestDetail} options={ScreenOptionsWithBack}/>
+    <Stack.Screen name="IncomingRequestChat" component={IncomingRequestChat} options={ScreenOptionsWithBack} />
+  </Stack.Navigator>
+)
+
+// Orders Stack
+
+const OrderStack = () => (
+  <Stack.Navigator screenOptions={screenOptions}>
+    <Stack.Screen name="Orders" component={Orders} />
+    <Stack.Screen name="Order" component={Order} options={ScreenOptionsWithBack} />
+  </Stack.Navigator>
+)
+
+const ProductMapStack = () => (
+  <Stack.Navigator screenOptions={screenOptions}>
+    <Stack.Screen name="product_map" component={AboutUs} options={ScreenOptionsWithBack}/>
+  </Stack.Navigator>
+)
 
 // Define TabBar
 const TabBarNavigator = () => (
@@ -153,8 +184,8 @@ const TabBarNavigator = () => (
     <Tab.Screen name={Constants.settings} component={SettingStack}  />
     <Tab.Screen name={Constants.my_Reviews} component={ReviewStack}  />
     <Tab.Screen name={Constants.contact_us} component={CatalogueStack}  />
-    <Tab.Screen name={Constants.about_us} component={AboutUs}  />
-    <Tab.Screen name={Constants.incoming_request} component={IncomingRequest}   />
+    <Tab.Screen name={Constants.about_us} component={ProductMapStack}  />
+    <Tab.Screen name={Constants.incoming_request} component={IncomingRequestStack}   />
     <Tab.Screen name={Constants.my_request_stack} component={MyRequestStack}  />
     <Tab.Screen name={Constants.faq} component={FaqStack}  />
     <Tab.Screen name={Constants.logout} component={WorkInProgress} />
@@ -162,6 +193,7 @@ const TabBarNavigator = () => (
     <Tab.Screen name="RequestStack" component={RequestStack}  />
     <Tab.Screen name="ContactStack" component={ContactStack}  />
     <Tab.Screen name={Constants.my_Favirity} component={FavoriteStack} />
+    <Tab.Screen name="MyOrders" component={OrderStack}  />
   </Tab.Navigator>
 )
 

@@ -1,11 +1,12 @@
 import React, { Component, PureComponent } from 'react';
 import { Text, StyleSheet, View, TouchableOpacity, Image, Dimensions, ToastAndroid, FlatList, ActivityIndicator } from 'react-native';
 import { GetRating } from './GetRating';
-import { bearerToken, imagePrefix } from '../constants/utils';
+import { imagePrefix } from '../constants/utils';
 import client from '../constants/client';
-import { SPECIAL_PRODUCT, CREATE_FAVOURITES_SPECIAL } from '../constants/queries';
+import { SPECIAL_PRODUCT, CREATE_FAVOURITES_SPECIAL, ADD_TO_CART_NULL, ADD_TO_CART } from '../constants/queries';
 import AsyncStorage from '@react-native-community/async-storage';
-import SQLite from 'react-native-sqlite-storage';
+import Toast from "react-native-toast-message";
+import moment from "moment";
 
 class SpecialProduct extends PureComponent {
   constructor(props) {
@@ -14,8 +15,6 @@ class SpecialProduct extends PureComponent {
       rating: "2",
       specialSize: 10,
       maxRating: [1, 2, 3, 4, 5],
-      email: '',
-      password: '',
       data: [],
       special_data_New: [],
       loading: false,
@@ -25,115 +24,24 @@ class SpecialProduct extends PureComponent {
       textnew: [],
       dataEMP: [],
       SQLiteProduct: [],
-      queryText: '',
       userToken: '',
-      search: '',
       specialDataNew: [],
-      scan: false,
-      ScanResult: false,
       result: null,
-      starImageFilled:
-        'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png',
-      starImageCorner:
-        'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png',
+      starImageFilled: 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png',
+      starImageCorner: 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png',
     }
   }
 
-  ExecuteQuery = (sql, params = []) => new Promise((resolve, reject) => {
-    var db = SQLite.openDatabase({ name: "testdatabase.db", createFromLocation: "~testdatabase.db" });
-    db.transaction((trans) => {
-      trans.executeSql(sql, params, (trans, results) => {
-        resolve(results);
-      },
-        (error) => {
-        });
-    });
-  });
-
   componentDidMount() {
-    this.CreateTable();
     this.checkLogin();
     const allData = this.props
     this.setState({ special_data_New: allData.allData, specialDataNew: allData.allData })
-    this.addCounrtyNew(allData.allData);
-  }
-
-  async addCounrtyNew(deta) {
-    let countryDataNew = deta;
-    let countryQueryNew = "INSERT INTO allSpecialDetailSQL( activeText , categoryID , categoryName,amount  ,specialDescription ,cityName ,imagePath,isActive ,specialID ,provinceName ,specialName, suburbID) VALUES";
-    for (let i = 0; i < countryDataNew.length; ++i) {
-      let dataid = i + 1;
-      let escapedSample = countryDataNew[i].specialDescription.replace(/\'/g, "")
-      countryQueryNew = countryQueryNew + "('"
-        + countryDataNew[i].suburb //user_id
-        + "','"
-        + countryDataNew[i].categoryID //country_name
-        + "','"
-        + countryDataNew[i].categoryName //id
-        + "','"
-        + countryDataNew[i].amount //id
-        + "','"
-        + escapedSample  //country_name
-        + "','"
-        + countryDataNew[i].cityName //id
-        + "','"
-        + countryDataNew[i].imagePath //user_id
-        + "','"
-        + countryDataNew[i].isActive //country_name
-        + "','"
-        + countryDataNew[i].specialID //id
-        + "','"
-        + countryDataNew[i].provinceName //user_id
-        + "','"
-        + countryDataNew[i].specialName //country_name
-        + "','"
-        + countryDataNew[i].suburbID //is_deleted
-        + "')";
-      if (i != countryDataNew.length - 1) {
-        countryQueryNew = countryQueryNew + ",";
-      }
-    }
-    countryQueryNew = countryQueryNew + ";";
-    await this.ExecuteQuery(countryQueryNew, []);
-
-  }
-  // Create Table
-  async CreateTable() {
-    global.db = SQLite.openDatabase(
-      {
-        name: 'testdatabase.db',
-        location: 'default',
-        createFromLocation: '~testdatabase.db',
-      },
-      () => { },
-      error => {
-        console.log("ERROR: " + error);
-      }
-    );
-    await this.ExecuteQuery("CREATE TABLE IF NOT EXISTS allSpecialDetailSQL (activeText VARCHAR(16), categoryID INTEGER, categoryName VARCHAR(16),amount VARCHAR(16),specialDescription TEXT,cityName VARCHAR(225),imagePath VARCHAR(225),isActive VARCHAR(16),specialID INTEGER,provinceName VARCHAR(225),specialName VARCHAR(225), suburbID VARCHAR(225))", []);
-  }
-
-  async SelectQuery() {
-    let selectQuery1 = await this.ExecuteQuery("SELECT * FROM allSpecialDetailSQL", []);
-    var rows1 = selectQuery1.rows;
-    for (let i = 0; i < rows1.length; i++) {
-      var item1 = rows1.item(i)
-      this.state.SQLiteProduct.push(item1);
-    }
-    const newArrayListNew = [];
-    this.state.SQLiteProduct.forEach(obj => {
-      if (!newArrayListNew.some(o => o.specialID === obj.specialID)) {
-        newArrayListNew.push({ ...obj });
-      }
-    });
-
-    this.setState({ special_data_New: newArrayListNew });
   }
 
   async addToFavourites(item) {
     let IsLogin = await AsyncStorage.getItem('IsLogin');
     if (IsLogin !== 'true') {
-      this.props.navigation.navigate('Auth');
+      this.props.navigation.navigate('AuthStack');
     } else {
       client
         .mutate({
@@ -151,11 +59,103 @@ class SpecialProduct extends PureComponent {
         })
         .then(result => {
           if (result.data.createMstFavourites.mstFavouriteId) {
-            ToastAndroid.show('Special added to Favourites', ToastAndroid.SHORT);
+            Toast.show({
+              type: "success",
+              text1 : "Success",
+              text2 : 'Special added to Favourites'
+            })
           }
         })
         .catch(err => {
-          // this.setState({ cartLoading: false });
+          console.log(err);
+          Toast.show({
+            type: "error",
+            text1 : "Error",
+            text2 : 'Something went wrong!'
+          })
+        });
+    }
+  }
+
+  async addToCart(id) {
+    let IsLogin = await AsyncStorage.getItem('IsLogin');
+    this.setState({ cartLoading: true })
+    if (IsLogin !== 'true') {
+      this.setState({ cartLoading: true });
+      client
+        .mutate({
+          mutation: ADD_TO_CART_NULL,
+          fetchPolicy: 'no-cache',
+          variables: {
+            pid: id,
+          },
+          context: {
+            headers: {
+              Authorization: `Bearer ${this.state.userToken}`,
+              'Content-Length': 0,
+            },
+          },
+        })
+        .then(result => {
+          this.setState({ cartLoading: false });
+          if (result.data.postPrdShoppingCartOptimized.success) {
+            Toast.show({
+              type: "success",
+              text1 : "Success",
+              text2 : 'Product added to cart'
+            })
+            this.setState({ cartLoading: false })
+            this.props.navigation.navigate('CartStack')
+          } else {
+            Toast.show({
+              type: "error",
+              text1 : "Oop!",
+              text2 : result.data.postPrdShoppingCartOptimized.message
+            })
+          }
+        })
+        .catch(err => {
+          this.setState({ cartLoading: false })
+          console.log(err);
+        });
+    } else {
+      var userIdData = this.state.userInfo.id
+      this.setState({ cartLoading: true });
+      client
+        .mutate({
+          mutation: ADD_TO_CART,
+          fetchPolicy: 'no-cache',
+          variables: {
+            pid: id,
+            userid: Number(this.state.userInfo.id),
+            dateCreated: moment().toISOString()
+          },
+          context: {
+            headers: {
+              Authorization: `Bearer ${this.state.userToken}`,
+            },
+          },
+        })
+        .then(result => {
+          this.setState({ cartLoading: false });
+          if (result.data.postPrdShoppingCartOptimized.success) {
+            Toast.show({
+              type: "success",
+              text1 : "Success",
+              text2 : 'Product added to cart'
+            })
+            this.setState({ cartLoading: false })
+            this.props.navigation.navigate('CartStack')
+          } else {
+            Toast.show({
+              type: "error",
+              text1 : "Oop!",
+              text2 : result.data.postPrdShoppingCartOptimized.message
+            })
+          }
+        })
+        .catch(err => {
+          this.setState({ cartLoading: false })
           console.log(err);
         });
     }
@@ -168,7 +168,7 @@ class SpecialProduct extends PureComponent {
     this.setState({
       userInfo: JSON.parse(userInfo),
     });
-    this.fetchSpecialProduct(token)
+    // this.fetchSpecialProduct(token)
   }
 
   fetchSpecialProduct(token) {
@@ -187,12 +187,8 @@ class SpecialProduct extends PureComponent {
           },
         })
         .then(result => {
-          if (result.data.getMstSpecialList.success) {
-            this.setState({ special_data_New: result.data.getMstSpecialList.result });
-            this.setState({ specialDataNew: result.data.getMstSpecialList.result });
-            this.addCounrtyNew(result.data.getMstSpecialList.result);
-          } else {
-          }
+          this.setState({ special_data_New: result.data.getPrdProductList.result });
+          this.setState({ specialDataNew: result.data.getPrdProductList.result });
         })
         .catch(err => {
           console.log(err);
@@ -201,7 +197,7 @@ class SpecialProduct extends PureComponent {
   }
   getrequestItem = () => {
     this.setState({ specialSize: this.state.specialSize + 10 });
-    this.fetchSpecialProductNext();
+    // this.fetchSpecialProductNext();
   };
 
   fetchSpecialProductNext() {
@@ -221,11 +217,8 @@ class SpecialProduct extends PureComponent {
           },
         })
         .then(result => {
-          if (result.data.getMstSpecialList.result.length > 0) {
-            this.setState({ special_data_New: result.data.getMstSpecialList.result });
-            this.setState({ specialDataNew: result.data.getMstSpecialList.result });
-          } else {
-          }
+          this.setState({ special_data_New: result.data.getPrdProductList.result });
+          this.setState({ specialDataNew: result.data.getPrdProductList.result });
         })
         .catch(err => {
           console.log(err);
@@ -235,8 +228,8 @@ class SpecialProduct extends PureComponent {
 
   renderItemSpecial = ({ item, index }) => {
     let imagege = '';
-    if (item.mapSpecialUpload.length > 0) {
-      imagege = item.mapSpecialUpload[0].uploadPath;
+    if (item.mapProductImages.length > 0) {
+      imagege = item.mapProductImages[0].imagePath;
     } else {
       imagege = '';
     }
@@ -252,7 +245,7 @@ class SpecialProduct extends PureComponent {
           <View style={{ flex: 1, borderColor: '#eeeeee', borderRadius: 15, borderWidth: 1 }}>
             <View style={{ flexDirection: 'column', marginLeft: 10, margin: 10 }}>
               <Text numberOfLines={1} style={styles.productTitle}>
-                {item.specialName}
+                {item.productName}
               </Text>
               <GetRating companyId={item.specialID} onprogress={(Rating) => { this.setState({ rating: Rating }); }} />
               <View style={{ flexDirection: "row", padding: 1, paddingBottom: 5, }}>
@@ -263,11 +256,7 @@ class SpecialProduct extends PureComponent {
                       key={key}>
                       <Image
                         style={styles.starImageStyle}
-                        source={
-                          item <= this.state.rating
-                            ? { uri: this.state.starImageFilled }
-                            : { uri: this.state.starImageCorner }
-                        }
+                        source={ item <= this.state.rating ? { uri: this.state.starImageFilled } : { uri: this.state.starImageCorner }}
                       />
                     </TouchableOpacity>
                   );
@@ -275,27 +264,24 @@ class SpecialProduct extends PureComponent {
               </View>
 
               <Text style={styles.productPrice}>
-                R {item.amount}
+                R {item.unitCost.toFixed(2)}
               </Text>
               <Text numberOfLines={2} style={{ color: '#BBB', marginTop: 5 }}>
-                {item.specialDescription}
+                {item.description}
               </Text>
             </View>
             <View style={{ justifyContent: 'space-around', flexDirection: 'row', padding: 5 }}>
               <TouchableOpacity onPress={() => {
-                this.addToFavourites(item.specialID)
+                this.addToFavourites(item.productID)
               }}>
                 <Image
                   style={{ height: 25, width: 25, tintColor: '#bbb' }}
                   source={require('../assets/heart.png')}
+                  resizeMode="contain"
                 />
               </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => { this.props.navigation.navigate('Categories20', { categoryId: item?.categoryID, subCategoryId: item?.categoryID, subCategoryName: item?.categoryName, title: item?.specialName, desc: item?.specialDescription, startdate: item?.startDate, mapSpecialUpload: item?.mapSpecialUpload }) }}>
-                <Image
-                  style={{ height: 35, width: 35, tintColor: '#DB3236', resizeMode: "contain" }}
-                  source={require('../assets/menu/request.png')}
-                />
+              <TouchableOpacity onPress={() => this.addToCart(item.productID)}>
+                <Image style={styles.cartIcon} source={require('../assets/shopping.png')} resizeMode="contain" />
               </TouchableOpacity>
             </View>
           </View>
@@ -361,6 +347,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: -17,
     alignSelf: 'flex-end',
+  },
+  cartIcon: {
+    height: 25,
+    width: 25,
+    tintColor: '#DB3236'
   }
 });
 

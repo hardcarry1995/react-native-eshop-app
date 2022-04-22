@@ -8,14 +8,13 @@ import Moment from 'moment';
 import { Rating, Chip } from "react-native-elements";
 import ProductSearchInput from "../../components/ProductSearchInput";
 import CategorySelector from "../../components/CategorySelector";
+import Toast from "react-native-toast-message";
 
 export default class FaqScreen extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      email: '',
-      password: '',
       data: [],
       special_data: [],
       dataFixed: [],
@@ -24,8 +23,6 @@ export default class FaqScreen extends React.Component {
       userInfo: {},
       cartLoading: false,
       isListEnd: false,
-      faqs: '',
-      str: '',
       textnew: [],
       isLoading: true,
       rating: "2",
@@ -33,10 +30,8 @@ export default class FaqScreen extends React.Component {
       offset: 10,
       categories: [],
       showCategorySelector : false,
-      starImageFilled:
-        'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png',
-      starImageCorner:
-        'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png',
+      starImageFilled: 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png',
+      starImageCorner: 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png',
     };
   }
 
@@ -46,7 +41,6 @@ export default class FaqScreen extends React.Component {
   }
 
   fetchMoreUsers = () => {
-    console.log("Render More");
     this.setState(
       prevState => ({
         offset: prevState.offset + 10,
@@ -128,14 +122,20 @@ export default class FaqScreen extends React.Component {
             this.setState({ loading: false });
           } else {
             this.setState({ loading: false });
-            ToastAndroid.show(
-              result.data.getMstSpecialList.message,
-              ToastAndroid.SHORT,
-            );
+            Toast.show({
+              type: "error",
+              text1: "Error",
+              text2: result.data.getMstSpecialList.message,
+            });
           }
         })
         .catch(err => {
           console.log(err);
+          Toast.show({
+            type: "error",
+            text1: "Error",
+            text2: "Something went wrong. Please try again later!",
+          });
         });
     }
   }
@@ -148,7 +148,7 @@ export default class FaqScreen extends React.Component {
       imagege = '';
     }
     return (
-      <View key={index} style={{ marginBottom: -25 }}>
+      <View key={index} style={{ }}>
         <TouchableOpacity key={index} onPress={() => { this.props.navigation.navigate('Special', { data: item }); }} activeOpacity={0.9}>
           <View style={styles.main}>
             <View style={{ justifyContent : 'center', alignItems : 'center'}}>
@@ -285,8 +285,7 @@ const styles = StyleSheet.create({
     elevation: 8,
     marginLeft: 16,
     marginRight: 16,
-    marginTop: 20,
-    marginBottom: 30,
+    marginTop: 10,
     flexDirection: "row",
   },
   image: {
@@ -296,5 +295,6 @@ const styles = StyleSheet.create({
   },
   text: {
     color: '#323232',
+    width: 220
   },
 });

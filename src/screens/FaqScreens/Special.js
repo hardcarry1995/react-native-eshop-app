@@ -50,7 +50,7 @@ export default class Special extends React.Component {
   async fetchProducts(token) {
     const { navigation, route } = this.props;
     const data = route.params.data;
-    console.log(data.companyIds);
+    console.log("DATA:", data);
     client
       .query({
         query: GET_SPECIAL_BY_ID,
@@ -125,14 +125,12 @@ export default class Special extends React.Component {
     const { navigation, route } = this.props;
     const data = route.params.data;
     this.setState({ specialData: data })
-    // console.log('GET_COMPANY_NAME>>>>>>>', data)
     client
       .query({
         query: GET_COMPANY_NAME,
         context: {
           headers: {
             Authorization: `Bearer ${token}`,
-            // 'Content-Length': 0,
           },
         },
         variables: {

@@ -97,6 +97,11 @@ export default class FaqScreen extends React.Component {
   getrequestItem() {
     if (!this.state.cartLoading) {
       this.setState({ cartLoading: true });
+      console.log({
+        size: this.state.offset,
+        name: this.state.textnew == "" ? null : this.state.textnew,
+        categories : this.state.categories.length == 0 ? null : this.state.categories.join(",")
+      });
       client
         .query({
           query: GET_ALL_MAGAZINE_LIST,

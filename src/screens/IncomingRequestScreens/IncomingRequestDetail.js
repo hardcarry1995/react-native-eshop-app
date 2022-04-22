@@ -45,8 +45,8 @@ const Request25 = ({ navigation, route }) => {
       navigation.navigate('AuthStack');
     } else {
       let token = await AsyncStorage.getItem('userToken');
+      console.log("Business Token:", token);
       let id = data.itemRequestID
-      console.log(token);
       client
         .query({
           query: GET_RESPONSE_ITEMS,
@@ -61,14 +61,7 @@ const Request25 = ({ navigation, route }) => {
         })
         .then(async result => {
           if (result.data.getResponseItems) {
-            const companies = [];
-            const items = result.data.getResponseItems;
-            items.forEach((item, index) => {
-              const { companyId } = item;
-              if(!companies.includes(companyId)) companies.push(companyId);
-            });
-
-
+            console.log(result.data.getResponseItems)
             setVehicleData(result.data.getResponseItems[0]);
           } else {
             Alert.alert('Failed', 'No Data Found')
@@ -230,7 +223,7 @@ const Request25 = ({ navigation, route }) => {
 
                   <TouchableOpacity style={styles.btnSend}
                     onPress={() => {
-                      navigation.navigate('MarshNew26' ,{ requestData: data });
+                      navigation.navigate('IncomingRequestChat' , { requestData: data });
                     }}>
                     <Image
                       source={require('../../assets/M26_3.png')}
@@ -257,7 +250,7 @@ const Request25 = ({ navigation, route }) => {
                 /> */}
                 <TouchableOpacity
                   onPress={() => {
-                    navigation.navigate('MarshNew26' , { requestData: data } );
+                    navigation.navigate('IncomingRequestChat' , { requestData: data } );
                   }}>
                   <Image 
                     style={{ height: 20, width: 20, alignSelf: 'flex-end', marginRight: 20, }}

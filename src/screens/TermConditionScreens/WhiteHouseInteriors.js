@@ -202,20 +202,10 @@ const WhiteHouse = ({ navigation, route }) => {
               })}
             </View>
 
-            <Text
-              style={{
-                color: '#A8A8A8',
-                fontSize: 11,
-                marginLeft: 10
-              }}>
+            <Text style={{ color: '#A8A8A8', fontSize: 11, marginLeft: 10 }}>
               {moment(item.startDate).format('DD-MMM-YYYY')}
             </Text>
-            <Text numberOfLines={1}
-              style={{
-                color: '#323232',
-                fontSize: 11,
-                marginLeft: 10
-              }}>
+            <Text numberOfLines={1} style={{ color: '#323232', fontSize: 11, marginLeft: 10 }}>
               {item.eFlyerDescription}
             </Text>
           </View>

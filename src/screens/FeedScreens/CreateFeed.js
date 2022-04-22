@@ -15,6 +15,7 @@ import url from '../../constants/api';
 import RBSheet from "react-native-raw-bottom-sheet";
 import { imagePrefix } from '../../constants/utils';
 import moment from 'moment';
+import Toast from "react-native-toast-message";
 
 export const REQUEST_ITEMS = gql
 {
@@ -159,6 +160,8 @@ const Request = (props) => {
     setScan(false)
     let string = e.data
     const words = string.split('%');
+    console.log(words)
+
     setVehicleData(words);
     saveVehicleDetail()
   }
@@ -205,13 +208,17 @@ const Request = (props) => {
         allFilesData.push(file);
       });
       if (title === '') {
-        ToastAndroid.show('Please enter title', ToastAndroid.SHORT);
+        // ToastAndroid.show('Please enter title', ToastAndroid.SHORT);
+        alert('Please enter title.');
       } else if (desc === '') {
-        ToastAndroid.show('Please enter description', ToastAndroid.SHORT);
+        // ToastAndroid.show('Please enter description', ToastAndroid.SHORT);
+        alert("Please enter description.");
       } else if (categoryId === '' || categoryId === undefined || categoryId === null) {
-        ToastAndroid.show('Category not selected', ToastAndroid.SHORT);
+        // ToastAndroid.show('Category not selected', ToastAndroid.SHORT);
+        alert("Category does not selected.");
       } else if (subCategoryId === '' || subCategoryId === undefined || subCategoryId === null) {
-        ToastAndroid.show('Subcategory not selected', ToastAndroid.SHORT);
+        // ToastAndroid.show('Subcategory not selected', ToastAndroid.SHORT);
+        alert("Subcategory does not selected.");
       } else {
         setAddRequestItem(true);
         if (allFilesData.length < 1) {
@@ -235,16 +242,28 @@ const Request = (props) => {
               variables: variablesDAta,
             })
             .then(result => {
-              console.log('result>>>', result)
               if (result.data.postMstItemRequest.success) {
-                Alert.alert('Success', result.data.postMstItemRequest.message)
+                Toast.show({
+                  type: 'success',
+                  text1: "Success",
+                  text2: result.data.postMstItemRequest.message
+                })
                 navigation.navigate('Request24');
               } else {
-                Alert.alert('Failed', result.data.postMstItemRequest.message)
+                Toast.show({
+                  type: 'error',
+                  text1: "Failed",
+                  text2: result.data.postMstItemRequest.message
+                })
               }
             })
             .catch(err => {
-              console.log('!!!!!!!!!!!!!!!!', err);
+              console.log('error:', err);
+              Toast.show({
+                type: 'error',
+                text1: "Failed",
+                text2: "Something went wrong. Please try again later!"
+              })
             });
           setAddRequestItem(false);
         } else {
@@ -329,7 +348,7 @@ const Request = (props) => {
     } else {
       let IsLogin = await AsyncStorage.getItem('IsLogin');
       if (IsLogin !== 'true') {
-        navigation.navigate('Auth');
+        navigation.navigate('AuthStack');
       } else {
         let resultdata = await AsyncStorage.getItem('userInfo');
         let jsondata = JSON.parse(resultdata);
@@ -424,7 +443,7 @@ const Request = (props) => {
   const getMyVehicles = async () => {
     let IsLogin = await AsyncStorage.getItem('IsLogin');
     if (IsLogin !== 'true') {
-      navigation.navigate('Auth');
+      navigation.navigate('AuthStack');
     } else {
       let token = await AsyncStorage.getItem('userToken');
       client
@@ -440,7 +459,7 @@ const Request = (props) => {
           if (result.data.getVehicles.success) {
             console.log('result', result);
             if (result.data.getVehicles.result.length > 0) {
-              RBSheet.current.open()
+              refRBSheet.current.open()
               getVehicleClick('yes')
               setAllVehicleStore(result.data.getVehicles.result)
             } else {
@@ -623,21 +642,19 @@ const Request = (props) => {
                   )}
                   {setImagesUpload.map(e =>
                     <View>
-                      <View>
-                        <TouchableOpacity style={{ marginLeft: 10, marginTop: 10, height: 65, width: 65 }} onPress={() => removeImage(e)}>
-                          <Image
-                            style={{ backgroundColor: 'gainsboro', height: 60, width: 60, resizeMode: 'center'}}
-                            source={{ uri: e.uri }}
-                            defaultSource={require('../../assets/image_placeholder1.png')}
-                            resizeMode="contain"
-                          />
-                          <Image
-                            style={{ height: 20, width: 20, position: 'absolute', top: 2, right: 0 }}
-                            source={require('../../assets/remove.png')}
-                            resizeMode="contain"
-                          />
-                        </TouchableOpacity>
-                      </View>
+                      <TouchableOpacity style={{ marginLeft: 10, marginTop: 10, height: 65, width: 65 }} onPress={() => removeImage(e)}>
+                        <Image
+                          style={{ backgroundColor: 'gainsboro', height: 60, width: 60, resizeMode: 'center'}}
+                          source={{ uri: e.uri }}
+                          defaultSource={require('../../assets/image_placeholder1.png')}
+                          resizeMode="contain"
+                        />
+                        <Image
+                          style={{ height: 20, width: 20, position: 'absolute', top: 2, right: 0 }}
+                          source={require('../../assets/remove.png')}
+                          resizeMode="contain"
+                        />
+                      </TouchableOpacity>
                     </View>
                   )}
 
@@ -801,7 +818,7 @@ const Request = (props) => {
                 }} value={checked} >
                   {AllVehicleStore.map((item, i) => {
                     return (
-                      <RadioButton.Item label={item.make} value={item} />
+                      <RadioButton.Item label={`${item.make} - ${item.vIN}`} value={item} />
                     )
                   })
                   }
@@ -834,7 +851,7 @@ const Request = (props) => {
                   </Text>
                 }
               />
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginTop : 20 }}>
                 <TouchableOpacity style={styles.stopbtn} onPress={() => this.scanner.reactivate()}>
                   <Text style={styles.buttonTextStyle}>OK. Got it!</Text>
                 </TouchableOpacity>
@@ -861,7 +878,6 @@ const mapDispatchToProps = dispatch => ({
 });
 
 export default connect(null, mapDispatchToProps)(Request);
-
 
 const styles = StyleSheet.create({
   container: {

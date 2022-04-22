@@ -62,7 +62,6 @@ const MyBidScreen = ({ navigation }) => {
         }
       })
       .catch((error) => {
-        console.log(error);
         setLoading(false);
       })
   }
@@ -74,18 +73,17 @@ const MyBidScreen = ({ navigation }) => {
           <View style={{ borderRightWidth : 1, borderRightColor : "#D0D0D0"}}>
             <Image style={styles.image} source={item.product.itemImagePath ? { uri: `${imagePrefix}${item.product.mapEflyersUploadDtos[0].documentName}` } : require('../assets/NoImage.jpeg')} />
           </View>
-          <View style={{ paddingHorizontal: 10, paddingVertical: 10, borderRightWidth : 1, borderRightColor : "#D0D0D0"}}>
+          <View style={{ paddingHorizontal: 10}}>
             <Text style={styles.text} numberOfLines={1}>{item.product.productName}</Text>
             <View style={{ alignItems: "flex-start", marginVertical: 5 }}>
               <Rating imageSize={12} readonly startingValue={item.product.ratingScore} />
             </View>
-            <Text numberOfLines={2} style={{ color: '#323232', fontSize: 11, width: 200 }}>
+            <Text numberOfLines={2} style={{ color: '#323232', fontSize: 11, width: 250 }}>
               {item.product.description}
             </Text>
-          </View>
-          <View style={{ justifyContent: "center", alignItems: "center", paddingLeft : 10 }}>
-            <Text style={{ fontSize: 11, color: "#323232", marginBottom : 10}}>Bid Amount</Text>
-            <Text style={{fontWeight: '700', color: "red"}}>R{item.bidDetail.bidAmount.toFixed(2)}</Text>
+            <View style={{ marginTop: 10 }}>
+              <Text style={{fontWeight: '700', color: "red"}}>R{item.bidDetail.bidAmount?.toFixed(2)}</Text>
+            </View>
           </View>
         </View>
       </TouchableOpacity>
@@ -124,14 +122,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   main: {
-    height: 100,
     backgroundColor: 'white',
     borderRadius: 15,
     shadowRadius: 20,
     elevation: 8,
     marginLeft: 16,
     marginRight: 16,
-    marginTop: 20,
+    marginTop: 10,
     paddingVertical: 10,
     flexDirection: 'row',
   },

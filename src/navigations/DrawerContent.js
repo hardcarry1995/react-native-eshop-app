@@ -3,11 +3,14 @@ import { ScrollView, TouchableOpacity, View, Image, Share, Platform, Linking } f
 import { connect } from "react-redux";
 import Colors from '../constants/colors';
 import { Card, CardItem, Text, Left, Body } from 'native-base';
+import { GUEST_LOGIN } from '../constants/queries';
+import client from '../constants/client';
 import Constant from '../constants/constant';
 import Utils from '../constants/utils';
 import { fontFamily, fontSize } from '../components/styles';
 import AsyncStorage from '@react-native-community/async-storage';
 import cont from '../components/cont';
+import { bearerToken } from '../constants/utils';
 
 class DrawerContent extends Component {
   state = {
@@ -26,6 +29,7 @@ class DrawerContent extends Component {
       { screen: Constant.my_Favirity, title: Constant.my_Favirity, image: cont.my_Favirity },
       { screen: Constant.my_Reviews, title: Constant.my_Reviews, image: cont.my_Reviews },
       { screen: "MyBid", title: "My Bids", image: cont.my_Reviews},
+      { screen: "MyOrders", title: 'My Orders', image: cont.my_Reviews},
       { screen: Constant.rate_the_app, title: Constant.rate_the_app, image: cont.rate_the_app },
       { screen: Constant.give_feedback, title: Constant.give_feedback, image: cont.give_feedback },
       { screen: Constant.share_app, title: Constant.share_app, image: cont.share_app },
@@ -146,11 +150,35 @@ class DrawerContent extends Component {
     }
   };
 
+  getQuestToken = async () => {
+    client
+      .query({
+        query: GUEST_LOGIN,
+        context: {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+            'Content-Length': 0,
+          },
+        },
+      })
+      .then(async result => {
+        await AsyncStorage.setItem('userToken', result.data.guestLogin.result.value);
+        this.props.setUser({});
+        this.props.setUserRole('');
+        this.props.navigation.reset({
+          index: 0,
+          routes: [{ name : 'Main'}]
+        });
+      })
+      .catch(err => {
+        this.setState({ loading: false });
+        console.log(err);
+      });
+  }
+
   handleSignOut = async () => {
     await AsyncStorage.clear();
-    this.props.setUser({});
-    this.props.setUserRole('');
-    this.props.navigation.navigate('Main');
+    this.getQuestToken();
   };
 
   _ShareApp = async () => {
@@ -284,6 +312,7 @@ class DrawerContent extends Component {
                     <Image
                       style={{ height: 25, width: 25, resizeMode: 'contain' }}
                       source={require('../assets/menu/clip.png')}
+                      resizeMode="contain"
                     />
                     <Text style={ { color: '#232323', marginStart: 8, fontFamily: fontFamily.regular}}>
                       My Request
@@ -300,6 +329,7 @@ class DrawerContent extends Component {
                         <Image
                           style={{ height: 25, width: 25, resizeMode: 'contain' }}
                           source={require('../assets/menu/clip.png')}
+                          resizeMode="contain"
                         />
                         <Text style={{ color: '#232323', marginStart: 8, fontFamily: fontFamily.regular }}>
                           My Enquiry
@@ -318,6 +348,7 @@ class DrawerContent extends Component {
                         <Image
                           style={{ height: 25, width: 25, resizeMode: 'contain' }}
                           source={require('../assets/menu/clip.png')}
+                          resizeMode="contain"
                         />
                         <Text
                           style={[
@@ -338,6 +369,7 @@ class DrawerContent extends Component {
                         <Image
                           style={{ height: 25, width: 25, resizeMode: 'contain' }}
                           source={require('../assets/menu/clip.png')}
+                          resizeMode="contain"
                         />
                         <Text style={{ color: '#232323', marginStart: 8, fontFamily: fontFamily.regular }}>
                           Incoming Enquiry
@@ -360,6 +392,7 @@ class DrawerContent extends Component {
                   <Image
                     style={{ height: 25, width: 25, resizeMode: 'center' }}
                     source={require('../assets/menu/logout.png')}
+                    resizeMode="contain"
                   />
                   <Text style={{ color: '#232323', marginStart: 8, fontFamily: fontFamily.regular }}>
                     Logout

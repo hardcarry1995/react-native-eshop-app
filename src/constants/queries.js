@@ -1,77 +1,84 @@
 import { gql } from '@apollo/client';
 
 export const SPECIAL_PRODUCT = gql`
- query GetSpecialProductList($size: Int!)  {
-  getMstSpecialList(
-    specialId: null,
-    specialName: null,
-    franchiseId: null,
-    statusIds: null,
-    distance: null,
-    companyIds: null,
-    categoryIds: null,
-    provinceIds: null,
-    cityIds: null,
-    suburbIds: null,
-    page: 1,
-    size: $size
-  ){
-    count,
-    currentPage,
-    message,
-    nextPage,
-    prevPage,
-    success,
-    totalPages,
-    result{
-      amount,
-      categoryID,
-      categoryIds,
-      categoryName,
-      cityID,
-      cityIds,
-      cityName,
-      companyIds,
-      countryID,
-      countryName,
-      dis,
-      distance,
-      documentLink,
-      endDate,
-      franchiseId,
-      imagePath,
-      latitude,
-      longitude,
-      phone,
-      provinceID,
-      provinceIds,
-      provinceName,
-      specialDescription,
-      specialId,
-      specialID,
-      specialName,
-      staId,
-      startDate,
-      statusId,
-      statusID,
-      statusName,
-      streetAddress,
-      suburb,
-      suburbID,
-      suburbIds,
-      userId,
-      userLatitude,
-      userLongtitude,
-      zipCode,
-      mapSpecialUpload{        
-        uploadPath,
-        thumbNailPath
-      }  
+ query GetSpecialProductList($productName: String = null, $domainCategoryIds: String = null, $size: Int = 10)  {
+  getPrdProductList(
+    productName: $productName,
+    productId: null,
+    fromPrice:null,
+    toPrice:null,
+    categoryId: null,
+    domainCategoryIds:$domainCategoryIds,
+    status: null,
+    salesTypeId:null,
+    scopeId: 2,
+    userId:null,  
+    companyId:null, 
+    page:1, 
+    size:$size)
+    {
+      count,
+      currentPage,    
+      message,
+      nextPage,
+      prevPage,
+      success,
+      totalPages,
+      result
+      {
+        activeText,
+        categoryID,
+        categoryName,
+        description,
+        documentName,
+        documentPath,
+        isActive,
+        ratingScore,
+        productID,
+        productImage,
+        productName,
+        productNumber,
+        salesTypeId,
+        typeID,
+        inventory,
+        clickCount,
+        viewCount
+        unitCost,
+        length, 
+        width, 
+        height, 
+        volume, 
+        weight, 
+        googleSchema,
+        domainCategory, 
+        startDate,
+        endDate,
+        companyID,
+        originalUnitCost,
+        longitude,
+        latitude,
+        mapProductImages{        
+          imageName,
+          imagePath,
+          thumbNailPath
+        }   
+        prdBid{
+          bidId,
+          createdDate,
+          bidAmount,
+          userId
+        }
+        prdHire{
+          hireId, 
+          userId,
+          isAccepted,
+          fromDate, 
+          toDate,
+          returned
+        }
+      }
     }
-    
-  }
-}
-`;
+}`;
 
 export const SPECIAL_PRODUCT_LIST_WITH_DISTANCE = gql`
  query GetSpecialProductList($distance: Decimal!)  {
@@ -287,8 +294,6 @@ query GetPrdProductList($productId: Int!) {
    }
 `;
 
-
-
 export const GET_PRODUCT_PURCHASE = gql`
 query GetPrdProductList($size: Int!) {
   getPrdProductList(
@@ -402,7 +407,6 @@ export const ADD_TO_CART = gql`
   }
 `;
 
-
 export const ADD_TO_CART_NULL = gql`
   mutation AddToCart($pid: Int!, $dateCreated: DateTime) {
       postPrdShoppingCartOptimized(
@@ -492,7 +496,7 @@ export const HANDLE_SIGNUP = gql`
     $gid: String!
     $fBAccessCode: String!
     $facebookUserID: String!
-    $deviceID: String!
+    $deviceID: String
     $deviceType: Int
     $latitude:String
     $longitude:String
@@ -1415,11 +1419,12 @@ export const REQUEST_ITEM_POST_RESPONSE = gql`
     $itemRequestId: Int
     $title: String
     $filePath: String
-    $fileName:String
+    $fileName:String,
+    $companyId: Int = null
   ) {
     postMstItemResponse(mstItemResponse:{
       comment: $title,
-      companyId: null,
+      companyId: $companyId,
       createdBy: null,
       createdDate: null,
       isAccepted: null,
@@ -1476,21 +1481,24 @@ query GetRespons($id: ID!)
   getResponseItems(
    id: $id
  ){
-  comment,
-  companyId,
-  createdBy,
-  createdDate,
-  isAccepted,
-  isActive,
-  isRejected,
-  itemRequestId,
-  itemResponseId,
-  modifiedBy,
-  modifiedDate,
-  replyToId,
-  responseDate,
-  userId
-  mapItemResponseUpload{
+    comment,
+    companyId,
+    createdBy,
+    createdDate,
+    isAccepted,
+    isActive,
+    isRejected,
+    itemRequestId,
+    itemResponseId,
+    modifiedBy,
+    modifiedDate,
+    replyToId,
+    responseDate,
+    userId,
+    company{
+      companyName
+    }
+    mapItemResponseUpload{
       createdBy,
       createdDate,
       documentName,
@@ -1500,8 +1508,8 @@ query GetRespons($id: ID!)
       modifiedBy,
       modifiedDate,
       uploadPath
-  }
-  replyTo{
+    }
+    replyTo{
       comment,
       companyId,
       createdBy,
@@ -1516,13 +1524,52 @@ query GetRespons($id: ID!)
       replyToId,
       responseDate,
       userId,
+      replyTo{
+        comment,
+        companyId,
+        createdBy,
+        createdDate,
+        isAccepted,
+        isActive,
+        isRejected,
+        itemRequestId,
+        itemResponseId,
+        modifiedBy,
+        modifiedDate,
+        replyToId,
+        responseDate,
+        userId,
+        replyTo{
+          comment,
+          companyId,
+          createdBy,
+          createdDate,
+          isAccepted,
+          isActive,
+          isRejected,
+          itemRequestId,
+          itemResponseId,
+          modifiedBy,
+          modifiedDate,
+          replyToId,
+          responseDate,
+          userId
+        }
+      }
+      mapItemResponseUpload{
+        createdBy,
+        createdDate,
+        documentName,
+        irUploadId,
+        isActive,
+        itemResponseId,
+        modifiedBy,
+        modifiedDate,
+        uploadPath
+      }
+    }
   }
-
-   
-   }
- }
-
-`;
+}`;
 
 export const GET_RESPONSE_ITEMS_NEW = gql`
 query GetRespons($id: ID!) 
@@ -2745,4 +2792,79 @@ export const GET_FAVORITES = gql`
      }
    }
  }
+`
+export const GET_ORDERS_BY_USER = gql`
+ query GetPrdOdersByUser(
+  $orderStatusTypeId:Int = null,
+  $fromDate: DateTime, 
+  $toDate: DateTime,
+  $page: ID!
+ ){
+  prdOrdersByUser(
+    orderStatusTypeId : $orderStatusTypeId,
+    fromDate : $fromDate, 
+    toDate : $toDate,
+    page : $page, 
+    size : 50
+  ){
+    count,
+    currentPage,
+    message,
+    nextPage,
+    prevPage,
+    success,
+    totalPages
+    result{
+      createdBy,
+      createdDate,
+      downloadCount,
+      expiredDate,
+      modifiedBy,
+      modifiedDate,
+      orderAmount,
+      orderDate,
+      orderId,
+      orderIdstring,
+      orderIpaddress,
+      orderSessionId,
+      orderStatusId,
+      orderTotal,
+      paymentDate,
+      productId,
+      transactionId,
+      userId,
+      prdOrderDetails{
+        createdBy,
+        createdDate,
+        downloadCount,
+        modifiedBy,
+        modifiedDate,
+        orderAmount,
+        orderDetailsId,
+        orderId,
+        orderQuantity,
+        productId,
+        productPrice,
+        products{
+          productName
+          mapProductDocument{
+            documentName,
+            documentPath
+          }
+          mapProductImages{
+            imagePath,
+            thumbNailPath
+          }
+        }
+      }
+      prdOrderStatus{
+        createdBy,
+        createdDate,
+        modifiedBy,
+        modifiedDate,
+        orderStatusTypeId
+      }
+    }
+  }
+}
 `

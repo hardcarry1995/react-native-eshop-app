@@ -12,6 +12,7 @@ import RNPickerSelect from 'react-native-picker-select';
 import CategorySelector from "../components/CategorySelector";
 import { Chip } from "react-native-elements";
 import ProductSearchInput from "../components/ProductSearchInput";
+import Toast from "react-native-toast-message";
 
 const filterItems = [
   { label: 'Purchase', value: 'Buy' },
@@ -55,11 +56,50 @@ function BidItem ({ item, onPressAddBid }) {
     setTotalDurationData(d);
 
   }, []);
+
+  useEffect(() => {
+    if(amount <= lastBidAmount) {
+      setDisableDecrease(true);
+    } else {
+      setDisableDecrease(false);
+    }
+  }, [amount, lastBidAmount])
   
-  const _onPressAddBid = () => {
-    console.log(item);
-    onPressAddBid(item);
+  const _onPressAddBid = async () => {
+    if (amount === '' || amount === undefined) {
+      Alert.alert('Error', 'Enter Amount')
+      return;
+    }
+    let dataLength = item.prdBid.length;
+    let dataAmount = item.prdBid[dataLength - 1];
+    if (dataAmount.bidAmount > amount) {
+      Alert.alert('Error', 'Enter more than the last amount ')
+      return;
+    }
+    const result = await onPressAddBid(item, amount);
+    if(result){
+      setLastBidAmount(amount);
+    }
   }
+
+  const decrease = () => {
+    if(disableDecrease) {
+      alert("Bid amount should be bigger that last bid amount!");
+      return;
+    }
+    var changeValue = lastBidAmount * 0.1;
+    setAmount(prevState => (parseFloat(prevState) - changeValue).toFixed(2));
+  }
+
+  const increase = () => {
+    var changeValue = lastBidAmount * 0.1;
+    if(amount !== 0) {
+      setAmount(prevState => ((parseFloat(prevState) + changeValue)).toFixed(2));
+    } else {
+      setAmount((lastBidAmount + changeValue).toFixed(2));
+    }
+  }
+
   return (
     <View style={{ flex: 1, backgroundColor: '#fff', padding: 5, marginBottom: 40 }}>
       <View
@@ -80,11 +120,7 @@ function BidItem ({ item, onPressAddBid }) {
                       >
                         <Image
                           style={styles.starImageStyle}
-                          source={
-                            item <= item.ratingScore
-                              ? { uri: starImageFilled }
-                              : { uri: starImageCorner }
-                          }
+                          source={ item <= item.ratingScore ? { uri: starImageFilled } : { uri: starImageCorner }}
                         />
                       </TouchableOpacity>
                     );
@@ -121,24 +157,13 @@ function BidItem ({ item, onPressAddBid }) {
                 <Image style={{ width: 15, height: 15, padding: 15 }} source={require('../assets/Bid1.png')} />
               </TouchableOpacity>
               <TextInput
-                style={{
-                  borderRadius: 5,
-                  fontSize: 12,
-                  borderColor: 'grey',
-                  borderWidth: 1,
-                  bottom: 25,
-                  padding: 5,
-                  height: 30,
-                  marginLeft: 30,
-                  marginRight: 30,
-                  marginTop: 25,
-                  width: 150
-                }}
+                style={{ borderRadius: 5, fontSize: 12, borderColor: 'grey', borderWidth: 1, bottom: 25, padding: 5, height: 30, marginLeft: 30, marginRight: 30, marginTop: 25, width: 150 }}
                 placeholder="Enter Bid Amount"
                 placeholderTextColor="red"
                 onChangeText={text => {
-                 setAmount(text);
+                 setAmount(isNaN(parseFloat(text)) ? 0 : parseFloat(text));
                 }}
+                value={amount === 0 ? "" : amount.toString()}
                 keyboardType="numeric"
               />
               <TouchableOpacity onPress={_onPressAddBid}>
@@ -146,13 +171,13 @@ function BidItem ({ item, onPressAddBid }) {
               </TouchableOpacity>
             </View>
             <View style={{flexDirection: "row", justifyContent: "center", marginBottom : 20}}>
-              <TouchableOpacity style={{ ...styles.decreaseBtn}}>
+              <TouchableOpacity style={{ ...styles.decreaseBtn}} onPress={decrease} >
                 <Image source={require('../assets/img/DownArrow.png')} />
                 <Text style={{ fontSize: 10, color: '#FAFAFA'}}>
                   decrease bid by 10%
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity style={{...styles.increaseBtn}}>
+              <TouchableOpacity style={{...styles.increaseBtn}} onPress={increase}>
                 <Text style={{ fontSize: 10, color: '#FAFAFA'}}>
                   increase bid by 10%
                 </Text>
@@ -249,20 +274,12 @@ export default class SettingsScreen extends React.Component {
     }
     return 0;
   }
-  addBid(item) {
+
+  async addBid(item, amount) {
     this.setState({ bidIdicator: true })
     if (this.state.userIsLogin === 'true') {
-      if (this.state.amount === '' || this.state.amount === undefined) {
-        Alert.alert('Error', 'Enter Amount')
-        return;
-      }
-      let dataLength = item.prdBid.length;
-      let dataAmount = item.prdBid[dataLength - 1];
-      if (dataAmount.bidAmount > this.state.amount) {
-        Alert.alert('Error', 'Enter more than the last amount ')
-        return;
-      }
-      client
+      try{
+        await client
         .mutate({
           mutation: BID_ON_PRODUCT,
           context: {
@@ -273,26 +290,30 @@ export default class SettingsScreen extends React.Component {
           },
           variables: {
             productId: item.productID,
-            amount: this.state.amount,
+            amount: amount,
             userId: Number(this.state.userInfo.id)
           },
         })
-        .then(result => {
-          this.setState({ cartLoading: false });
-          console.log(result);
-          Alert.alert('Success', 'Your Bid Number is - ' + result.data.createPrdBid.bidId)
-          this.setState({ bidIdicator: false })
-          // if (result.data.getPrdProductList.success) {
-          //   this.setState({ data: result.data.getPrdProductList.result })
-          //   this.setState({ setAllcartcount: result.data.getPrdProductList.count })
-          // }
-        })
-        .catch(err => {
-          this.setState({ cartLoading: false });
-          console.log(err);
+        this.setState({ cartLoading: false });
+        this.setState({ bidIdicator: false });
+        Toast.show({
+          type: 'success',
+          text1: 'Success', 
+          text2: "Your bid has been applied sucessfully!",
         });
+        return true;
+      }catch(err){
+        this.setState({ cartLoading: false });
+        Toast.show({
+          type: "error",
+          text1: "Error!",
+          text2 : "Something went wrong! Please try again later!"
+        })
+        console.log(err);
+        return false;
+      }
     } else {
-      this.props.navigation.navigate('Login')
+      this.props.navigation.navigate('AuthStack')
     }
   }
   updateUser = user => {
@@ -340,7 +361,7 @@ export default class SettingsScreen extends React.Component {
   }
 
   renderItem = ({ item, index }) => {
-   return <BidItem  item={item} key={index} onPressAddBid={(item) => this.addBid(item)} />
+   return <BidItem  item={item} key={index} onPressAddBid={(item, amount) => this.addBid(item, amount)} />
   }
   filterItems = (keyword) => {
     this.setState({ searchText: keyword});
@@ -409,13 +430,7 @@ export default class SettingsScreen extends React.Component {
               textInputProps={styles.pickerContainer}
             />
           </View>
-          <View
-            style={{
-              justifyContent: 'center',
-              padding: 18,
-              alignItems: 'center',
-              flex: 1,
-            }}>
+          <View style={{ justifyContent: 'center', padding: 18, alignItems: 'center', flex: 1 }}>
             <FlatList
               style={{ flex: 1, width: '100%', marginBottom: -17 }}
               showsVerticalScrollIndicator={false}

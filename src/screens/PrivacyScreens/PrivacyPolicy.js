@@ -15,6 +15,7 @@ import ProductSearchInput from "../../components/ProductSearchInput";
 import CategorySelector from "../../components/CategorySelector";
 import { Chip } from "react-native-elements";
 
+
 const filterItems = [
   { label: 'Purchase', value: 'Buy' },
   { label: 'Bid', value: 'Bid' },
@@ -99,31 +100,19 @@ export default class PrivacyPolicy extends React.Component {
 
   hireTheProduct(visible) {
     if (this.state.fromDate === '' || this.state.fromDate === undefined) {
-      ToastAndroid.show(
-        'Select start date',
-        ToastAndroid.SHORT,
-      );
+      alert('Select start date');
       return;
     }
     if (this.state.toDate === '' || this.state.toDate === undefined) {
-      ToastAndroid.show(
-        'Select end date',
-        ToastAndroid.SHORT,
-      );
+      alert('Select end date');
       return;
     }
     if (this.state.fromDate === this.state.toDate) {
-      ToastAndroid.show(
-        'Invalid Date',
-        ToastAndroid.SHORT,
-      );
+      alert('Invalid Date');
       return;
     }
     if (this.state.fromDate > this.state.toDate) {
-      ToastAndroid.show(
-        'Invalid date',
-        ToastAndroid.SHORT,
-      );
+      alert('Invalid date');
       return;
     }
     if (this.state.userIsLogin === 'true') {
@@ -139,21 +128,21 @@ export default class PrivacyPolicy extends React.Component {
           variables: {
             productId: this.state.hireData.productID,
             userId: Number(this.state.userInfo.id),
-            fromDate: this.state.fromDate + ' 18:30:00.000',
-            toDate: this.state.toDate + ' 18:30:00.000'
+            fromDate: Moment(this.state.fromDate + ' 18:30:00.000').format(),
+            toDate: Moment(this.state.toDate + ' 18:30:00.000').format()
           },
         })
         .then(result => {
           this.setState({ cartLoading: false });
           if (result.data.postPrdShoppingCartOptimized.success) {
             Alert.alert('Success', 'Hire product successfully')
+          } else {
+            console.log(result.data.postPrdShoppingCartOptimized);
+            Alert.alert('Error', result.data.postPrdShoppingCartOptimized.message)
+
           }
           this.setState({ modalVisible: visible });
           this.setState({ bidIdicator: true })
-          // if (result.data.getPrdProductList.success) {
-          //   this.setState({ data: result.data.getPrdProductList.result })
-          //   this.setState({ setAllcartcount: result.data.getPrdProductList.count })
-          // }
         })
         .catch(err => {
           this.setState({ cartLoading: false });
@@ -523,8 +512,8 @@ export default class PrivacyPolicy extends React.Component {
                       <View style={{ width: '40%' }}>
                         <TouchableOpacity
                           style={styles.buttonClose}
-                          onPress={() => this.hireTheProduct(!modalVisible)
-                          }>
+                          onPress={() => this.hireTheProduct(!modalVisible)}
+                        >
                           <Text style={styles.textStyle}>HIRE</Text>
                         </TouchableOpacity>
                       </View>

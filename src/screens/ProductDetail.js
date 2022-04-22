@@ -18,12 +18,14 @@ export default class ProductDetail extends React.Component {
       exerciseTypeIndex: -1,
       sliderOneValue: [4],
       multiSliderValue: [10, 30],
+      reviewScore : 0,
+      reviewCount: 0,
       ratings : []
     };
   }
 
   async componentDidMount() {
-    console.log("Sale:", this.props.route.params.data.salesTypeId);
+    console.log("Sale:", this.props.route.params.data.productID);
     let token = await AsyncStorage.getItem('userToken');
     client.query({
       query: GET_PRODUCT_RATING,
@@ -38,7 +40,7 @@ export default class ProductDetail extends React.Component {
     })
     .then(result => {
       if (result.data.getMstRatingScoreList.success) {
-
+        // console.log(result.data.getMstRatingScoreList)
       } 
     })
   }
@@ -82,6 +84,7 @@ export default class ProductDetail extends React.Component {
   }
   
   addToCart = async (id) => {
+    console.log(id)
     let IsLogin = await AsyncStorage.getItem('IsLogin');
     let userToken = await AsyncStorage.getItem('userToken');
     if (IsLogin !== 'true') {
@@ -143,6 +146,8 @@ export default class ProductDetail extends React.Component {
               alert('Product added to cart');
             }
             this.props.navigation.navigate('CartStack')
+          } else {
+            console.log(result.data.postPrdShoppingCartOptimized)
           }
         })
         .catch(err => {
@@ -173,7 +178,7 @@ export default class ProductDetail extends React.Component {
           <View style={{ flexDirection: 'row', paddingTop: 5, alignItems: 'center', marginBottom: 10}}>
             <Rating imageSize={20} readonly startingValue={data.ratingScore} />
             <Text style={{ fontSize: 10, color: '#316EE6', marginLeft: 10 }}>
-              204 Reviews
+              {this.state.reviewCount} Reviews
             </Text>
           </View>
           <View style={{ flexDirection: 'row', paddingTop: 0, paddingBottom: 10 }}>
@@ -243,9 +248,7 @@ export default class ProductDetail extends React.Component {
               }}
               activeOpacity={0.8}
             >
-
               {this.state.cartLoading ? (
-
                 <ActivityIndicator color="white" style={{ alignItems: 'center' }} />
               ) : (
                 <View style={{ flexDirection: 'row' }}>
@@ -279,7 +282,7 @@ export default class ProductDetail extends React.Component {
             {data.prdBid.length > 0 ? <ScrollView style={{ height: 300, width: "100%", marginTop : 10}}>
               {data.prdBid.map((bid, index) => (
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                  <Text style={{ fontSize: 16 }}>R {bid.bidAmount.toFixed(2)}</Text>
+                  <Text style={{ fontSize: 16 }}>R {bid.bidAmount?.toFixed(2)}</Text>
                   <Text>{moment(bid.createdDate).format("YYYY-MM-DD H:m")}</Text>
                   <Text>{bid.userId}</Text>
                 </View>

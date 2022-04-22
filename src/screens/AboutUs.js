@@ -1,49 +1,43 @@
 import React, { useState, useEffect } from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  Image,
-  Modal,
-  Alert,
-  Dimensions,
-  TouchableHighlight,
-} from 'react-native';
+import { SafeAreaView, StyleSheet, View, Text, TouchableOpacity, ScrollView, Image, Alert, Dimensions, TouchableHighlight } from 'react-native';
 import MapView, { Marker, Callout } from 'react-native-maps';
 import AsyncStorage from '@react-native-community/async-storage';
 import Geolocation from '@react-native-community/geolocation';
 import client from '../constants/client';
-const { width, height } = Dimensions.get('window');
-import { SPECIAL_PRODUCT_LIST_WITH_DISTANCE } from '../constants/queries';
+import { SPECIAL_PRODUCT } from '../constants/queries';
 import { BottomSheet } from 'react-native-btr';
 import Moment from 'moment';
 import { imagePrefix } from '../constants/utils';
 import HMSMap, { HMSMarker, HMSInfoWindow, MapTypes } from "@hmscore/react-native-hms-map";
+import ProductSearchInput from '../components/ProductSearchInput';
+import CategorySelector from "../components/CategorySelector";
+import { connect } from "react-redux";
+import { Chip } from "react-native-elements";
 
+
+const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
-const Map33 = ({ navigation }) => {
+const ProductsMap = ({ navigation, token }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [currentLatitude, setCurrentLatitude] = useState(-28.4793);
   const [currentLongitude, setCurrentLongitude] = useState(24.6727);
   const [specialData, setSpecialData] = useState([]);
   const [selectedSpecialData, setSelectedSpecialData] = useState({});
   const [platformType, setPlatformType] = useState('');
+  const [showCategorySelector, setShowCategorySelector] = useState(false); 
+  const [keyword, setKeyword] = useState("");
+  const [categories, setCategories] = useState([]);
 
   const getLocation = async () => {
-    let token = (await AsyncStorage.getItem('userToken')) || '';
     Geolocation.getCurrentPosition(
       position => {
         let latitude = position.coords.latitude;
         let longitude = position.coords.longitude;
         setCurrentLatitude(latitude);
         setCurrentLongitude(longitude);
-        fetchSpecialProduct(latitude, longitude, token);
       },
       error => {
         console.log(error.code, error.message);
@@ -57,15 +51,14 @@ const Map33 = ({ navigation }) => {
     );
   };
 
-  const fetchSpecialProduct = (latitude, longitude, token) => {
-    // console.log('ttkk', `Bearer ${bearerToken}`)
-    const specialDistance = 100;
+  const fetchSpecialProduct = (token) => {
     client
       .query({
-        query: SPECIAL_PRODUCT_LIST_WITH_DISTANCE,
+        query: SPECIAL_PRODUCT,
         fetchPolicy: 'no-cache',
         variables: {
-          distance: specialDistance,
+          productName : keyword,
+          domainCategoryIds : categories.join(","),
         },
         context: {
           headers: {
@@ -74,10 +67,7 @@ const Map33 = ({ navigation }) => {
         },
       })
       .then(result => {
-        if (result?.data?.getMstSpecialList?.success) {
-          setSpecialData(result?.data?.getMstSpecialList.result);
-        } else {
-        }
+        setSpecialData(result.data.getPrdProductList.result);
       })
       .catch(err => {
         console.log(err);
@@ -123,8 +113,8 @@ const Map33 = ({ navigation }) => {
           {specialData.length > 0 &&
             specialData.map((marker, index) => {
               let markerImage = '';
-              if (marker.mapSpecialUpload.length > 0) {
-                markerImage = marker.mapSpecialUpload[0].thumbNailPath;
+              if (marker.mapProductImages.length > 0) {
+                markerImage = marker.mapProductImages[0].imagePath;
               } else {
                 markerImage = '';
               }
@@ -142,11 +132,8 @@ const Map33 = ({ navigation }) => {
                     }}
                     title={marker?.specialName}
                     description={marker?.specialDescription}
-                    image={
-                      markerImage
-                        ? { uri: `${imagePrefix}${markerImage}` }
-                        : require('../assets/NoImage.jpeg')
-                    }>
+                    image={ markerImage ? { uri: `${imagePrefix}${markerImage}` } : require('../assets/NoImage.jpeg')}
+                  >
                     <Callout
                       onPress={e => {
                         if (
@@ -328,11 +315,49 @@ const Map33 = ({ navigation }) => {
     }
   }, [navigation.isFocused()]);
 
+  useEffect(() => {
+    fetchSpecialProduct(token);
+  }, [keyword, categories])
+
+  _onSelectCategoryDone = (categories) => {
+    setShowCategorySelector(false);
+    setCategories(categories);
+  }
+
+  _onPressSelectedCategory = (category) => {
+    setCategories(prevState => prevState.filter((cat) => cat.categoryId != category.categoryId));
+  }
+
   return (
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1 }}>
         {specialDataModal()}
-        <View style={{ height: '100%' }}>{renderMapView()}</View>
+        <View style={{ height: '100%' }}>
+          <View style={{ top: 0, zIndex: 10}}>
+            <ProductSearchInput 
+              onChangeText={setKeyword} 
+              onPressFilterIcon={() => setShowCategorySelector(true)} 
+            />
+          </View>
+          {categories.length > 0 && <View style={{zIndex: 2, flexDirection: 'row', flexWrap: 'wrap', marginBottom : 20, paddingHorizontal : 10}}>
+            {categories.map(item => (
+              <Chip 
+                title={item.categoryName}
+                icon={{
+                  name: 'close',
+                  type: 'font-awesome',
+                  size: 14,
+                  color: 'white',
+                }}
+                onPress={() => _onPressSelectedCategory(item)}
+                iconRight
+                titleStyle={{ fontSize: 10 }}
+                buttonStyle={{ backgroundColor: '#F54D30', marginBottom: 5}}
+              />
+            ))}
+          </View>}
+          {renderMapView()}
+        </View>
 
         {/* <TouchableOpacity
           style={{alignSelf: 'center'}}
@@ -342,12 +367,20 @@ const Map33 = ({ navigation }) => {
             source={require('../assets/Down.png')}
           />
         </TouchableOpacity> */}
+        <CategorySelector 
+          visible={showCategorySelector} 
+          onDone={(values) => _onSelectCategoryDone(values)}
+        />
       </SafeAreaView>
     </View>
   );
 };
 
-export default Map33;
+const mapStateToProps = (state) =>({
+  token: state.user.token
+});
+
+export default connect(mapStateToProps, null)(ProductsMap);
 
 const mapStyle = [
   { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
