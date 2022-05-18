@@ -172,7 +172,7 @@ const TabBarNavigator = () => (
     screenOptions={{ gestureEnabled: false, headerShown: false }}
   >
     <Tab.Screen name="HomeStack" component={HomeStack} />
-    <Tab.Screen name="ProductStack" component={ProductStack} />
+    <Tab.Screen name={Constants.my_request_stack} component={MyRequestStack}  />
     <Tab.Screen name="CategoryStack" component={RequestStack}  />
     <Tab.Screen name="CartStack" component={CartStack}  />
     <Tab.Screen name="WishStack" component={WishStack}  />
@@ -186,7 +186,6 @@ const TabBarNavigator = () => (
     <Tab.Screen name={Constants.contact_us} component={CatalogueStack}  />
     <Tab.Screen name={Constants.about_us} component={ProductMapStack}  />
     <Tab.Screen name={Constants.incoming_request} component={IncomingRequestStack}   />
-    <Tab.Screen name={Constants.my_request_stack} component={MyRequestStack}  />
     <Tab.Screen name={Constants.faq} component={FaqStack}  />
     <Tab.Screen name={Constants.logout} component={WorkInProgress} />
     <Tab.Screen name={Constants.share_app} component={WorkInProgress}  />
@@ -194,6 +193,7 @@ const TabBarNavigator = () => (
     <Tab.Screen name="ContactStack" component={ContactStack}  />
     <Tab.Screen name={Constants.my_Favirity} component={FavoriteStack} />
     <Tab.Screen name="MyOrders" component={OrderStack}  />
+    <Tab.Screen name="ProductStack" component={ProductStack} />
   </Tab.Navigator>
 )
 

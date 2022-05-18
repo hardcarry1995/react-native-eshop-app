@@ -7,20 +7,26 @@ import client from '../../constants/client';
 import { GetRating } from '../../components/GetRating';
 import Moment from 'moment';
 import fileExtention from "file-extension";
+import { connect } from "react-redux";
 
-const Request24 = ({ navigation }) => {
+const MyRequests = ({ navigation, userState }) => {
   const [data, setData] = useState([])
   const [maxRating, setMaxrating] = useState([1, 2, 3, 4, 5,])
   const [rating, setRating] = useState("2")
   const [loading, setLoading] = useState(false);
   const [isListEnd, setIsListEnd] = useState(false);
   const [offset, setOffset] = useState(10);
+  const [isLoggedIn, setLoggedIn] = useState(false);
 
   const starImageFilled = 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png';
   const starImageCorner = 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png';
 
   useEffect(() => {
-    getrequestItem();
+    const isLogedIn = Object.keys(userState.user).length > 0;
+    setLoggedIn(isLogedIn);
+    if(isLogedIn){
+      getrequestItem();
+    }
   }, []);
 
   const getrequestItem = async () => {
@@ -61,7 +67,7 @@ const Request24 = ({ navigation }) => {
   const renderFooter = () => {
     return (
       <View style={styles.footer}>
-        {loading ? (
+        {(loading && isListEnd) ? (
           <ActivityIndicator
             color="black"
             style={{ margin: 15 }} />
@@ -135,16 +141,21 @@ const Request24 = ({ navigation }) => {
 
 
   return (
-    <SafeAreaView>
-      <FlatList
+    <View style={{ flex: 1 }}>
+      {isLoggedIn ? <FlatList
         data={data}
         keyExtractor={(item, i) => i}
         ListFooterComponent={renderFooter}
         renderItem={renderItem}
         onEndReached={getrequestItem}
         onEndReachedThreshold={0.5}
-      />
-    </SafeAreaView>
+      /> : <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <Text>You must login to your requests.</Text>
+        <TouchableOpacity style={styles.signinButton} onPress={() => navigation.navigate("AuthStack")}>
+          <Text style={{ color: "#fff", fontSize: 16, fontWeight: 'bold' }}>Sign In</Text>
+        </TouchableOpacity>
+      </View> }
+    </View>
   );
 };
 
@@ -197,6 +208,19 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
   },
+  signinButton : {
+    width: 120, 
+    height :45, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    backgroundColor : "#F54D30", 
+    borderRadius : 10, 
+    marginTop : 10
+  }
 });
 
-export default Request24;
+const mapStateToProps = (state) => ({
+  userState: state
+})
+
+export default connect(mapStateToProps, null)(MyRequests);

@@ -7,8 +7,14 @@ import client from './src/constants/client';
 import { MenuProvider } from 'react-native-popup-menu';
 import AppNavigator from './src/navigations/AppNavigator';
 import Toast from 'react-native-toast-message';
+import Geocoder from 'react-native-geocoding';
+import { googleMapApiKey } from "./src/constants/googlemap";
+
 
 function App() {
+  useEffect(() => {
+    Geocoder.init(googleMapApiKey) //rescue
+  }, [])
   return (
     <ApolloProvider client={client}>
       <Provider store={store}>

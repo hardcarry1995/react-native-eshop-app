@@ -1,15 +1,36 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, SafeAreaView, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, SafeAreaView, ScrollView, ActivityIndicator } from 'react-native';
 import { imagePrefix } from '../../constants/utils';
 import Moment from 'moment';
-import { GET_RESPONSE_ITEMS } from '../../constants/queries';
+import { GET_RESPONSE_ITEMS, GET_TOP_LEVEL_RESPONSE_ITEMS, GET_HIERARCHY_RESPONSE_ITEMS } from '../../constants/queries';
 import AsyncStorage from '@react-native-community/async-storage';
-import client from '../../constants/client';
+// import client from '../../constants/client';
 import fileExtention from "file-extension";
 import RNFS from "react-native-fs";
 import FileViewer from "react-native-file-viewer";
 import { SliderBox } from "react-native-image-slider-box";
 import FontawesomeIcon from "react-native-vector-icons/FontAwesome";
+import { ApolloClient, InMemoryCache } from '@apollo/client';
+import url from '../../constants/api';
+
+const client = new ApolloClient({
+  uri: url,
+  cache: new InMemoryCache(),
+  defaultOptions: {
+    watchQuery: {
+      fetchPolicy: 'no-cache',
+      errorPolicy: 'ignore',
+    },
+    query: {
+      fetchPolicy: 'no-cache',
+      errorPolicy: 'all',
+    },
+  },
+  onError: ({ networkError, graphQLErrors }) => {
+    console.log('graphQLErrors', graphQLErrors);
+    console.log('networkError', networkError);
+  },
+});
 
 const Request25 = ({ navigation, route }) => {
   const data = route.params.data;
@@ -18,6 +39,7 @@ const Request25 = ({ navigation, route }) => {
   const [name_address, setname_address] = useState('');
   const [images, setImages ] = useState([]);
   const [documents, setDocuments] = useState([]);
+  const [loading ,setLoading] = useState(false);
 
   useEffect(() => {
     const files = data.mapItemRequestUploadDto;
@@ -36,46 +58,84 @@ const Request25 = ({ navigation, route }) => {
       setImages(imageFiles);
       setDocuments(documentFiles);
     }
-    getRequestItem();
   }, []);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      getRequestItem();
+    });
+    return unsubscribe;
+  }, [])
   
   const getRequestItem = async () => {
     let IsLogin = await AsyncStorage.getItem('IsLogin');
     if (IsLogin !== 'true') {
       navigation.navigate('AuthStack');
     } else {
+      setLoading(true);
       let token = await AsyncStorage.getItem('userToken');
       let id = data.itemRequestID
-      console.log(token);
       client
         .query({
-          query: GET_RESPONSE_ITEMS,
+          query: GET_TOP_LEVEL_RESPONSE_ITEMS,
           context: {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           },
           variables: {
-            id: id,
+            requestId: parseInt(id),
           },
         })
         .then(async result => {
-          if (result.data.getResponseItems) {
-            const companies = [];
-            const items = result.data.getResponseItems;
-            items.forEach((item, index) => {
-              const { companyId } = item;
-              if(!companies.includes(companyId)) companies.push(companyId);
+          const topLevelResponses = result.data.getTopLevelResponseItems;
+          let companies = topLevelResponses.map(response => {
+            return {
+              company: response.company,
+              msgs : [response]
+            }
+          });
+
+          client
+            .query({
+              query: GET_HIERARCHY_RESPONSE_ITEMS,
+              context: {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              },
+              variables: {
+                requestId: parseInt(id),
+              },
+            })
+            .then(async result => {
+              setLoading(false);
+              if (result.data.getHierarchyResponseItems) {
+                const msgs = [...result.data.getHierarchyResponseItems];
+                msgs.sort((a, b) => a.itemResponseId - b.itemResponseId);
+
+                msgs.forEach(msg => {
+                  const replyToId = msg.replyToId;
+                  if(replyToId == null ) return;
+                  companies.forEach((company, index) => {
+                    const containIndex = company.msgs.findIndex(m => m.itemResponseId == replyToId);
+                    if(containIndex > -1){
+                      companies[index].msgs.push(msg);
+                    }
+                  })
+                });
+                setVehicleData(companies);
+              } 
+            })
+            .catch(err => {
+             console.log(err);
+             setVehicleData(companies);
+             setLoading(false);
             });
-
-
-            setVehicleData(result.data.getResponseItems[0]);
-          } else {
-            Alert.alert('Failed', 'No Data Found')
-          }
         })
         .catch(err => {
           console.log('REQUEST_ITEM_GET_RESPONSE Error', err);
+          setLoading(false);
         });
     }
   };
@@ -101,6 +161,11 @@ const Request25 = ({ navigation, route }) => {
         // error
         console.log(error);
       });
+  }
+
+  const _onPressChatItem = (chat) => {
+    navigation.navigate('MarshNew26' , { requestData: data, mainChat : chat.msgs } );
+    // console.log("Msgs:", chat.msgs);
   }
 
   return (
@@ -170,7 +235,7 @@ const Request25 = ({ navigation, route }) => {
                   return (
                   <TouchableOpacity style={{ marginLeft : 10}} onPress={() => onPressDownloadFile(file)}>
                     <FontawesomeIcon name="file-pdf-o" color="red" size={36} />
-                  </TouchableOpacity> )
+                  </TouchableOpacity> ) 
                 }
                 if(file.ext == "doc" || file.ext == 'docx'){
                   return (
@@ -188,7 +253,6 @@ const Request25 = ({ navigation, route }) => {
               })}
             </View>
           </View>
-         
         </View>
 
         <View style={styles.main2}>
@@ -196,28 +260,26 @@ const Request25 = ({ navigation, route }) => {
             <Text style={{ color: '#9F1D20', fontSize: 21, padding: 15 }}>
               Selected Company
             </Text>
-
             {data.selectedCompany === null &&
               <Text style={{ color: '#232323', fontSize: 16, padding: 15, marginTop: -20 }}>
                 No Selected Company
-              </Text>
-            }
+              </Text>}
             {data.selectedCompany !== null &&
               <Text style={{ color: '#232323', fontSize: 16, padding: 15, marginTop: -20, }}>
                 {data.selectedCompany}
-              </Text>
-            }
+              </Text>}
           </View>
         </View>
+        { loading && <ActivityIndicator  />}
 
-        <View style={{ marginBottom: 40 }}>
+        {!loading && <View style={{ marginBottom: 40 }}>
           <View style={styles.main3}>
             <Text style={{ color: '#9F1D20', fontSize: 21, padding: 15 }}>
-              Responses({vehicleData == '' || vehicleData == undefined ? '0' : '1'})
+              Responses({vehicleData.length})
             </Text>
-            {vehicleData == undefined &&
+            {vehicleData.length == 0 &&
               <View>
-                <View style={styles.footer}>
+                {/* <View style={styles.footer}>
                   <View style={styles.inputContainer}>
                     <TextInput
                       style={styles.inputs}
@@ -228,47 +290,44 @@ const Request25 = ({ navigation, route }) => {
                     />
                   </View>
 
-                  <TouchableOpacity style={styles.btnSend}
+                  <TouchableOpacity 
+                    style={styles.btnSend}
                     onPress={() => {
-                      navigation.navigate('MarshNew26' ,{ requestData: data });
+                      navigation.navigate('MarshNew26' ,{ requestData: data, mainChat : null });
                     }}>
                     <Image
                       source={require('../../assets/M26_3.png')}
                       style={styles.iconSend}
                     />
                   </TouchableOpacity>
-                </View>
+                </View> */}
               </View>
             }
-            {vehicleData !== undefined &&
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <View>
-                  <Text style={{ color: '#232323', fontSize: 17, padding: 15, marginTop: -20, marginLeft: 10 }}>
-                    {vehicleData.createdBy ?? "Unknown"}
-                  </Text>
-                  <Text style={{ color: '#232323', fontSize: 15, padding: 15, marginTop: -23, marginLeft: 10, opacity: 0.7, }}>
-                    {vehicleData == '' ? 'Hello' : vehicleData.comment}
-                  </Text>
-                </View>
-                {/* <Image
-                  style={{ height: 10, width: 10, marginTop: -63, marginLeft: 77, }}
-                  source={require('../../assets/R25_1.png')}
-                  resizeMode="contain"
-                /> */}
-                <TouchableOpacity
-                  onPress={() => {
-                    navigation.navigate('MarshNew26' , { requestData: data } );
-                  }}>
+            {vehicleData.length > 0 &&
+            <View style={{ paddingHorizontal: 20}}>
+              {vehicleData.map(chat => (
+                <TouchableOpacity 
+                  style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15, paddingBottom: 10,  borderBottomWidth: 1, borderBottomColor: '#cecece'}}  
+                  onPress={() => _onPressChatItem(chat)}>
+                  <View>
+                    <Text style={{ color: '#232323', fontSize: 17 }}>
+                      {chat.company?.companyName}
+                    </Text>
+                    <Text style={{ color: '#232323', fontSize: 15, opacity: 0.7, marginTop: 5 }}>
+                      {chat.msgs[chat.msgs.length - 1].comment}
+                    </Text>
+                  </View>
                   <Image 
                     style={{ height: 20, width: 20, alignSelf: 'flex-end', marginRight: 20, }}
                     source={require('../../assets/R25_2.png')}
                     resizeMode="contain"
                   />
-                </TouchableOpacity>
-              </View>
+              </TouchableOpacity>
+              ))}
+            </View>
             }
           </View>
-        </View>
+        </View>}
       </ScrollView>
     </SafeAreaView>
   );
@@ -286,7 +345,6 @@ const styles = StyleSheet.create({
     paddingBottom: 10
   },
   main2: {
-    height: 105,
     backgroundColor: 'white',
     borderRadius: 15,
     shadowRadius: 20,
@@ -296,7 +354,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   main3: {
-    height: 145,
     backgroundColor: 'white',
     borderRadius: 15,
     shadowRadius: 20,

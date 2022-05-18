@@ -81,9 +81,9 @@ const CartItem = ({ item }) => {
         style={{width: 80, height: 100, marginLeft: 2, marginRight: 2}}
         source={ item.productImage ? {uri: `${imagePrefix}${item.productImage}`} : require('../assets/NoImage.jpeg') }
       />
-      <View style={{ marginLeft: 20, height: 100 }}>
+      <View style={{ marginLeft: 10, height: 100, flex: 1 }}>
         <View>
-          <Text style={{fontSize: 16}} numberOfLines={1}>
+          <Text style={{fontSize: 15, }} numberOfLines={1}>
             {item.productName}
           </Text>
           <Text style={{fontSize: 14 }}>
@@ -115,7 +115,8 @@ const styles = StyleSheet.create({
     height: 120,
     backgroundColor: '#FFFFFF',
     borderRadius: 15,
-    padding: 20,
+    paddingVertical: 20,
+    paddingHorizontal : 10,
     elevation: 24,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 1},

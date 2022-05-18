@@ -1,7 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import PrivacyPolicy from "../screens/PrivacyScreens/PrivacyPolicy";
-import HireProduct from "../screens/PrivacyScreens/HireProduct";
+import PrivacyPolicy from "../screens/HireScreens/PrivacyPolicy";
+import HireProduct from "../screens/HireScreens/HireProduct";
 import ScreenOptionsWithBack from "../components/ScreenOptionsWithBack";
 import ScreenOptions from "../components/ScreenOptions";
 

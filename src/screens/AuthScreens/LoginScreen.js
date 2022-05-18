@@ -210,6 +210,7 @@ function LoginScreen(props) {
         },
       })
       .then(async result => {
+        console.log("Login result:", result);
         setLoading(false);
         if (result.data.sSOLogin.success) {
           await AsyncStorage.setItem(
@@ -221,7 +222,6 @@ function LoginScreen(props) {
           decoded = JSON.parse(decoded);
           let userInfo = result.data.sSOLogin.result;
           userInfo.id = decoded.Id;
-          const resultData = Object.values(decoded);
           await AsyncStorage.setItem('userRole', decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']);
           await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
           props.setUserToken(result.data.sSOLogin.result.token);
@@ -260,7 +260,7 @@ function LoginScreen(props) {
             'Content-Length': 0,
           },
           variables: {
-            tokenData: jti,
+            jti: jti,
           },
         },
       })

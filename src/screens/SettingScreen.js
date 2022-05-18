@@ -39,6 +39,7 @@ function BidItem ({ item, onPressAddBid }) {
       setLastBidAmount(0);
     } else {
       setLastBidAmount(data.bidAmount);
+      setAmount(data.bidAmount.toFixed(2));
     }
 
     const  date = item.endDate;
@@ -78,13 +79,13 @@ function BidItem ({ item, onPressAddBid }) {
     }
     const result = await onPressAddBid(item, amount);
     if(result){
-      setLastBidAmount(amount);
+      setLastBidAmount(parseFloat(amount));
     }
   }
 
   const decrease = () => {
     if(disableDecrease) {
-      alert("Bid amount should be bigger that last bid amount!");
+      // alert("Bid amount should be bigger that last bid amount!");
       return;
     }
     var changeValue = lastBidAmount * 0.1;
@@ -171,13 +172,25 @@ function BidItem ({ item, onPressAddBid }) {
               </TouchableOpacity>
             </View>
             <View style={{flexDirection: "row", justifyContent: "center", marginBottom : 20}}>
-              <TouchableOpacity style={{ ...styles.decreaseBtn}} onPress={decrease} >
+              <TouchableOpacity 
+                style={{ 
+                  ...styles.decreaseBtn, 
+                  backgroundColor: disableDecrease ? "lightgrey" : styles.decreaseBtn.backgroundColor,
+                  borderColor: disableDecrease ? "lightgrey" : styles.decreaseBtn.backgroundColor
+                }} 
+                activeOpacity={disableDecrease ? 1 : 0.5}
+                onPress={decrease} 
+              >
                 <Image source={require('../assets/img/DownArrow.png')} />
                 <Text style={{ fontSize: 10, color: '#FAFAFA'}}>
                   decrease bid by 10%
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity style={{...styles.increaseBtn}} onPress={increase}>
+              <TouchableOpacity 
+                style={{...styles.increaseBtn}} 
+                onPress={increase}
+                activeOpacity={0.5}
+              >
                 <Text style={{ fontSize: 10, color: '#FAFAFA'}}>
                   increase bid by 10%
                 </Text>
@@ -290,7 +303,7 @@ export default class SettingsScreen extends React.Component {
           },
           variables: {
             productId: item.productID,
-            amount: amount,
+            amount: parseFloat(amount),
             userId: Number(this.state.userInfo.id)
           },
         })
@@ -395,11 +408,7 @@ export default class SettingsScreen extends React.Component {
   render() {
     return (
       <View style={{ flex: 1, backgroundColor: '#fff' }}>
-        <StatusBar
-          translucent
-          backgroundColor="transparent"
-          barStyle="dark-content"
-        />
+        <StatusBar translucent backgroundColor="transparent" barStyle="dark-content" />
         <ScrollView style={{ padding: 5, flex: 1 }}>
           <ProductSearchInput 
             onChangeText={(search) => this.filterItems(search)} 

@@ -280,7 +280,7 @@ export default class PrivacyPolicy extends React.Component {
                     })}
                   </View>
                   <Text style={{ fontSize: 10, marginLeft: 25, color: '#9f1d20', fontWeight: 'bold', marginTop: -3 }}>
-                    R {item.unitCost}
+                    R {item.unitCost.toFixed(2)}
                   </Text>
                 </View>
                 <Text numberOfLines={2} style={{ color: '#BBB' }}>
@@ -336,7 +336,7 @@ export default class PrivacyPolicy extends React.Component {
     }
     return (
       <Text style={{ fontSize: 12, color: '#DB3236', fontWeight: 'bold' }}>
-          R{this.state.hireData.unitCost * this.state.quantity * Moment(this.state.toDate).diff(this.state.fromDate, 'days')}
+          R{(this.state.hireData.unitCost * this.state.quantity * Moment(this.state.toDate).diff(this.state.fromDate, 'days')).toFixed(2)}
         </Text>
     );
   }

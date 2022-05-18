@@ -3,7 +3,8 @@ const initialState = {
   userToken: null,
   signInMethod: '',
   refered_by:'',
-  userRole : ''
+  userRole : '',
+  carts: []
 };
 
 export default function(state = initialState, action) {
@@ -35,6 +36,21 @@ export default function(state = initialState, action) {
         ...state,
         signInMethod: action.payload,
       };
+    case "GET_CARTS_ITEMS": 
+      return {
+        ...state,
+        carts : action.payload
+      }
+    case "ADD_CART": 
+      return {
+        ...state,
+        carts : [...state.carts, action.payload]
+      }
+    case "REMOVE_CART": 
+      return {
+        ...state,
+        carts : state.carts.filter(cart => cart.productID !== action.payload)
+      }
     default:
       return state;
   }

@@ -1,15 +1,74 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import moment from 'moment';
 import { imagePrefix } from '../../constants/utils';
+import { GET_ORDER_STATUS } from "../../constants/queries";
+import client from '../../constants/client';
 import fileExtention from "file-extension";
 import RNFS from "react-native-fs";
 import FileViewer from "react-native-file-viewer";
 import Toast from "react-native-toast-message";
+import ImageLoad from 'react-native-image-placeholder';
+import Timeline from 'react-native-timeline-flatlist';
+import { Icon } from 'react-native-elements'
+import { connect } from "react-redux";
 
 const Order = ({ route, ...props}) => {
   const { orderDate, orderAmount, orderIdstring, prdOrderStatus, prdOrderDetails } = route.params.order;
   const [ downloadingFile, setDownloadingFile ] = useState(false);
+  const [ timelineData, setTimeline] = useState([]);
+  const [orderStatus, setOrderStatus ] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const token = props.userState.user.token;
+    setLoading(true);
+    client
+      .query({
+        query : GET_ORDER_STATUS,
+        context: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+        },
+      })
+      .then(response => {
+        const orderStatusData  = response.data.prdOrderStatusTypes.data;
+        let data = orderStatusData.map((item) => ({
+          id: item.orderStatusTypeId,
+          time : null,
+          title : item.statusName,
+          circleColor : 'lightgrey',
+          lineColor : 'lightgrey',
+          sequenceId : item.statusSequence
+        }));
+
+        prdOrderStatus.map((item) => { 
+          const { orderStatusTypeId, createdDate } = item;
+          const index = data.findIndex(d => d.id == orderStatusTypeId);
+          if(index === -1 ) return;
+          data[index].time = moment(createdDate).format('h:mm A');
+          data[index].icon = <Icon name='check' type="feather" color='#fff' size={20}  />;
+          data[index].circleColor = orderStatusTypeId == 4 ? "red" : "#007AFF";
+          data[index].lineColor = orderStatusTypeId == 4 ? "red" : "#007AFF";
+          return null;
+        });
+
+        const paymentFailedIndex = data.findIndex(d => d.id == 4);
+        if(data[paymentFailedIndex].time == null) {
+          data = data.filter(d => d.id !== 4);
+        }
+
+        data.sort((a, b) => a.sequenceId > b.sequenceId);
+
+        setTimeline(data);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.log(error);
+        setLoading(false);
+      })
+  }, [])
 
   downloadDocument = (mapDocument) => {
     const document = mapDocument[0];
@@ -17,7 +76,7 @@ const Order = ({ route, ...props}) => {
       uploadPath : document.documentPath,
       ext: fileExtention(document.documentPath)
     }
-    const fullUrl = `${imagePrefix}${file.uploadPath}`.replace("\\", "/");
+    const fullUrl = `${imagePrefix}${file.uploadPath}`.replace("\\", "/").replaceAll(" ", "%20");
     const tempfilename = `temperary_${Date.now()}.${file.ext}`;
     const localFile = `${RNFS.DocumentDirectoryPath}/${tempfilename}`;
     const options = {
@@ -52,7 +111,7 @@ const Order = ({ route, ...props}) => {
   }
 
   return (
-    <View>
+    <ScrollView>
       <View style={styles.header}>
         <Text style={{ fontSize: 12, color: "#888"}}>Order : {orderIdstring}</Text>
         <View>
@@ -71,9 +130,10 @@ const Order = ({ route, ...props}) => {
             }
 
             return (<View key={index} style={styles.productContainer}>
-              <Image  
+              <ImageLoad  
                 source={ prdImagePath ? { uri : `${imagePrefix}${prdImagePath}`} : require('../../assets/NoImage.jpeg')}
                 style={styles.productImage}
+                placeholderSource={require('../../assets/NoImage.jpeg')}
               />
               <View style={{ marginLeft: 10}}>
                 <Text style={styles.productName} numberOfLines={1}>{products.productName}</Text>
@@ -92,12 +152,26 @@ const Order = ({ route, ...props}) => {
             <Text style={{ color: "#333", fontWeight: '600'}}>Return</Text>
           </TouchableOpacity>
         </View>
+
+        <View style={{ flex: 1, marginTop : 20, marginBottom : 20}}>
+          <Timeline  
+            data={timelineData} 
+            titleStyle={{ marginTop: -10, marginBottom: 30, fontSize : 20, fontWeight: '600'}}
+            circleSize={30}
+            timeStyle={{ marginTop: 5}}
+            innerCircle={'icon'}
+          />
+        </View>
       </View>
-    </View>
+    </ScrollView>
   )
 }
 
-export default Order
+const mapStateToProps = (state) => ({
+  userState : state
+})
+
+export default connect(mapStateToProps, null)(Order);
 
 const styles = StyleSheet.create({
   header : {

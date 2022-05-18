@@ -1,27 +1,91 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Image, Alert, Dimensions, TextInput, FlatList, Modal, ToastAndroid, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, Image, Alert, Dimensions, TextInput, FlatList, Modal, ToastAndroid, Keyboard, ActivityIndicator } from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
-import { REQUEST_ITEM_POST_RESPONSE, GET_RESPONSE_ITEMS } from '../../constants/queries';
+import { REQUEST_ITEM_POST_RESPONSE, GET_INCOMING_HIERARCHY_RESPONSE_ITEMS, UPDATE_REQUEST_ITEM_RESPONSE } from '../../constants/queries';
 import AsyncStorage from '@react-native-community/async-storage';
 import client from '../../constants/client';
 import { decode } from 'base-64';
+import { connect } from "react-redux";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import moment from "moment";
+import IonIcon from "react-native-vector-icons/Ionicons";
 
-const Marsh26 = ({ navigation, route }) => {
-  const [msgData, setmsgData] = useState([]);
+
+const IncomingRequestChat = ({ navigation, route, userState }) => {
+  const [msgData, setmsgData] = useState(route.params.mainChat);
   const [msgDataNew, setmsgDataNew] = useState([]);
   const [name_address, setname_address] = useState('');
   const [modalVisible, setmodalVisibler] = useState(false);
-  const [token, SetToken] = useState('');
+  const [token, SetToken] = useState(userState.user.token);
   const [userInfo, setUserInfo] = useState([]);
   const [jsondata, Setjsondata] = useState('');
-  const [idTo, setIdData] = useState('');
+  const [requestId, setIdData] = useState(route.params.requestData.itemRequestID);
+  const [replyToId, setReplyToId] = useState(route.params.mainChat.length > 0 ? route.params.mainChat[route.params.mainChat.length - 1].itemResponseId : null);
   const [loading, setLoading] = useState(false);
   const [filePath, setFilePath] = useState('')
   const [fileName, setFileName] = useState(null)
+  const [isLoaded, setLoaded] = useState(false);
+
+  const flatlistRef = useRef(0);
+  const scrollViewRef= useRef(0);
 
   useEffect(() => {
+    if(!isLoaded){
       getToken();
+    }
   }, []);
+
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
+      // if(flatlistRef.current){
+      //   flatlistRef.current.scrollToEnd();
+      // }
+      if(scrollViewRef.current){
+        scrollViewRef.current.scrollToEnd();
+      }
+    });
+
+    return () => {
+      showSubscription.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    msgData.map(msg => {
+      let inMessage = msg.companyId == 0;
+      if(inMessage && msg.statusId != 2 ){
+        client
+          .mutate({
+            mutation: UPDATE_REQUEST_ITEM_RESPONSE,
+            context: {
+              headers: {
+                Authorization: `Bearer ${token}`
+              },
+            },
+            variables: {
+              comment: msg.comment,
+              companyId: msg.companyId,
+              createdBy: msg.createdBy,
+              createdDate: msg.createdDate,
+              isAccepted: true,
+              isActive: msg.isActive,
+              isRejected: msg.isRejected,
+              itemRequestId: msg.itemRequestId,
+              itemResponseId: msg.itemResponseId,
+              modifiedBy: msg.modifiedBy,
+              modifiedDate: msg.modifiedDate,
+              replyToId: msg.replyToId,
+              responseDate: msg.responseDate,
+              userId: msg.userId,
+            }
+          })
+          .catch(error => { 
+            console.log(error);
+          })
+      }
+
+    });
+  }, []) 
 
   const setModalVisible = visible => {
     setmodalVisibler(visible);
@@ -34,8 +98,8 @@ const Marsh26 = ({ navigation, route }) => {
     setUserInfo({...jsondata, ...decoded});
     SetToken(token)
     Setjsondata(jsondata)
-    getRequestItemNext();
-    setIdData(route.params.requestData.itemRequestID)
+    // getRequestItemNext();
+    setLoaded(true);
   }
 
   const requestItem = () => {
@@ -54,45 +118,35 @@ const Marsh26 = ({ navigation, route }) => {
         },
         variables: {
           title: name_address,
-          itemRequestId: route.params.requestData.itemRequestID,
+          itemRequestId: requestId,
           userId: Number(jsondata.id),
           companyId: parseInt(userInfo.companyId),
           filePath: filePath,
-          fileName: fileName
+          fileName: fileName,
+          replyToId: replyToId
         },
       })
       .then(async result => {
-          setname_address('')
+        const { comment, companyId, createdDate, isAccepted, isActive, isRejected, itemRequestId, itemResponseId, mapItemResponseUpload, responseDate, userId  } = result.data.postMstItemResponse;
+        setname_address('')
           setmsgDataNew([])
           let tdata = {
-            comment: name_address,
-            companyId: null,
+            comment: comment,
+            companyId: parseInt(companyId),
             createdBy: null,
-            createdDate: null,
-            isAccepted: null,
-            isActive: null,
-            isRejected: null,
-            itemRequestId: 11035,
-            itemResponseId: 4302,
-            mapItemResponseUpload: [
-              {
-                createdBy: null,
-                createdDate: "2015-08-14T13:27:23.747",
-                documentName: fileName,
-                irUploadId: 1192,
-                isActive: true,
-                itemResponseId: 4456,
-                modifiedBy: null,
-                modifiedDate: null,
-                uploadPath: filePath,
-                __typename: "MapItemResponseUploadType"
-              }
-            ],
+            createdDate: createdDate,
+            isAccepted: isAccepted,
+            isActive: isActive,
+            isRejected: isRejected,
+            itemRequestId: itemRequestId,
+            itemResponseId: itemResponseId,
+            mapItemResponseUpload: mapItemResponseUpload,
             modifiedBy: null,
             modifiedDate: null,
             replyToId: null,
-            responseDate: "2015-06-23T17:35:44.68",
-            userId: null
+            statusId: 1,
+            responseDate: responseDate,
+            userId: userId
           };
           if (msgData.length > 0) {
             let i = -1;
@@ -106,9 +160,7 @@ const Marsh26 = ({ navigation, route }) => {
 
           setmsgData(msgDataNew)
           setLoading(false)
-        // } else {
-          // Alert.alert('Failed', result.data.postMstItemResponse.message)
-        // }
+          setReplyToId(itemResponseId);
       })
       .catch(err => {
         console.log(err);
@@ -118,26 +170,24 @@ const Marsh26 = ({ navigation, route }) => {
     navigation.navigate('ShowPDF', { pdfPath: item });
   }
   const getRequestItemNext = () => {
-    let id = route.params.requestData.itemRequestID
-    console.log(id)
     client
       .query({
-        query: GET_RESPONSE_ITEMS,
+        query: GET_INCOMING_HIERARCHY_RESPONSE_ITEMS,
         context: {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${userState.user.token}`,
           },
         },
         variables: {
-          id: id,
+          requestId: parseInt(requestId),
+          replyToId: parseInt(replyToId)
         },
       })
       .then(async result => {
-        console.log("REsult:", result.data);
-        if (result.data.getResponseItems) {
-          setmsgData(result.data.getResponseItems);
+        if (result.data.getIncommingHierarchyResponseItems) {
+          console.log(result.data.getIncommingHierarchyResponseItems);
+          setmsgData(prev => [...prev, ...result.data.getIncommingHierarchyResponseItems]);
         } else {
-          Alert.alert('Failed', 'No Data Found')
         }
       })
       .catch(err => {
@@ -163,138 +213,146 @@ const Marsh26 = ({ navigation, route }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          Alert.alert('Modal has been closed.');
-          setModalVisible(!modalVisible);
-        }}>
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={{ marginTop: 20, fontSize: 15 }}>
-              Would you like to accept the offer
-            </Text>
-            <View style={{ flexDirection: 'row' }}>
-              <TouchableOpacity
-                style={[styles.button, styles.buttonClo]}
-                onPress={() => setModalVisible(false)}>
-                <Text style={styles.textStyle}>Purchase</Text>
-                <Image
-                  style={{
-                    resizeMode: 'center',
-                    height: 15,
-                    width: 15,
-                    marginTop: -17,
-                    marginLeft: 10,
-                  }}
-                  source={require('../../assets/noun_Check.png')}
-                />
-              </TouchableOpacity>
+    <KeyboardAwareScrollView ref = {scrollViewRef} contentContainerStyle={{ flex : 1}}>
+      <View style={styles.container}>
+        <FlatList
+          ref={flatlistRef}
+          style={styles.list}
+          data={msgData}
+          keyExtractor={item => {
+            return item.id;
+          }}
+          renderItem={comment => {
+            const item = comment.item;
+            let inMessage = item.companyId == 0;
+            let itemStyle = inMessage ? styles.itemIn : styles.itemOut;
+            return (
+              <View key={comment.index}>
+                <View style={itemStyle}>
+                  <View style={styles.balloon}>
+                    <Text>{item.comment}</Text>
+                  </View>
+                  <View style={{ flexDirection: 'row', justifyContent: 'flex-end', paddingRight: 10, paddingBottom : 5, alignItems: 'center', }}>
+                    <Text style={{fontSize: 12, color: "#666", marginTop: 2}}>{moment(item.createdDate).format("HH:mm")}</Text>
+                    {(item.statusId == 1 && !inMessage) && <IonIcon name="checkmark" color="#0AA1DD" /> }
+                    {(item.statusId == 2 && !inMessage) && <IonIcon name="checkmark-done" color="#0AA1DD" /> }
+                  </View>
+                </View>
+                {item.mapItemResponseUpload[0]?.documentName && (
+                  <View style={{ alignSelf: 'flex-end' }}>
+                    <TouchableOpacity onPress={() => showPDFOnClick(item.mapItemResponseUpload[0].uploadPath)}>
+                      <View style={styles.itemOutNew}>
+                        <View>
+                          <Image
+                            source={require('../../assets/PDFSHOW.png')}
+                            style={{ width: 20, height: 20, marginRight: 5, marginTop: 0, }}
+                            resizeMode="contain"
+                          />
+                        </View>
+                        <View >
+                          <Text>{item.mapItemResponseUpload[0]?.documentName}</Text>
+                        </View>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
+            );
+          }}
+        />
+        <View style={styles.footer}>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.inputs}
+              placeholder="Write a message..."
+              underlineColorAndroid="transparent"
+              value={name_address}
+              onChangeText={name_address => setname_address(name_address)}
+              multiline
+            />
+            <TouchableOpacity onPress={() => selectFileDoc()}>
+              <Image
+                style={{ height: 24, width: 17, marginRight: 10 }}
+                source={require('../../assets/M26_1.png')}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
 
-              <TouchableOpacity style={[styles.butt, styles.buttonClose]}
-                onPress={() =>
-                  navigation.goBack()}>
-                <Text style={styles.textSty}>Decline</Text>
-                <Image
-                  style={{
-                    resizeMode: 'center',
-                    height: 15,
-                    width: 15,
-                    marginTop: -17,
-                    marginLeft: 10,
-                  }}
-                  source={require('../../assets/cros.png')}
-                />
-              </TouchableOpacity>
+            <TouchableOpacity onPress={() => setModalVisible(true)}>
+              <Image
+                style={{ height: 22, width: 15, marginRight: 19 }}
+                source={require('../../assets/M26_2.png')}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity style={styles.btnSend}
+            onPress={() => {
+              requestItem();
+            }}>
+            {loading ? (
+              <ActivityIndicator color="#000" />
+            ) : (
+              <Image
+                source={require('../../assets/M26_3.png')}
+                style={styles.iconSend}
+                resizeMode="contain"
+              />
+            )}
+          </TouchableOpacity>
+        </View>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            Alert.alert('Modal has been closed.');
+            setModalVisible(!modalVisible);
+          }}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={{ marginTop: 20, fontSize: 15 }}>
+                Would you like to accept the offer
+              </Text>
+              <View style={{ flexDirection: 'row' }}>
+                <TouchableOpacity
+                  style={[styles.button, styles.buttonClose]}
+                  onPress={() => setModalVisible(false)}>
+                  <Text style={styles.textStyle}>Purchase</Text>
+                  <Image
+                    style={{
+                      resizeMode: 'center',
+                      height: 15,
+                      width: 15,
+                      marginTop: -17,
+                      marginLeft: 10,
+                    }}
+                    source={require('../../assets/noun_Check.png')}
+                  />
+                </TouchableOpacity>
+
+                <TouchableOpacity style={[styles.butt, styles.buttonClose]}
+                  onPress={() =>
+                    navigation.goBack()}>
+                  <Text style={styles.textSty}>Decline</Text>
+                  <Image
+                    style={{
+                      resizeMode: 'center',
+                      height: 15,
+                      width: 15,
+                      marginTop: -17,
+                      marginLeft: 10,
+                    }}
+                    source={require('../../assets/cros.png')}
+                  />
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
-      </Modal>
-
-      <FlatList
-        style={styles.list}
-        data={msgData}
-        keyExtractor={item => {
-          return item.id;
-        }}
-        renderItem={comment => {
-          const item = comment.item;
-          let inMessage = '';
-          let itemStyle = inMessage ? styles.itemIn : styles.itemOut;
-          return (
-            <View>
-              <View style={styles.itemOut}>
-                <View style={styles.balloon}>
-                  <Text>{item.comment}</Text>
-                </View>
-              </View>
-              {item.mapItemResponseUpload[0]?.documentName && (
-                <View style={{ alignSelf: 'flex-end' }}>
-                  <TouchableOpacity onPress={() => showPDFOnClick(item.mapItemResponseUpload[0].uploadPath)}>
-                    <View style={styles.itemOutNew}>
-                      <View>
-                        <Image
-                          source={require('../../assets/PDFSHOW.png')}
-                          style={{ width: 20, height: 20, marginRight: 5, marginTop: 0, resizeMode: 'contain' }}
-                        />
-                      </View>
-                      <View >
-                        <Text>{item.mapItemResponseUpload[0]?.documentName}</Text>
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-              )}
-            </View>
-          );
-        }}
-      />
-
-      <View style={styles.footer}>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.inputs}
-            placeholder="Write a message..."
-            underlineColorAndroid="transparent"
-            value={name_address}
-            onChangeText={name_address => setname_address(name_address)}
-          />
-          <TouchableOpacity onPress={() => selectFileDoc()}>
-            <Image
-              style={{ height: 24, width: 17, marginRight: 10 }}
-              source={require('../../assets/M26_1.png')}
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => setModalVisible(true)}>
-            <Image
-              style={{ height: 22, width: 15, marginRight: 19 }}
-              source={require('../../assets/M26_2.png')}
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
-        </View>
-
-        <TouchableOpacity style={styles.btnSend}
-          onPress={() => {
-            requestItem();
-          }}>
-          {loading ? (
-            <ActivityIndicator color="#000" />
-          ) : (
-            <Image
-              source={require('../../assets/M26_3.png')}
-              style={styles.iconSend}
-              resizeMode="contain"
-            />
-          )}
-        </TouchableOpacity>
+        </Modal>
       </View>
-    </View>
+    </KeyboardAwareScrollView>
   );
 }
 
@@ -332,6 +390,7 @@ const styles = StyleSheet.create({
     height: 40,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     flex: 1,
     marginRight: 10,
   },
@@ -339,14 +398,20 @@ const styles = StyleSheet.create({
     height: 40,
     marginLeft: 16,
     flex: 1,
+    paddingTop: 10
   },
   balloon: {
     maxWidth: 250,
-    padding: 15,
+    paddingHorizontal : 15,
+    paddingTop: 15,
     borderRadius: 20,
   },
   itemIn: {
     alignSelf: 'flex-start',
+    backgroundColor: 'lightgrey',
+    elevation: 4,
+    margin: 5,
+    borderRadius: 15
   },
   itemOut: {
     alignSelf: 'flex-end',
@@ -444,4 +509,8 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Marsh26;
+const mapStateToProps = (state) => ({
+  userState: state
+})
+
+export default connect(mapStateToProps, null)(IncomingRequestChat);

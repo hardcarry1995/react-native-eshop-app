@@ -10,8 +10,6 @@ import MapView, { Marker } from 'react-native-maps';
 import RNPickerSelect from 'react-native-picker-select';
 import CategorySelector from "../components/CategorySelector";
 
-Geocoder.init("AIzaSyCNjKB84RyfVRuvuU8sCcQT6uWB_wVY03s") //rescue
-
 const RequestItem = ({ navigation, route }) => {
   const [switchValue, setSwitchValue] = useState(false);
   const [province, setProvince] = useState([]);
@@ -31,8 +29,8 @@ const RequestItem = ({ navigation, route }) => {
   const [categoryId, setCategoryId] = useState('');
   const [subCategoryId, setSubCategoryId] = useState('');
   const [subCategoryName, setSubCategoryName] = useState('');
-
   const [mapRegion, setMapReson] = useState();
+
   const title = "";
   const desc = "";
   const startdate = "";
@@ -386,8 +384,6 @@ const RequestItem = ({ navigation, route }) => {
         console.log(err);
       });
   };
-
-
 
 
   return (

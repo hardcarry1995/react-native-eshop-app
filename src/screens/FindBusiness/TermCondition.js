@@ -6,6 +6,10 @@ import { imagePrefix } from '../../constants/utils';
 import { GET_BUSINESS } from '../../constants/queries';
 import client from '../../constants/client';
 import { GetRating } from '../../components/GetRating';
+import ProductSearchInput from "../../components/ProductSearchInput";
+import CategorySelector from "../../components/CategorySelector";
+import { Chip } from "react-native-elements";
+
 
 const TermCondition = ({ navigation }) => {
   const [data, setData] = useState([])
@@ -20,6 +24,10 @@ const TermCondition = ({ navigation }) => {
   const [loadMoreNext, setLoadMoreNext] = useState(true);
   const [userToken, setUserToken] = useState('');
   const [userInfo, setUserInfo] = useState([]);
+  const [showCategorySelector, setShowCategorySelector] = useState(false);
+  const [categoriesForSearch, setCategoriesForSearch] = useState([]);
+  const [searchText, setSearchText] = useState('');
+  const [filteredData, setFilteredData] = useState([]);
 
   const starImageFilled = 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png';
   const starImageCorner = 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png';
@@ -29,8 +37,7 @@ const TermCondition = ({ navigation }) => {
 
   const handleSearch = (text) => {
     settextnew(text)
-    let vdata = dataSave.filter(i =>
-      i.companyName.toLowerCase().includes(text.toLowerCase()))
+    let vdata = dataSave.filter(i => i.companyName.toLowerCase().includes(text.toLowerCase()))
     setData(vdata);
     setLoadMoreNext(false);
   };
@@ -55,14 +62,16 @@ const TermCondition = ({ navigation }) => {
             },
           },
           variables: {
-            userId: Number(userInfo?.id),
-            size: offset
+            size: offset,
+            categories : categoriesForSearch.map(cat => cat.categoryId).join(","),
+            title: searchText == '' ? null : searchText
           },
         })
         .then(async result => {
           if (result.data.getBusinessList.success) {
             setData(result.data.getBusinessList.result)
             setDataSave(result.data.getBusinessList.result)
+            setOffset(10);
             setLoading(false);
           } else {
             setIsListEnd(true);
@@ -87,13 +96,15 @@ const TermCondition = ({ navigation }) => {
             },
           },
           variables: {
-            userId: Number(userInfo?.id),
-            size: offset
+            size: offset,
+            categories : categoriesForSearch.map(cat => cat.categoryId).join(","),
+            title: searchText == '' ? null : searchText
           },
         })
         .then(async result => {
           if (result.data.getBusinessList.success) {
             setData(result.data.getBusinessList.result)
+            setFilteredData(result.data.getBusinessList.result);
             setDataSave(result.data.getBusinessList.result)
             setOffset(offset + 10);
             setLoading(false);
@@ -160,23 +171,53 @@ const TermCondition = ({ navigation }) => {
     </View>
   );
   
+  useEffect(() =>{
+    if(userToken != ''){
+      getrequestItemtt(userToken);
+    }
+  }, [searchText, categoriesForSearch]);
+
+  filterItems = (keyword) => {
+    setSearchText(keyword);
+  }
+
+  _onSelectCategoryDone = (categories) => {
+    setCategoriesForSearch(categories);
+    setShowCategorySelector(false);
+  } 
+
+  _onPressSelectedCategory = (item) => {
+    const items = categoriesForSearch.filter((cat) => cat.categoryId != item.categoryId);
+    setCategoriesForSearch(items);
+  }
+
+
+
   return (
     <SafeAreaView>
       <ScrollView>
         <View>
-          <View style={styles.SectionStyle}>
-            <Image
-              source={require('../../assets/search.png')}
-              style={styles.ImageStyle}
-            />
-
-            <TextInput
-              style={{ flex: 1 }}
-              placeholder="Search for a business"
-              underlineColorAndroid="transparent"
-              onChangeText={queryText => handleSearch(queryText)}
-            />
-          </View>
+          <ProductSearchInput 
+            onChangeText={(search) => filterItems(search)} 
+            onPressFilterIcon={() => setShowCategorySelector(true)}
+          />
+          {categoriesForSearch.length > 0 && <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom : 20, paddingHorizontal : 10 }}>
+            {categoriesForSearch.map(item => (
+              <Chip 
+                title={item.categoryName}
+                icon={{
+                  name: 'close',
+                  type: 'font-awesome',
+                  size: 14,
+                  color: 'white',
+                }}
+                onPress={() => this._onPressSelectedCategory(item)}
+                iconRight
+                titleStyle={{ fontSize: 10 }}
+                buttonStyle={{ backgroundColor: '#F54D30', marginBottom: 5}}
+              />
+            ))}
+          </View>}
           <FlatList
             data={data}
             keyExtractor={(item, i) => i}
@@ -188,6 +229,10 @@ const TermCondition = ({ navigation }) => {
         </View>
         <View style={{ marginBottom: 20 }}></View>
       </ScrollView>
+      <CategorySelector 
+        visible={showCategorySelector} 
+        onDone={(values) => _onSelectCategoryDone(values)}
+      />
     </SafeAreaView>
   );
 };

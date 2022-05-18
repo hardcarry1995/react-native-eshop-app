@@ -7,9 +7,10 @@ import client from '../constants/client';
 import AsyncStorage from '@react-native-community/async-storage';
 import moment from 'moment';
 import { Rating } from 'react-native-elements';
+import Toast from "react-native-toast-message";
+import { connect } from "react-redux";
 
-export default class ProductDetail extends React.Component {
-
+class ProductDetail extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -25,7 +26,6 @@ export default class ProductDetail extends React.Component {
   }
 
   async componentDidMount() {
-    console.log("Sale:", this.props.route.params.data.productID);
     let token = await AsyncStorage.getItem('userToken');
     client.query({
       query: GET_PRODUCT_RATING,
@@ -52,8 +52,6 @@ export default class ProductDetail extends React.Component {
     } else {
       let userInfo = await AsyncStorage.getItem('userInfo');
       let token = await AsyncStorage.getItem('userToken');
-      console.log(token);
-
       client
         .mutate({
           mutation: CREATE_FAVOURITES_PRODUCT,
@@ -84,7 +82,6 @@ export default class ProductDetail extends React.Component {
   }
   
   addToCart = async (id) => {
-    console.log(id)
     let IsLogin = await AsyncStorage.getItem('IsLogin');
     let userToken = await AsyncStorage.getItem('userToken');
     if (IsLogin !== 'true') {
@@ -106,11 +103,12 @@ export default class ProductDetail extends React.Component {
         .then(result => {
           this.setState({ cartLoading: false });
           if (result.data.postPrdShoppingCartOptimized.success) {
-            if(Platform.OS === 'android') {
-              ToastAndroid.show('Product added to cart', ToastAndroid.SHORT);
-            } else {
-              alert('Product added to cart');
-            }
+            Toast.show({
+              type: 'success',
+              text1: "Success",
+              text2: 'Product added to cart'
+            })
+            this.props.addProductToCart(result.data.postPrdShoppingCartOptimized.result.prdShoppingCartDto)
             this.props.navigation.navigate('CartStack')
           }
         })
@@ -119,8 +117,8 @@ export default class ProductDetail extends React.Component {
           console.log(err);
         });
     } else {
-      let userToken1 = await AsyncStorage.getItem('userToken');
       let userInfo = await AsyncStorage.getItem('userInfo');
+      console.log(userToken);
       let userID = JSON.parse(userInfo)
       client
         .mutate({
@@ -128,26 +126,26 @@ export default class ProductDetail extends React.Component {
           fetchPolicy: 'no-cache',
           variables: {
             pid: id,
-            userid: Number(userID.id),
-            dateCreated: moment().toISOString()
+            userid: 0,
+            dateCreated: moment().toISOString(),
           },
           context: {
             headers: {
-              Authorization: `Bearer ${userToken1}`,
+              Authorization: `Bearer ${userToken}`,
               'Content-Length': 0,
             },
           },
         })
         .then(result => {
           if (result.data.postPrdShoppingCartOptimized.success) {
-            if(Platform.OS == "android"){
-              ToastAndroid.show('Product added to cart', ToastAndroid.SHORT);
-            } else {
-              alert('Product added to cart');
-            }
+            Toast.show({
+              type: 'success',
+              text1: "Success",
+              text2: 'Product added to cart'
+            })
+            this.props.addProductToCart(result.data.postPrdShoppingCartOptimized.result.prdShoppingCartDto)
             this.props.navigation.navigate('CartStack')
           } else {
-            console.log(result.data.postPrdShoppingCartOptimized)
           }
         })
         .catch(err => {
@@ -181,12 +179,14 @@ export default class ProductDetail extends React.Component {
               {this.state.reviewCount} Reviews
             </Text>
           </View>
+          
           <View style={{ flexDirection: 'row', paddingTop: 0, paddingBottom: 10 }}>
             <Text style={{ fontSize: 25, fontWeight: '500' }}>R {data.unitCost.toFixed(2)}</Text>
-            {data.originalUnitCost && <Text style={{ fontSize: 9, color: 'gray', marginLeft: 10, marginTop: 16, fontWeight: '500', textDecorationLine: "line-through" }}>
+            {!!data.originalUnitCost && <Text style={{ fontSize: 9, color: 'gray', marginLeft: 10, marginTop: 16, fontWeight: '500', textDecorationLine: "line-through" }}>
               R {data.originalUnitCost.toFixed(2)}
             </Text>}
           </View>
+
           <Text>Free Delivery</Text>
           <View style={{ height: 1, width: '100%', backgroundColor: '#AAA', marginVertical: 5, }} />
           <Text style={{ fontSize: 18 }}>Describtion</Text>
@@ -296,3 +296,12 @@ export default class ProductDetail extends React.Component {
     );
   }
 }
+
+const mapDispatchToProps = (dispatch) => ({
+  addProductToCart : value => dispatch({
+    type: "GET_CARTS_ITEMS",
+    payload : value
+  })
+})
+
+export default connect(null, mapDispatchToProps)(ProductDetail)

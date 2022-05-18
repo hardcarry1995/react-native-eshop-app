@@ -6,9 +6,9 @@ import AsyncStorage from '@react-native-community/async-storage';
 import client from '../../constants/client';
 import Swipeout from 'react-native-swipeout';
 import moment from 'moment';
+import { connect } from "react-redux";
 
-
-export default class Workout extends React.PureComponent {
+class Workout extends React.PureComponent {
 
   constructor(props) {
     super(props);
@@ -26,17 +26,23 @@ export default class Workout extends React.PureComponent {
       AllDAtaAdd: [],
       checkoutLoading: false,
     };
+
+    this.interval = null;
   }
 
 
   componentDidMount() {
     this.setState({ firstcartLoading: true });
     this.fetchToken();
-    this.interval = setInterval(() =>
-      this.fetchToken()
-      , 5000
+    this.interval = setInterval(() => {
+        this.fetchToken()
+      },
+      5000
     );
-    return () => {
+  }
+
+  componentWillUnmount(){
+    if(this.interval){
       clearInterval(this.interval);
     }
   }
@@ -180,6 +186,7 @@ export default class Workout extends React.PureComponent {
       .then(result => {
         if (result.data.deletePrdShoppingCart.success) {
           this.setState({ cartLoading: false });
+          this.props.setCarts(result.data.deletePrdShoppingCart.result.prdShoppingCartDto);
         } else {
           ToastAndroid.show(
             result.data.deletePrdShoppingCart.message,
@@ -319,6 +326,15 @@ export default class Workout extends React.PureComponent {
     );
   }
 }
+
+const mapDispatchToProps = (dispatch) => ({
+  setCarts : value => dispatch({
+    type: "GET_CARTS_ITEMS",
+    payload : value
+  })
+})
+
+export default connect(null, mapDispatchToProps)(Workout);
 
 const styles = StyleSheet.create({
   bottomView: {

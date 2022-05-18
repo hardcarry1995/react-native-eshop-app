@@ -2,7 +2,7 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ContactUs from "../screens/CatalogueScreens/ContactUs";
 import CatalogueNew from "../screens/CatalogueScreens/CatalogueNew";
-import RateandReview from "../screens/TermConditionScreens/RateandReview";
+import RateandReview from "../screens/FindBusiness/RateandReview";
 import ScreenOptionsWithBack from "../components/ScreenOptionsWithBack";
 import ScreenOptions from "../components/ScreenOptions";
 

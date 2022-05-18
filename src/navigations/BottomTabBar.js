@@ -3,6 +3,11 @@ import { Text, View, Image, TouchableOpacity, Keyboard, SafeAreaView, StyleSheet
 import { Avatar } from 'react-native-elements';
 import { ifIphoneX } from 'react-native-iphone-x-helper'
 import Colors from '../constants/colors';
+import Constants from '../constants/constant';
+import { connect } from "react-redux";
+import client from '../constants/client';
+import { GET_SHOPPING_CART } from '../constants/queries';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const Tab = ({ title, activeImage, unactiveImage, onPress, isFocused, isShowBadge, badge_value }) => {
   return (
@@ -18,7 +23,7 @@ const Tab = ({ title, activeImage, unactiveImage, onPress, isFocused, isShowBadg
               title={badge_value}
               containerStyle={{ marginLeft: 40 }}
               overlayContainerStyle={{ backgroundColor: Colors.red }}
-              titleStyle={{ color: '#fff' }}
+              titleStyle={{ color: '#fff', fontWeight: 'bold', fontSize: 14 }}
             />
           </View>
         )}
@@ -45,9 +50,10 @@ class TabBar extends React.Component {
     super(props);
     this.state = {
       isVisible: true,
+      cartCount: 0
     };
   }
-  componentDidMount() {
+  async componentDidMount() {
     this.keyboardWillShowSub = Keyboard.addListener(
       'keyboardDidShow',
       this.keyboardWillShow,
@@ -56,6 +62,30 @@ class TabBar extends React.Component {
       'keyboardDidHide',
       this.keyboardWillHide,
     );
+    let token = await AsyncStorage.getItem('userToken');
+    this.getShoppingCart(token)
+
+  }
+  getShoppingCart = (Token) => {
+    this.setState({ cartLoading: true });
+    client
+      .mutate({
+        mutation: GET_SHOPPING_CART,
+        context: {
+          headers: {
+            Authorization: `Bearer ${Token}`,
+            'Content-Length': 0,
+          },
+        },
+      })
+      .then(result => {
+        if (result?.data?.getPrdShoppingCart?.success && result?.data?.getPrdShoppingCart?.count > 0) {
+          // this.setState({ cartCount :  result?.data?.getPrdShoppingCart?.count })
+          console.log("Cart Data:", result?.data?.getPrdShoppingCart);
+          this.props.setCartItems(result?.data?.getPrdShoppingCart.result.prdShoppingCartDto);
+        }
+      })
+     
   }
 
   componentWillUnmount() {
@@ -78,6 +108,7 @@ class TabBar extends React.Component {
   render() {
     const { navigation } = this.props;
     const navigationState = this.props.state;
+    console.log(this.props.userState.carts);
     return this.state.isVisible ? (
         <View style={styles.tabBarContainer}>
           {this.props.state.routes.map((route, index) => {
@@ -93,10 +124,10 @@ class TabBar extends React.Component {
                   isFocused={navigationState.index == index}
                 />
               );
-            } else if (route.name === 'ProductStack') {
+            } else if (route.name === Constants.my_request_stack) {
               return (
                 <Tab
-                  title={'Product'}
+                  title={'My Requests'}
                   activeImage={require('../assets/img/product.png')}
                   unactiveImage={require('../assets/img/product.png')}
                   onPress={() => {
@@ -128,6 +159,7 @@ class TabBar extends React.Component {
                     navigation.navigate(route.name);
                   }}
                   isShowBadge
+                  badge_value={this.props.userState.carts.length}
                   isFocused={navigationState.index == index}
                 />
               );
@@ -213,4 +245,17 @@ const styles = StyleSheet.create({
   }
 })
 
-export default TabBar;
+const mapStateToProps = state => ({
+  userState : state
+})
+
+const mapDispatchToProps = (dispatch) => ({
+  setCartItems: value => {
+    dispatch({
+      type: 'GET_CARTS_ITEMS',
+      payload: value,
+    });
+  },
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(TabBar);

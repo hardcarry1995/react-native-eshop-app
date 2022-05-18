@@ -234,7 +234,7 @@ class SpecialProduct extends PureComponent {
       imagege = '';
     }
     return (
-      <TouchableOpacity activeOpacity={0.9} style={styles.itemContainer} key={index}>
+      <TouchableOpacity activeOpacity={0.9} style={styles.itemContainer} key={index} onPress={() => this.props.navigation.navigate('Filter', { data: item })}>
         <View style={{ flex: 1, backgroundColor: '#FFF', borderRadius: 15, elevation: 5 }}>
           <View style={{ alignSelf: 'center', flex: 1 }}>
             <Image

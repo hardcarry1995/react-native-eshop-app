@@ -18,21 +18,21 @@ class DrawerContent extends Component {
     user_email: '',
     setuserRole: '',
     channels: [
-      { screen: Constant.feed, title: Constant.feed, image: cont.feed },
-      { screen: Constant.near_by, title: Constant.near_by, image: cont.near_by },
-      { screen: Constant.settings, title: Constant.settings, image: cont.settings },
-      { screen: Constant.privacy_policy, title: Constant.privacy_policy, image: cont.privacy_policy },
-      { screen: Constant.term_condition, title: Constant.term_condition, image: cont.term_condition },
-      { screen: Constant.faq, title: Constant.faq, image: cont.faq },
-      { screen: Constant.contact_us, title: Constant.contact_us, image: cont.contact_us },
-      { screen: Constant.about_us, title: Constant.about_us, image: cont.about_us, },
-      { screen: Constant.my_Favirity, title: Constant.my_Favirity, image: cont.my_Favirity },
-      { screen: Constant.my_Reviews, title: Constant.my_Reviews, image: cont.my_Reviews },
-      { screen: "MyBid", title: "My Bids", image: cont.my_Reviews},
-      { screen: "MyOrders", title: 'My Orders', image: cont.my_Reviews},
-      { screen: Constant.rate_the_app, title: Constant.rate_the_app, image: cont.rate_the_app },
-      { screen: Constant.give_feedback, title: Constant.give_feedback, image: cont.give_feedback },
-      { screen: Constant.share_app, title: Constant.share_app, image: cont.share_app },
+      { screen: Constant.feed, title: Constant.feed, image: cont.feed, isLoggedIn : false },
+      { screen: Constant.near_by, title: Constant.near_by, image: cont.near_by, isLoggedIn : false },
+      { screen: Constant.settings, title: Constant.settings, image: cont.settings, isLoggedIn : false },
+      { screen: Constant.privacy_policy, title: Constant.privacy_policy, image: cont.privacy_policy, isLoggedIn : false },
+      { screen: Constant.term_condition, title: Constant.term_condition, image: cont.term_condition, isLoggedIn : false },
+      { screen: Constant.faq, title: Constant.faq, image: cont.faq, isLoggedIn : false },
+      { screen: Constant.contact_us, title: Constant.contact_us, image: cont.contact_us, isLoggedIn : false },
+      { screen: Constant.about_us, title: Constant.about_us, image: cont.about_us, isLoggedIn : false },
+      { screen: Constant.my_Favirity, title: Constant.my_Favirity, image: cont.my_Favirity ,isLoggedIn : true },
+      { screen: Constant.my_Reviews, title: Constant.my_Reviews, image: cont.my_Reviews, isLoggedIn : true },
+      { screen: "MyBid", title: "My Bids", image: cont.my_Reviews, isLoggedIn : true},
+      { screen: "MyOrders", title: 'My Orders', image: cont.my_Reviews, isLoggedIn : true },
+      { screen: Constant.rate_the_app, title: Constant.rate_the_app, image: cont.rate_the_app, isLoggedIn : false },
+      { screen: Constant.give_feedback, title: Constant.give_feedback, image: cont.give_feedback, isLoggedIn : false },
+      { screen: Constant.share_app, title: Constant.share_app, image: cont.share_app, isLoggedIn : false },
     ],
     selectedRoute: '',
     IsLoginData: 'false',
@@ -204,52 +204,55 @@ class DrawerContent extends Component {
 
 
   renderChannelButtons() {
-    return this.state.channels.map(({ screen, title, image }) => (
-      <TouchableOpacity
-        key={screen + title + image}
-        onPress={this.navigateToScreen(screen)}
-        activeOpacity={0.6}>
-        <View transparent style={{ height: 46, marginTop: 2, marginBottom: 2 }}>
-          {screen === this.state.selectedRoute ? (
-            <View style={{ borderLeftColor: '#fff' }}>
-              <CardItem style={{ borderLeftColor: '#fff', backgroundColor: '#FE5665' }} transparent>
-                <Text
-                  style={[
-                    {
-                      color: '#fff',
-                      marginStart: 8,
-                      fontFamily: fontFamily.regular,
-                    },
-                    styles.font_applied,
-                  ]}>
-                  {title}
-                </Text>
-              </CardItem>
-            </View>
-          ) : (
-            <View style={{ backgroundColor: 'transparent' }}>
-              <CardItem style={{ backgroundColor: 'transparent' }} transparent>
-                <Image
-                  style={{ height: 25, width: 25, resizeMode: 'contain' }}
-                  source={image}
-                />
-                <Text
-                  style={[
-                    {
-                      color: '#232323',
-                      marginStart: 8,
-                      fontFamily: fontFamily.regular,
-                    },
-                    styles.font_applied,
-                  ]}>
-                  {title}
-                </Text>
-              </CardItem>
-            </View>
-          )}
-        </View>
-      </TouchableOpacity>
-    ));
+    return this.state.channels.map(({ screen, title, image, isLoggedIn }) => {
+      if(isLoggedIn && this.state.IsLoginData === 'false') return null
+      return (
+        <TouchableOpacity
+          key={screen + title + image}
+          onPress={this.navigateToScreen(screen)}
+          activeOpacity={0.6}>
+          <View transparent style={{ height: 46, marginTop: 2, marginBottom: 2 }}>
+            {screen === this.state.selectedRoute ? (
+              <View style={{ borderLeftColor: '#fff' }}>
+                <CardItem style={{ borderLeftColor: '#fff', backgroundColor: '#FE5665' }} transparent>
+                  <Text
+                    style={[
+                      {
+                        color: '#fff',
+                        marginStart: 8,
+                        fontFamily: fontFamily.regular,
+                      },
+                      styles.font_applied,
+                    ]}>
+                    {title}
+                  </Text>
+                </CardItem>
+              </View>
+            ) : (
+              <View style={{ backgroundColor: 'transparent' }}>
+                <CardItem style={{ backgroundColor: 'transparent' }} transparent>
+                  <Image
+                    style={{ height: 25, width: 25, resizeMode: 'contain' }}
+                    source={image}
+                  />
+                  <Text
+                    style={[
+                      {
+                        color: '#232323',
+                        marginStart: 8,
+                        fontFamily: fontFamily.regular,
+                      },
+                      styles.font_applied,
+                    ]}>
+                    {title}
+                  </Text>
+                </CardItem>
+              </View>
+            )}
+          </View>
+        </TouchableOpacity>
+      )
+    }).filter(c => c !== null);
   }
 
   render() {

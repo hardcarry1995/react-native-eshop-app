@@ -366,7 +366,14 @@ query GetPrdProductList($size: Int!) {
 `;
 
 export const ADD_TO_CART = gql`
-  mutation AddToCart($pid: Int!,$userid: Int!,$dateCreated: DateTime, $fromDate: DateTime = null, $endDate: DateTime = null, $quantity: Int = 1) {
+  mutation AddToCart(
+    $pid: Int!,
+    $userid: Int!,
+    $dateCreated: DateTime, 
+    $fromDate: DateTime = null, 
+    $endDate: DateTime = null, 
+    $quantity: Int = 1
+  ){
     postPrdShoppingCartOptimized(
       prdShoppingCart: {
         productId: $pid
@@ -954,13 +961,17 @@ query GetBusinessIncommingEnquries($page: Int!, $size: Int!){
 }`;
 
 export const GET_BUSINESS = gql`
-query GetBusinessList($size: Int!){
+query GetBusinessList(
+  $size: Int!,
+  $categories : String = null,
+  $title : String = null
+){
   getBusinessList(
     companyId: null
-    companyName: null
+    companyName: $title
     franchiseeId: null,
     statusIds:"",
-    categoryIds:null,
+    categoryIds:$categories,
     provinceIds:"",
     cityIds:"",
     suburbIds:""
@@ -1420,7 +1431,8 @@ export const REQUEST_ITEM_POST_RESPONSE = gql`
     $title: String
     $filePath: String
     $fileName:String,
-    $companyId: Int = null
+    $companyId: Int = null,
+    $replyToId: Int = null
   ) {
     postMstItemResponse(mstItemResponse:{
       comment: $title,
@@ -1434,8 +1446,9 @@ export const REQUEST_ITEM_POST_RESPONSE = gql`
       itemResponseId: 0,
       modifiedBy: null,
       modifiedDate: null,
-      replyToId: null,
+      replyToId: $replyToId,
       responseDate: "2015-06-23T17:35:44.68",
+      statusId: 1,
       userId: $userId,
       mapItemResponseUpload:{
         createdBy: null,
@@ -2863,8 +2876,457 @@ export const GET_ORDERS_BY_USER = gql`
         modifiedBy,
         modifiedDate,
         orderStatusTypeId
+        prdOrderStatusType
+        {
+          orderStatusTypeId
+          statusName,
+          statusSequence
+        }
       }
     }
   }
 }
 `
+export const GET_ORDER_STATUS = gql`
+{
+  prdOrderStatusTypes(page:1, size:5){   
+    data{    
+    createdDate,
+    modifiedBy,
+    modifiedDate,
+    orderStatusTypeId,
+    statusName,
+    statusSequence
+    }
+  }
+}`;
+
+export const GET_TOP_LEVEL_RESPONSE_ITEMS = gql`
+ query GetTopLevelResponseItems(
+   $requestId : ID!
+ ){
+  getTopLevelResponseItems(
+    id:$requestId
+  ){
+    comment,
+    companyId,
+    createdBy,
+    createdDate,
+    isAccepted,
+    isActive,
+    isRejected,
+    itemRequestId,
+    itemResponseId,
+    modifiedBy,
+    modifiedDate,
+    replyToId,
+    responseDate,
+    userId,
+    company{
+      companyName
+    }
+    mapItemResponseUpload{
+      createdBy,
+      createdDate,
+      documentName,
+      irUploadId,
+      isActive,
+      itemResponseId,
+      modifiedBy,
+      modifiedDate,
+      uploadPath
+    }
+    replyTo{
+      comment,
+      companyId,
+      createdBy,
+      createdDate,
+      isAccepted,
+      isActive,
+      isRejected,
+      itemRequestId,
+      itemResponseId,
+      modifiedBy,
+      modifiedDate,
+      replyToId,
+      responseDate,
+      userId,
+      replyTo{
+        comment,
+        companyId,
+        createdBy,
+        createdDate,
+        isAccepted,
+        isActive,
+        isRejected,
+        itemRequestId,
+        itemResponseId,
+        modifiedBy,
+        modifiedDate,
+        replyToId,
+        responseDate,
+        userId,
+        replyTo{
+          comment,
+          companyId,
+          createdBy,
+          createdDate,
+          isAccepted,
+          isActive,
+          isRejected,
+          itemRequestId,
+          itemResponseId,
+          modifiedBy,
+          modifiedDate,
+          replyToId,
+          responseDate,
+          userId
+        }
+      }
+      mapItemResponseUpload{
+        createdBy,
+        createdDate,
+        documentName,
+        irUploadId,
+        isActive,
+        itemResponseId,
+        modifiedBy,
+        modifiedDate,
+        uploadPath
+      }
+    }
+  }
+}`;
+
+export const GET_HIERARCHY_RESPONSE_ITEMS = gql`
+query GetHierarchyResponseItems(
+  $requestId : ID!,
+){
+  getHierarchyResponseItems(
+    id:$requestId,
+  ){
+    comment,
+    companyId,
+    createdBy,
+    createdDate,
+    isAccepted,
+    isActive,
+    isRejected,
+    itemRequestId,
+    itemResponseId,
+    modifiedBy,
+    modifiedDate,
+    replyToId,
+    responseDate,
+    userId,
+    statusId,
+    company{
+      companyName
+    }
+    mapItemResponseUpload{
+      createdBy,
+      createdDate,
+      documentName,
+      irUploadId,
+      isActive,
+      itemResponseId,
+      modifiedBy,
+      modifiedDate,
+      uploadPath
+    }
+    replyTo{
+      comment,
+      companyId,
+      createdBy,
+      createdDate,
+      isAccepted,
+      isActive,
+      isRejected,
+      itemRequestId,
+      itemResponseId,
+      modifiedBy,
+      modifiedDate,
+      replyToId,
+      responseDate,
+      userId,
+      replyTo{
+        comment,
+        companyId,
+        createdBy,
+        createdDate,
+        isAccepted,
+        isActive,
+        isRejected,
+        itemRequestId,
+        itemResponseId,
+        modifiedBy,
+        modifiedDate,
+        replyToId,
+        responseDate,
+        userId,
+        replyTo{
+          comment,
+          companyId,
+          createdBy,
+          createdDate,
+          isAccepted,
+          isActive,
+          isRejected,
+          itemRequestId,
+          itemResponseId,
+          modifiedBy,
+          modifiedDate,
+          replyToId,
+          responseDate,
+          userId
+        }
+      }
+      mapItemResponseUpload{
+        createdBy,
+        createdDate,
+        documentName,
+        irUploadId,
+        isActive,
+        itemResponseId,
+        modifiedBy,
+        modifiedDate,
+        uploadPath
+      }
+    }
+  }
+}`;
+
+export const GET_INCOMING_TOP_LEVEL_RESPONSE_ITEMS = gql`
+ query GetIncomingTopLevelResponseItems(
+   $requestId : ID!
+ ){
+  getIncommingTopLevelResponseItems(
+    id:$requestId
+  ){
+    comment,
+    companyId,
+    createdBy,
+    createdDate,
+    isAccepted,
+    isActive,
+    isRejected,
+    itemRequestId,
+    itemResponseId,
+    modifiedBy,
+    modifiedDate,
+    replyToId,
+    responseDate,
+    userId,
+    company{
+      companyName
+    }
+    mapItemResponseUpload{
+      createdBy,
+      createdDate,
+      documentName,
+      irUploadId,
+      isActive,
+      itemResponseId,
+      modifiedBy,
+      modifiedDate,
+      uploadPath
+    }
+    replyTo{
+      comment,
+      companyId,
+      createdBy,
+      createdDate,
+      isAccepted,
+      isActive,
+      isRejected,
+      itemRequestId,
+      itemResponseId,
+      modifiedBy,
+      modifiedDate,
+      replyToId,
+      responseDate,
+      userId,
+      replyTo{
+        comment,
+        companyId,
+        createdBy,
+        createdDate,
+        isAccepted,
+        isActive,
+        isRejected,
+        itemRequestId,
+        itemResponseId,
+        modifiedBy,
+        modifiedDate,
+        replyToId,
+        responseDate,
+        userId,
+        replyTo{
+          comment,
+          companyId,
+          createdBy,
+          createdDate,
+          isAccepted,
+          isActive,
+          isRejected,
+          itemRequestId,
+          itemResponseId,
+          modifiedBy,
+          modifiedDate,
+          replyToId,
+          responseDate,
+          userId
+        }
+      }
+      mapItemResponseUpload{
+        createdBy,
+        createdDate,
+        documentName,
+        irUploadId,
+        isActive,
+        itemResponseId,
+        modifiedBy,
+        modifiedDate,
+        uploadPath
+      }
+    }
+  }
+}`;
+
+export const GET_INCOMING_HIERARCHY_RESPONSE_ITEMS = gql`
+query GetIncommingHierarchyResponseItems(
+  $requestId : ID!,
+){
+  getIncommingHierarchyResponseItems(
+    id:$requestId,
+  ){
+    comment,
+    companyId,
+    createdBy,
+    createdDate,
+    isAccepted,
+    isActive,
+    isRejected,
+    itemRequestId,
+    itemResponseId,
+    modifiedBy,
+    modifiedDate,
+    replyToId,
+    responseDate,
+    userId,
+    company{
+      companyName
+    }
+    mapItemResponseUpload{
+      createdBy,
+      createdDate,
+      documentName,
+      irUploadId,
+      isActive,
+      itemResponseId,
+      modifiedBy,
+      modifiedDate,
+      uploadPath
+    }
+    replyTo{
+      comment,
+      companyId,
+      createdBy,
+      createdDate,
+      isAccepted,
+      isActive,
+      isRejected,
+      itemRequestId,
+      itemResponseId,
+      modifiedBy,
+      modifiedDate,
+      replyToId,
+      responseDate,
+      userId,
+      replyTo{
+        comment,
+        companyId,
+        createdBy,
+        createdDate,
+        isAccepted,
+        isActive,
+        isRejected,
+        itemRequestId,
+        itemResponseId,
+        modifiedBy,
+        modifiedDate,
+        replyToId,
+        responseDate,
+        userId,
+        replyTo{
+          comment,
+          companyId,
+          createdBy,
+          createdDate,
+          isAccepted,
+          isActive,
+          isRejected,
+          itemRequestId,
+          itemResponseId,
+          modifiedBy,
+          modifiedDate,
+          replyToId,
+          responseDate,
+          userId
+        }
+      }
+      mapItemResponseUpload{
+        createdBy,
+        createdDate,
+        documentName,
+        irUploadId,
+        isActive,
+        itemResponseId,
+        modifiedBy,
+        modifiedDate,
+        uploadPath
+      }
+    }
+  }
+}`;
+
+export const UPDATE_REQUEST_ITEM_RESPONSE = gql`
+mutation UpdateRequestItemResponse(
+  $comment: String!,
+  $companyId: Int,
+  $createdBy: Int,
+  $createdDate: DateTime,
+  $isAccepted: Boolean,
+  $isActive: Boolean,
+  $isRejected: Boolean,
+  $itemRequestId: Int,
+  $itemResponseId: Int!,
+  $modifiedBy: Int,
+  $modifiedDate: DateTime,
+  $replyToId: Int,
+  $responseDate: DateTime,
+  $userId: Int!,
+){
+  updateMstItemResponse(
+    mstItemResponse: {
+        comment: $comment,
+        companyId: $companyId,
+        createdBy: $createdBy,
+        createdDate: $createdDate,
+        isAccepted: $isAccepted,
+        isActive: $isActive,
+        isRejected: $isRejected,
+        itemRequestId: $itemRequestId,
+        itemResponseId: $itemResponseId,
+        modifiedBy: $modifiedBy,
+        modifiedDate: $modifiedDate,
+        replyToId: $replyToId,
+        responseDate: $responseDate,
+        userId: $userId,
+        statusId: 2
+    }
+  ){
+    itemResponseId,
+    itemRequestId
+  }
+}`;

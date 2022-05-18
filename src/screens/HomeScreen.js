@@ -498,6 +498,7 @@ class HomeScreen extends Component {
               text2 : 'Product added to cart'
             })
             this.setState({ isCartLoading: false })
+            this.props.addProductToCart(result.data.postPrdShoppingCartOptimized.result.prdShoppingCartDto)
             this.props.navigation.navigate('CartStack')
           } else {
             Toast.show({
@@ -538,6 +539,7 @@ class HomeScreen extends Component {
               text2 : 'Product added to cart'
             })
             this.setState({ isCartLoading: false })
+            this.props.addProductToCart(result.data.postPrdShoppingCartOptimized.result.prdShoppingCartDto)
             this.props.navigation.navigate('CartStack')
           } else {
             Toast.show({
@@ -674,6 +676,10 @@ const mapDispatchToProps = dispatch => ({
       payload: value,
     });
   },
+  addProductToCart : value => dispatch({
+    type: "GET_CARTS_ITEMS",
+    payload : value
+  })
 });
 
 
