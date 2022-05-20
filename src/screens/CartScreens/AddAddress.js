@@ -382,6 +382,10 @@ export default class AddAddress extends React.Component {
 				selectProvince: '',
 				selectSub: '',
 				selectCity: '',
+				latitude: '',
+				longitude: '',
+				streetAddress: '',
+				zipcode: '',
 			})
     }
   };
@@ -485,7 +489,7 @@ export default class AddAddress extends React.Component {
         </View>
 					<View style={{ marginTop: 2 }}>
 						<View style={styles.paddingview}>
-							<View style={{ borderRadius: 10, borderColor: '#E22727', borderWidth: 1, height: 50, marginTop: 15 }}>
+							<View style={styles.pickerButtonContainer}>
 								<RNPickerSelect
 									value={this.state.selectProvince}
 									onValueChange={(itemValue, itemIndex) => {
@@ -494,12 +498,12 @@ export default class AddAddress extends React.Component {
 											this.fetchCity(itemValue);
 									}}
 									items={this.state.province}
-									textInputProps={styles.pickerContainer}
+									textInputProps={{ style: styles.pickerContainer, multiline: false }}
 									placeholder={{ label: "Select a province...", value: null }}
 								/>
 							</View>
 
-							<View style={{ borderRadius: 10, borderColor: '#E22727', borderWidth: 1, height: 50, marginTop: 15 }}>
+							<View style={styles.pickerButtonContainer}>
 								<RNPickerSelect
 									value={this.state.selectCity}
 									onValueChange={(itemValue, itemIndex) => {
@@ -507,19 +511,19 @@ export default class AddAddress extends React.Component {
 										if(!this.state.setLocatin) this.fetchSuburb(itemValue);
 									}}
 									items={this.state.setLocatin ? this.state.allCities : this.state.city}
-									textInputProps={styles.pickerContainer}
+									textInputProps={{ style: styles.pickerContainer,  multiline: false  }}
 									placeholder={{ label: "Select a city...", value: null }}
 								/>
 							</View>
 
-							<View style={{ borderRadius: 10, borderColor: '#E22727', borderWidth: 1, height: 50, marginTop: 15 }}>
+							<View style={styles.pickerButtonContainer}>
 								<RNPickerSelect
 									value={this.state.selectSub}
 									onValueChange={(itemValue, itemIndex) => {
 										this.setState({ selectSub: itemValue })
 									}}
 									items={this.state.setLocatin ? this.state.allSubs :  this.state.suburb}
-									textInputProps={styles.pickerContainer}
+									textInputProps={{ style: styles.pickerContainer, numberOfLines: 1 }}
 									placeholder={{ label: "Select a sub...", value: null }}
 								/>
 							</View>
@@ -726,9 +730,10 @@ const styles = StyleSheet.create({
 	},
 	pickerContainer: {
 		borderRadius: 5,
-		height: 50,
 		textAlign: 'center',
 		color: 'red',
+		justifyContent: 'center',
+		alignItems: 'center',
 		fontSize: 18
 	},
 	mapStyle: {
@@ -744,4 +749,13 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		paddingLeft: 20
 	},
+	pickerButtonContainer: { 
+		borderRadius: 10, 
+		borderColor: '#E22727', 
+		borderWidth: 1, 
+		height: 50, 
+		marginTop: 15, 
+		justifyContent: "center", 
+		alignItems: "center"
+	}
 });

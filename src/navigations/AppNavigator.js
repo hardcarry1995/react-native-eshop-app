@@ -5,9 +5,10 @@ import MainTabNavigator from "./MainTabNavigator";
 import DrawerContent from "./DrawerContent";
 import AuthStack from "./AuthStack";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createStackNavigator } from '@react-navigation/stack';
 import SplashScreen from '../screens/SplashScreen';
 
-const Stack = createNativeStackNavigator();
+const Stack = createStackNavigator();
 
 const Drawer = createDrawerNavigator();
 

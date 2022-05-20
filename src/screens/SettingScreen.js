@@ -20,7 +20,7 @@ const filterItems = [
   { label: 'Hire', value: 'Hire' },
 ]
 
-function BidItem ({ item, onPressAddBid }) {
+function BidItem ({ item, onPressAddBid, onPressAddToFav }) {
 
   const [ lastBidAmount, setLastBidAmount ] = useState(0);
   const [totalDurationData, setTotalDurationData ] = useState(0);
@@ -103,8 +103,7 @@ function BidItem ({ item, onPressAddBid }) {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#fff', padding: 5, marginBottom: 40 }}>
-      <View
-        style={{ flex: 1, flexDirection: 'column', alignItems: 'center', marginTop: 5 }}>
+      <View style={{ flex: 1, flexDirection: 'column', alignItems: 'center', marginTop: 5 }}>
         <View style={styles.mainCardView}>
           <Image style={styles.proimg} source={{ uri: `${imagePrefix}${item.productImage}`}} />
           <View style={styles.subCardView}>
@@ -154,7 +153,7 @@ function BidItem ({ item, onPressAddBid }) {
               </Text>
             </View>
             <View style={{ marginTop: 10, flexDirection: 'row', justifyContent: 'space-around' }}>
-              <TouchableOpacity onPress={() => { this.addToFavourites(item.productID) }} style={{ width: 30, marginLeft: 10 }}>
+              <TouchableOpacity onPress={onPressAddToFav} style={{ width: 30, marginLeft: 10 }}>
                 <Image style={{ width: 15, height: 15, padding: 15 }} source={require('../assets/Bid1.png')} />
               </TouchableOpacity>
               <TextInput
@@ -239,7 +238,6 @@ export default class SettingsScreen extends React.Component {
     this.getAllBidProduct(token);
   }
   async addToFavourites(item) {
-    console.log('addToFavourites', item)
     let IsLogin = await AsyncStorage.getItem('IsLogin');
     let token = await AsyncStorage.getItem('userToken');
     if (IsLogin !== 'true') {
@@ -261,13 +259,27 @@ export default class SettingsScreen extends React.Component {
           },
         })
         .then(result => {
-          console.log('result>>>>>', result)
           if (result.data.createMstFavourites.mstFavouriteId) {
-            ToastAndroid.show('Product added to Favourites', ToastAndroid.SHORT);
+            Toast.show({
+              type: 'success',
+              text1: 'Success', 
+              text2: "Product has been added to the favorites list!",
+            });
+          } else {
+            Toast.show({
+              type: "error",
+              text1: "Error!",
+              text2 : "Something went wrong! Please try again later!"
+            })
           }
         })
         .catch(err => {
           console.log(err);
+          Toast.show({
+            type: "error",
+            text1: "Error!",
+            text2 : "Something went wrong! Please try again later!"
+          })
         });
     }
   }
@@ -374,7 +386,7 @@ export default class SettingsScreen extends React.Component {
   }
 
   renderItem = ({ item, index }) => {
-   return <BidItem  item={item} key={index} onPressAddBid={(item, amount) => this.addBid(item, amount)} />
+   return <BidItem  item={item} key={index} onPressAddBid={(item, amount) => this.addBid(item, amount)} onPressAddToFav={() => this.addToFavourites(item.productID)} />
   }
   filterItems = (keyword) => {
     this.setState({ searchText: keyword});

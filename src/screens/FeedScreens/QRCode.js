@@ -38,8 +38,6 @@ const QRCode = ({ navigation }) => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView style={{ flex: 1, padding: 15 }}>
-
-
         <View style={styles.scrollViewStyle}>
         </View>
         {/* </ScrollView> */}

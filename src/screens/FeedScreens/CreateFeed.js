@@ -106,6 +106,20 @@ const Request = (props) => {
   const [mapSpecialUploads, setMapSpecialUploads] = useState(mapSpecialUpload);
   const acceptedImageArray = ["image/gif", "image/jpg", "image/jpeg", "image/png"];
 
+  const scanner = useRef(0);
+
+  const clearFields = () => {
+    setTitle("");
+    setDesc("");
+    setResult(null);
+    settodayDate('');
+    setStartdate(moment(new Date()).format(format3));
+    setImagesUploadData([]);
+    setMapSpecialUploads([]);
+    setAllPDF([]);
+    setVehicleData([]);
+  }
+
   useEffect(() => {
     ShowCurrentDate();
   });
@@ -248,6 +262,7 @@ const Request = (props) => {
                   text1: "Success",
                   text2: result.data.postMstItemRequest.message
                 })
+                clearFields();
                 navigation.navigate('Request24');
               } else {
                 Toast.show({
@@ -323,7 +338,8 @@ const Request = (props) => {
             });
             const result = await response.json();
             if (result?.data?.postMstItemRequest?.success) {
-              Alert.alert('Success', result?.data?.postMstItemRequest?.message)
+              Alert.alert('Success', result?.data?.postMstItemRequest?.message);
+              clearFields();
               navigation.navigate('Request24');
             } else {
               Alert.alert('Failed', result?.data?.postMstItemRequest?.message)
@@ -827,35 +843,21 @@ const Request = (props) => {
             </View>
           </View>
         }
-        <View style={styles.scrollViewStyle}></View>
         <View style={styles.body}>
-          {result &&
-            <View style={styles.sectionContainer}>
-              {/* <Text style={styles.centerText}>{result}</Text> */}
-            </View>
-          }
-          {!scan &&
-            <View style={styles.sectionContainer}>
-            </View>
-          }
           {scan &&
-            <View style={styles.sectionContainer}>
+            <View style={styles.scannerContainer}>
               <QRCodeScanner
                 reactivate={true}
                 showMarker={true}
-                ref={(node) => { this.scanner = node }}
+                ref={scanner}
                 onRead={onSuccess}
                 topContent={
-                  <Text style={styles.centerText}>
+                  <Text style={{...styles.centerText, marginBottom: 10}}>
                     Scan your QRCode!
                   </Text>
                 }
               />
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginTop : 20 }}>
-                <TouchableOpacity style={styles.stopbtn} onPress={() => this.scanner.reactivate()}>
-                  <Text style={styles.buttonTextStyle}>OK. Got it!</Text>
-                </TouchableOpacity>
-                <View style={{ width: 20 }}></View>
+              <View style={{ marginTop : 20, justifyContent: 'center', width: '100%',alignItems: 'center'}}>
                 <TouchableOpacity style={styles.stopbtn} onPress={() => setScan(false)}>
                   <Text style={styles.buttonTextStyle}>Stop Scan</Text>
                 </TouchableOpacity>
@@ -920,16 +922,16 @@ const styles = StyleSheet.create({
     height: 46,
   },
   buttonTextStyle: {
-    color: '#FAFAFA', margin: 5, marginLeft: 10,
+    color: '#FAFAFA', 
     textAlign: 'center'
   },
   stopbtn: {
-    height: 35,
-    width: '47%',
+    height: 40,
+    width: 200,
     backgroundColor: '#DE5246',
     borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#DE5246',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   centeredView: {
     flex: 1,
@@ -963,4 +965,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 18,
   },
+  scannerContainer : {
+    marginHorizontal: -15,
+  }
 });

@@ -328,7 +328,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     padding: 10,
-    marginBottom: 10
+    marginBottom: 10,
+    marginRight : 10,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 10
+    
   },
   productImage: {
     height: 100,

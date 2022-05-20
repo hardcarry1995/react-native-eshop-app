@@ -14,6 +14,7 @@ import RNPickerSelect from 'react-native-picker-select';
 import ProductSearchInput from "../../components/ProductSearchInput";
 import CategorySelector from "../../components/CategorySelector";
 import { Chip } from "react-native-elements";
+import Toast from "react-native-toast-message";
 
 
 const filterItems = [
@@ -89,11 +90,27 @@ export default class PrivacyPolicy extends React.Component {
         })
         .then(result => {
           if (result.data.createMstFavourites.mstFavouriteId) {
-            ToastAndroid.show('Product added to Favourites', ToastAndroid.SHORT);
+            // ToastAndroid.show('Product added to Favourites', ToastAndroid.SHORT);
+            Toast.show({
+              type: 'success',
+              text1: 'Success', 
+              text2: "Product has been added to the favorites list!",
+            });
+          } else {
+            Toast.show({
+              type: "error",
+              text1: "Error!",
+              text2 : "Something went wrong! Please try again later!"
+            })
           }
         })
         .catch(err => {
           console.log(err);
+          Toast.show({
+            type: "error",
+            text1: "Error!",
+            text2 : "Something went wrong! Please try again later!"
+          })
         });
     }
   }
@@ -235,8 +252,7 @@ export default class PrivacyPolicy extends React.Component {
 
   renderItem = ({ item, index }) => (
     <View style={{ flex: 1, backgroundColor: '#fff', padding: 5 }} key={index}>
-      <View
-        style={{ marginBottom: 10 }}>
+      <View style={{ marginBottom: 10 }}>
         <View
           style={{ flex: 1, backgroundColor: '#FFF', borderColor: '#ccc', borderRadius: 15, borderWidth: 1, elevation: 8 }}>
           <View style={{ alignSelf: 'center', flex: 1 }}>

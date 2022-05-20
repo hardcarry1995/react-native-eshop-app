@@ -17,7 +17,7 @@ const ProductCard = ({ item, navigation, addToFavourites, addToCart }) => {
   }
 
   return (
-    <View style={styles.productItemContainer}>
+    <View style={styles.container}>
       <TouchableOpacity onPress={onPressItem} style={styles.productItemContainer}>
         <Image style={styles.productImage} source={item.productImage ? { uri: `${imagePrefix}${item.productImage}` } : require('../assets/NoImage.jpeg')} />
         <View style={styles.productDetailContainer}>
@@ -51,12 +51,28 @@ const ProductCard = ({ item, navigation, addToFavourites, addToCart }) => {
 
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 15,
+    elevation: 5,
+  },
   productItemContainer: {
     flex: 1,
     backgroundColor: '#fff',
     padding: 10,
     marginBottom: 10,
     borderRadius: 15,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
     elevation: 5,
   },
   productImage: {

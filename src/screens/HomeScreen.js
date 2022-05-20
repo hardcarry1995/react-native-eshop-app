@@ -643,7 +643,7 @@ class HomeScreen extends Component {
               }
               return (
                 <View style={{ padding: 5, flex: 1 }}>
-                  <Text style={styles.sectionLabel}> SPECIAL PRODUCTS </Text>
+                  <Text style={{...styles.sectionLabel, marginBottom : 5}}> SPECIAL PRODUCTS </Text>
                   <SpecialCard allData={this.state.special_data} navigation={this.props.navigation} />
                   <Text style={styles.sectionLabel}> ALL PRODUCTS </Text>
                 </View>

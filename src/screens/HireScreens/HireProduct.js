@@ -52,14 +52,7 @@ export default class HireProduct extends React.Component {
               </View>
             </Modal>
 
-            <View
-              style={{
-                height: 1,
-                backgroundColor: 'grey',
-                marginVertical: 30,
-                marginHorizontal: 20,
-              }}
-            />
+            <View style={{ height: 1, backgroundColor: 'grey', marginVertical: 30, marginHorizontal: 20 }} />
 
             <Text style={{ top: -20, left: 20 }}>Select Method of Payment</Text>
 

@@ -67,7 +67,7 @@ const ProductsMap = ({ navigation, token }) => {
         },
       })
       .then(result => {
-        setSpecialData(result.data.getPrdProductList.result);
+        setSpecialData(result.data.getPrdProductList.result ? result.data.getPrdProductList.result : []);
       })
       .catch(err => {
         console.log(err);

@@ -8,6 +8,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { connect } from "react-redux";
 import IonIcon from "react-native-vector-icons/Ionicons";
 import moment from "moment";
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 
 
 const Marsh26 = ({ navigation, route, userState }) => {
@@ -23,6 +24,8 @@ const Marsh26 = ({ navigation, route, userState }) => {
   const [filePath, setFilePath] = useState('')
   const [fileName, setFileName] = useState(null);
   const [isLoaded, setLoaded] = useState(false);
+  const [didShowKeyboard, setDidShowKeyboard] = useState(false);
+  const [contentMargin, setContentMargin] = useState(0);
 
   const flatlistRef = useRef(0);
   const scrollViewRef= useRef(0);
@@ -31,6 +34,26 @@ const Marsh26 = ({ navigation, route, userState }) => {
     if(!isLoaded){
       getToken();
     }
+  }, []);
+
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener("keyboardDidShow", (e) => {
+      if(flatlistRef.current){
+        flatlistRef.current.scrollToEnd();
+      }
+      setDidShowKeyboard(true);
+      setContentMargin(e.endCoordinates.height);
+    });
+
+    const hideSubscription = Keyboard.addListener("keyboardWillHide", () => {
+      setDidShowKeyboard(false);
+      setContentMargin(0);
+    })
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
   }, []);
 
   useEffect(() => {
@@ -69,21 +92,6 @@ const Marsh26 = ({ navigation, route, userState }) => {
 
     });
   }, []) 
-
-  useEffect(() => {
-    const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
-      // if(flatlistRef.current){
-      //   flatlistRef.current.scrollToEnd();
-      // }
-      if(scrollViewRef.current){
-        scrollViewRef.current.scrollToEnd();
-      }
-    });
-
-    return () => {
-      showSubscription.remove();
-    };
-  }, []);
 
   const setModalVisible = visible => {
     setmodalVisibler(visible);
@@ -198,8 +206,18 @@ const Marsh26 = ({ navigation, route, userState }) => {
     }
   };
 
+  const chooseImage = async () => {
+    const result = await launchImageLibrary({selectionLimit : 1}, null);
+    if(result.didCancel){
+      return ;
+    }
+    const image = result.assets[0];
+    setFilePath(image.uri)
+    setFileName(image.fileName)
+  }
+
   return (
-    <KeyboardAwareScrollView ref={scrollViewRef} contentContainerStyle={{ flex : 1}}>
+    <View style={{ flex : 1,  marginBottom : contentMargin }}>
       <View style={styles.container}>
         <FlatList
           style={styles.list}
@@ -243,6 +261,8 @@ const Marsh26 = ({ navigation, route, userState }) => {
               </View>
             );
           }}
+          onContentSizeChange={() => flatlistRef.current.scrollToEnd({ animated: true })}
+          onLayout={() => flatlistRef.current.scrollToEnd({ animated: true })}
         />
 
         <View style={styles.footer}>
@@ -254,7 +274,6 @@ const Marsh26 = ({ navigation, route, userState }) => {
               value={name_address}
               onChangeText={name_address => setname_address(name_address)}
               multiline
-
             />
             <TouchableOpacity onPress={() => selectFileDoc()}>
               <Image
@@ -298,34 +317,47 @@ const Marsh26 = ({ navigation, route, userState }) => {
           }}>
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
+              <View style={{ alignItems: 'flex-end', width: '100%', paddingRight : 20, marginTop: 10}}>
+                <TouchableOpacity onPress={() => setModalVisible(false)}>
+                  <Image
+                    style={{ height: 15, width: 15, marginLeft: 10, tintColor: "#000" }}
+                    source={require('../../assets/cros.png')} 
+                    resizeMode="contain"
+                  />
+                </TouchableOpacity>
+              </View>
               <Text style={{ marginTop: 20, fontSize: 15 }}>
                 Would you like to accept the offer
               </Text>
               <View style={{ flexDirection: 'row' }}>
                 <TouchableOpacity
-                  style={[styles.button, styles.buttonClose]}
+                  style={[styles.button, styles.buttonClose, { flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}]}
                   onPress={() => setModalVisible(false)}>
-                  <Text style={styles.textStyle}>Purchase</Text>
                   <Image
-                    style={{ resizeMode: 'center', height: 15, width: 15, marginTop: -17, marginLeft: 10, }}
+                    style={{ height: 15, width: 15, marginRight: 10, tintColor: "#fff" }}
                     source={require('../../assets/noun_Check.png')}
+                    resizeMode="contain"
                   />
+                  <Text style={{ fontWeight: '600', color: "#fff"}}>Purchase</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={[styles.butt, styles.buttonClose]}
-                  onPress={() =>
-                    navigation.goBack()}>
-                  <Text style={styles.textSty}>Decline</Text>
-                  <Image style={{ resizeMode: 'center', height: 15, width: 15, marginTop: -17, marginLeft: 10, }}
+                <TouchableOpacity
+                  style={[styles.butt, styles.buttonClose, { flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}]}
+                  onPress={() => navigation.goBack()}>
+                  <Image
+                    style={{ height: 12, width: 12, marginRight: 10, tintColor: '#fff' }}
                     source={require('../../assets/cros.png')}
+                    resizeMode="contain"
                   />
+                  <Text style={{ fontWeight: '600', color: "#fff" }}>Decline</Text>
+
                 </TouchableOpacity>
               </View>
             </View>
           </View>
         </Modal>
       </View>
-    </KeyboardAwareScrollView>
+    </View>
    
   );
 }
@@ -336,12 +368,17 @@ const styles = StyleSheet.create({
   },
   list: {
     paddingHorizontal: 17,
+    marginBottom: 65
   },
   footer: {
     flexDirection: 'row',
     height: 60,
     paddingHorizontal: 10,
     padding: 5,
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
+    backgroundColor: "#eee"
   },
   btnSend: {
     backgroundColor: 'white',

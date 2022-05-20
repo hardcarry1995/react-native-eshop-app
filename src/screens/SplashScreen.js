@@ -46,7 +46,10 @@ const SplashScreen = ({ navigation }) => {
         });
     }
     setTimeout(() => {
-      navigation.navigate("MainDrawer");
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'MainDrawer' }],
+      });
     }, 2000)
   }
 
@@ -66,7 +69,7 @@ const SplashScreen = ({ navigation }) => {
     <View style={styles.container}>
       <Image  
         source={require("../assets/logos/2.gif")}
-        style={{ width : 280, height : 160 }}
+        style={{ width : 350, height : 200 }}
         resizeMode="contain"
       />
     </View>

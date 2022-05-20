@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Image, Alert, Dimensions, TextInput, FlatList, Modal, ToastAndroid, Keyboard, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image, Alert, Dimensions, TextInput, FlatList, Modal, ToastAndroid, Keyboard, ActivityIndicator, ScrollView } from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
 import { REQUEST_ITEM_POST_RESPONSE, GET_INCOMING_HIERARCHY_RESPONSE_ITEMS, UPDATE_REQUEST_ITEM_RESPONSE } from '../../constants/queries';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -9,6 +9,7 @@ import { connect } from "react-redux";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import moment from "moment";
 import IonIcon from "react-native-vector-icons/Ionicons";
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 
 
 const IncomingRequestChat = ({ navigation, route, userState }) => {
@@ -25,7 +26,9 @@ const IncomingRequestChat = ({ navigation, route, userState }) => {
   const [filePath, setFilePath] = useState('')
   const [fileName, setFileName] = useState(null)
   const [isLoaded, setLoaded] = useState(false);
-
+  const [didShowKeyboard, setDidShowKeyboard] = useState(false);
+  const [contentMargin, setContentMargin] = useState(0);
+  
   const flatlistRef = useRef(0);
   const scrollViewRef= useRef(0);
 
@@ -36,17 +39,23 @@ const IncomingRequestChat = ({ navigation, route, userState }) => {
   }, []);
 
   useEffect(() => {
-    const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
-      // if(flatlistRef.current){
-      //   flatlistRef.current.scrollToEnd();
-      // }
-      if(scrollViewRef.current){
-        scrollViewRef.current.scrollToEnd();
+    const showSubscription = Keyboard.addListener("keyboardDidShow", (e) => {
+      if(flatlistRef.current){
+        console.log("flatlistRef")
+        flatlistRef.current.scrollToEnd();
       }
+      setDidShowKeyboard(true);
+      setContentMargin(e.endCoordinates.height);
     });
+
+    const hideSubscription = Keyboard.addListener("keyboardWillHide", () => {
+      setDidShowKeyboard(false);
+      setContentMargin(0);
+    })
 
     return () => {
       showSubscription.remove();
+      hideSubscription.remove();
     };
   }, []);
 
@@ -86,6 +95,7 @@ const IncomingRequestChat = ({ navigation, route, userState }) => {
 
     });
   }, []) 
+
 
   const setModalVisible = visible => {
     setmodalVisibler(visible);
@@ -161,6 +171,7 @@ const IncomingRequestChat = ({ navigation, route, userState }) => {
           setmsgData(msgDataNew)
           setLoading(false)
           setReplyToId(itemResponseId);
+          Keyboard.dismiss();
       })
       .catch(err => {
         console.log(err);
@@ -212,16 +223,24 @@ const IncomingRequestChat = ({ navigation, route, userState }) => {
     }
   };
 
+  const chooseImage = async () => {
+    const result = await launchImageLibrary({selectionLimit : 1}, null);
+    if(result.didCancel){
+      return ;
+    }
+    const image = result.assets[0];
+    setFilePath(image.uri)
+    setFileName(image.fileName)
+  }
+
   return (
-    <KeyboardAwareScrollView ref = {scrollViewRef} contentContainerStyle={{ flex : 1}}>
+    <View style={{ flex : 1, marginBottom : contentMargin}}>
       <View style={styles.container}>
         <FlatList
           ref={flatlistRef}
           style={styles.list}
           data={msgData}
-          keyExtractor={item => {
-            return item.id;
-          }}
+          keyExtractor={item => item.id }
           renderItem={comment => {
             const item = comment.item;
             let inMessage = item.companyId == 0;
@@ -259,6 +278,8 @@ const IncomingRequestChat = ({ navigation, route, userState }) => {
               </View>
             );
           }}
+          onLayout={() => flatlistRef.current.scrollToEnd({ animated: true })}
+          onContentSizeChange={() => flatlistRef.current.scrollToEnd({ animated: true })}
         />
         <View style={styles.footer}>
           <View style={styles.inputContainer}>
@@ -307,52 +328,51 @@ const IncomingRequestChat = ({ navigation, route, userState }) => {
           transparent={true}
           visible={modalVisible}
           onRequestClose={() => {
-            Alert.alert('Modal has been closed.');
             setModalVisible(!modalVisible);
           }}>
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
+              <View style={{ alignItems: 'flex-end', width: '100%', paddingRight : 20, marginTop: 10}}>
+                <TouchableOpacity onPress={() => setModalVisible(false)}>
+                  <Image
+                    style={{ height: 15, width: 15, marginLeft: 10, tintColor: "#000" }}
+                    source={require('../../assets/cros.png')} 
+                    resizeMode="contain"
+                  />
+                </TouchableOpacity>
+              </View>
               <Text style={{ marginTop: 20, fontSize: 15 }}>
                 Would you like to accept the offer
               </Text>
               <View style={{ flexDirection: 'row' }}>
                 <TouchableOpacity
-                  style={[styles.button, styles.buttonClose]}
+                  style={[styles.button, styles.buttonClose, { flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}]}
                   onPress={() => setModalVisible(false)}>
-                  <Text style={styles.textStyle}>Purchase</Text>
                   <Image
-                    style={{
-                      resizeMode: 'center',
-                      height: 15,
-                      width: 15,
-                      marginTop: -17,
-                      marginLeft: 10,
-                    }}
+                    style={{ height: 15, width: 15, marginRight: 10, tintColor: "#fff" }}
                     source={require('../../assets/noun_Check.png')}
+                    resizeMode="contain"
                   />
+                  <Text style={{ fontWeight: '600', color: "#fff"}}>Purchase</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={[styles.butt, styles.buttonClose]}
-                  onPress={() =>
-                    navigation.goBack()}>
-                  <Text style={styles.textSty}>Decline</Text>
+                <TouchableOpacity
+                  style={[styles.butt, styles.buttonClose, { flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}]}
+                  onPress={() => navigation.goBack()}>
                   <Image
-                    style={{
-                      resizeMode: 'center',
-                      height: 15,
-                      width: 15,
-                      marginTop: -17,
-                      marginLeft: 10,
-                    }}
+                    style={{ height: 12, width: 12, marginRight: 10, tintColor: '#fff' }}
                     source={require('../../assets/cros.png')}
+                    resizeMode="contain"
                   />
+                  <Text style={{ fontWeight: '600', color: "#fff" }}>Decline</Text>
+
                 </TouchableOpacity>
               </View>
             </View>
           </View>
         </Modal>
       </View>
-    </KeyboardAwareScrollView>
+    </View>
   );
 }
 
@@ -362,12 +382,17 @@ const styles = StyleSheet.create({
   },
   list: {
     paddingHorizontal: 17,
+    marginBottom: 65
   },
   footer: {
     flexDirection: 'row',
     height: 60,
     paddingHorizontal: 10,
     padding: 5,
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
+    backgroundColor: "#eee"
   },
   btnSend: {
     backgroundColor: 'white',
