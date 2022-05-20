@@ -464,8 +464,8 @@ const styles = StyleSheet.create({
   modalView: {
     backgroundColor: 'white',
     borderRadius: 20,
-    height: '20%',
     width: '80%',
+    paddingBottom: 20,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
