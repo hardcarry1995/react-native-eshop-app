@@ -58,6 +58,8 @@ class HomeScreen extends Component {
 
     };
     this.linkingUrlSub = null;
+
+    console.log("Props:", props.state);
   }
 
   ExecuteQuery = (sql, params = []) => new Promise((resolve, reject) => {
@@ -141,6 +143,7 @@ class HomeScreen extends Component {
     let token = await AsyncStorage.getItem('userToken');
     let IsLogin = await AsyncStorage.getItem('IsLogin');
     if (IsLogin === 'true') {
+      console.log("IsLogin:", IsLogin);
       const { refered_by = '' } = this.props.state || {};
       const paredRB = refered_by ? JSON.parse(refered_by) : {};
       if (paredRB?.name) {
@@ -303,6 +306,7 @@ class HomeScreen extends Component {
   async fetchToken() {
     let token = await AsyncStorage.getItem('userToken');
     let userInfo = await AsyncStorage.getItem('userInfo');
+    console.log("User Info:", userInfo);
     this.setState({
       userInfo: JSON.parse(userInfo),
     });
@@ -331,7 +335,6 @@ class HomeScreen extends Component {
         },
       })
       .then(result => {
-        console.log(result);
         if (result.data.getPrdProductList.result.length > 0) {
           this.setState({ dataEMP: result.data.getPrdProductList.result });
           let data = result.data.getPrdProductList.result ;
@@ -422,7 +425,6 @@ class HomeScreen extends Component {
         },
       })
       .then(result => {
-        console.log(result.data.getPrdProductList.result);
         this.setState({ special_data: result.data.getPrdProductList.result });
         this.setState({ specialData: result.data.getPrdProductList.result });
       })
@@ -472,8 +474,9 @@ class HomeScreen extends Component {
     let IsLogin = await AsyncStorage.getItem('IsLogin');
     this.setState({ isCartLoading: true })
     this.setState({ isproductID: id })
+
+    console.log(this.state.userInfo);
     if (IsLogin !== 'true') {
-      var userIdData = null;
       this.setState({ cartLoading: true });
       client
         .mutate({
@@ -513,7 +516,6 @@ class HomeScreen extends Component {
           console.log(err);
         });
     } else {
-      var userIdData = this.state.userInfo.id
       this.setState({ cartLoading: true });
       client
         .mutate({

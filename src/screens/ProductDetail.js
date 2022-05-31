@@ -118,7 +118,6 @@ class ProductDetail extends React.Component {
         });
     } else {
       let userInfo = await AsyncStorage.getItem('userInfo');
-      console.log(userToken);
       let userID = JSON.parse(userInfo)
       client
         .mutate({
@@ -146,6 +145,7 @@ class ProductDetail extends React.Component {
             this.props.addProductToCart(result.data.postPrdShoppingCartOptimized.result.prdShoppingCartDto)
             this.props.navigation.navigate('CartStack')
           } else {
+            console.log(result.data.postPrdShoppingCartOptimized);
           }
         })
         .catch(err => {

@@ -173,7 +173,6 @@ function LoginScreen(props) {
  
   const submit = async () => {
     let token = await AsyncStorage.getItem('userToken');
-    console.log(decode(token.split('.')[1]));
     let rjx = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     let isValid = rjx.test(email.trim());
     // console.warn(isValid);
@@ -204,7 +203,6 @@ function LoginScreen(props) {
         },
       })
       .then(async result => {
-        console.log("Login result:", result);
         setLoading(false);
         if (result.data.sSOLogin.success) {
           await AsyncStorage.setItem(
@@ -268,13 +266,18 @@ function LoginScreen(props) {
           await AsyncStorage.setItem('IsLogin', 'true');
           let decoded = decode(result.data.oAuth.result.token.split('.')[1]);
           decoded = JSON.parse(decoded);
+          console.log(decoded);
           let userInfo = result.data.oAuth.result;
           userInfo.id = decoded.Id;
+          await AsyncStorage.setItem('userRole', decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']);
           await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
           props.setUserData(userInfo);
           props.setUserRole(decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']);
           props.setUserToken(result.data.oAuth.result.token);
-          props.navigation.navigate('Main');
+          props.navigation.reset({
+            index: 0,
+            routes: [{ name : 'Main'}]
+          });
         } else {
           if(Platform.OS === 'android'){
             ToastAndroid.show(result.data.oAuth.message, ToastAndroid.SHORT);
