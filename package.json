@@ -13,6 +13,7 @@
   "dependencies": {
     "@apollo/client": "^3.5.9",
     "@hmscore/react-native-hms-map": "^6.0.1-304",
+    "@invertase/react-native-apple-authentication": "^2.2.0",
     "@react-native-community/async-storage": "^1.12.1",
     "@react-native-community/geolocation": "^2.0.2",
     "@react-native-community/netinfo": "^8.0.0",

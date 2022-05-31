@@ -13,9 +13,9 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 
 
 const IncomingRequestChat = ({ navigation, route, userState }) => {
-  const [msgData, setmsgData] = useState(route.params.mainChat);
+  const [msgData, setmsgData] = useState(route.params.mainChat ? route.params.mainChat : []);
   const [msgDataNew, setmsgDataNew] = useState([]);
-  const [name_address, setname_address] = useState('');
+  const [name_address, setname_address] = useState(route.params.msg ? route.params.msg : "");
   const [modalVisible, setmodalVisibler] = useState(false);
   const [token, SetToken] = useState(userState.user.token);
   const [userInfo, setUserInfo] = useState([]);
@@ -60,6 +60,7 @@ const IncomingRequestChat = ({ navigation, route, userState }) => {
   }, []);
 
   useEffect(() => {
+    console.log("TEST BUG:", route.params.mainChat);
     msgData.map(msg => {
       let inMessage = msg.companyId == 0;
       if(inMessage && msg.statusId != 2 ){

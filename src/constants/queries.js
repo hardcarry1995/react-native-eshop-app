@@ -503,6 +503,7 @@ export const HANDLE_SIGNUP = gql`
     $gid: String!
     $fBAccessCode: String!
     $facebookUserID: String!
+    $appleUserID: String!
     $deviceID: String
     $deviceType: Int
     $latitude:String
@@ -516,6 +517,7 @@ export const HANDLE_SIGNUP = gql`
         linkedInUserID: ""
         twitterUserId: ""
         instagramUserID: ""
+        appleUserID: $appleUserID
         email: $email
         contactNo: $contactNo
         userName: $email

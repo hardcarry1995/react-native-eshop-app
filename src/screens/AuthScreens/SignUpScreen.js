@@ -8,14 +8,18 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import Modal from 'react-native-modal';
 import { LoginManager, Profile, AccessToken } from 'react-native-fbsdk-next';
 import { HANDLE_SIGNUP, CHECK_MAIL, HANDLE_SIGNUP_BUSINESS } from '../../constants/queries';
-
+import { appleAuth, AppleButton } from '@invertase/react-native-apple-authentication';
 import Geolocation from '@react-native-community/geolocation';
 import Geocoder from 'react-native-geocoding';
+import { decode } from 'base-64';
+import { connect } from 'react-redux';
 
 Geocoder.init("AIzaSyCNjKB84RyfVRuvuU8sCcQT6uWB_wVY03s")
 
+// {"authorizationCode": "cba4e68cad88c494b9df81acaea7fcedc.0.rzxz.ud8e42aY42vyCVtKilds7Q", "authorizedScopes": [], "email": null, "fullName": {"familyName": null, "givenName": null, "middleName": null, "namePrefix": null, "nameSuffix": null, "nickname": null}, "identityToken": "eyJraWQiOiJXNldjT0tCIiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJodHRwczovL2FwcGxlaWQuYXBwbGUuY29tIiwiYXVkIjoiY29tLmlubm8uZXp5ZmluZCIsImV4cCI6MTY1Mzk5MDE4MywiaWF0IjoxNjUzOTAzNzgzLCJzdWIiOiIwMDA5NzkuNjg2MmQ0OTg5ODRjNDg3ZWFmZjdkZWRmNjk3MTI5YmUuMTQwNyIsIm5vbmNlIjoiYTMzZGM4YzFiNTBlODZiMzZjMDBmN2RiOWYwMDZjMGIyN2QyMmI1YWZmOGEwMDdiYjgzZTEzZjMzZmQ4Mzk5ZSIsImNfaGFzaCI6Il95OW1KcnBuRzh4UEVnV0xaaFByN3ciLCJlbWFpbCI6Imh0aGpieGJmNXBAcHJpdmF0ZXJlbGF5LmFwcGxlaWQuY29tIiwiZW1haWxfdmVyaWZpZWQiOiJ0cnVlIiwiaXNfcHJpdmF0ZV9lbWFpbCI6InRydWUiLCJhdXRoX3RpbWUiOjE2NTM5MDM3ODMsIm5vbmNlX3N1cHBvcnRlZCI6dHJ1ZX0.JZapEoVKvXF55SovVpnOtPYZgooByXHE-ZcrTkxotuX9sFayoWJS4VKbsLoxvsOoVQQLVtDqnL7WFTbnWuqxRZA16C31HF8iSnR2cmeVDqNX_tLAqgjqc2sVxkJ1gDZ5as9irm3EYAi4_oV7KSAjQIWz6oeaGyUAab0emOCxy7pZvfS12JjA8DEZ8ELDwYcCbLSPTADuqWlU1qoHPYfPuB5CnWYTSugcjTdsq3vS6vDmXscr0osYPfEFfJS5cUbCN29oj3wZA4BZ99eqYj2_qx30PrGhfZQLRyGL46whJ1HopkuCX3FwTpMAHPxsl1jiL9Bbnq5Zz5-GZbqh-P0DAA", "nonce": "yTppwCaiw.iwsVwTMrgasZrFULztvay6", "realUserStatus": 1, "state": null, "user": "000979.6862d498984c487eaff7dedf697129be.1407"}
 
-export default class Signup extends React.Component {
+
+class Signup extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -32,6 +36,7 @@ export default class Signup extends React.Component {
       companyName: '',
       track: 1,
       googleUserId: '',
+      appleUserId: '',
       fbUserID: '',
       fbAccessToken: '',
       showResultsNew: 'true',
@@ -121,36 +126,35 @@ export default class Signup extends React.Component {
       this.props.navigation.push('SetSubscriptionPlan');
     } else {
       this.setState({ loading: true });
-
       if (this.state.contact.length < 10) {
-        ToastAndroid.show('Please enter valid contact', ToastAndroid.SHORT);
+        alert("Please enter valid contact");
         this.setState({ loading: false });
         return;
       }
       let rjx = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
       let isValid = rjx.test(this.state.email);
       if (!isValid) {
-        ToastAndroid.show('Please enter valid email', ToastAndroid.SHORT);
+        alert("Please enter valid email");
         this.setState({ loading: false });
         return;
       }
       if (this.state.password !== this.state.cpassword) {
-        ToastAndroid.show('Password does not match', ToastAndroid.SHORT);
+        alert("Password does not match");
         this.setState({ loading: false });
         return;
       }
       if (this.state.email === '' || this.state.password === '' || this.state.cpassword === '' || this.state.contact === '' || this.state.fname === '' || this.state.lname === '') {
-        ToastAndroid.show('Please enter all details', ToastAndroid.SHORT);
+        alert("Please enter all details");
         this.setState({ loading: false });
         return;
       }
       let isEmailExist = await this.checkEmailExist();
       if (isEmailExist) {
-        ToastAndroid.show('Email already exists', ToastAndroid.SHORT);
+        alert("Email already exists");
         this.setState({ loading: false });
         return;
       }
-
+      this.setState({ phoneModal: false });
       let token = await AsyncStorage.getItem('userToken');
       let fcm_token = await AsyncStorage.getItem('fcm_token');
       let isPlatform = 1;
@@ -162,22 +166,6 @@ export default class Signup extends React.Component {
       } else {
         isPlatform = 3;
       }
-      let variablestt = {
-        name: this.state.fname,
-        lname: this.state.lname,
-        email: this.state.email,
-        contactNo: this.state.contact,
-        password: this.state.password,
-        track: this.state.track,
-        gid: this.state.googleUserId,
-        fBAccessCode: this.state.fbAccessToken,
-        facebookUserID: this.state.fbUserID,
-        deviceID: fcm_token,
-        deviceType: isPlatform,
-        latitude: this.state.setLatitude,
-        longitude: this.state.setLongitude
-      }
-      console.log('variablestt variablestt', variablestt)
       client
         .mutate({
           mutation: HANDLE_SIGNUP,
@@ -192,10 +180,11 @@ export default class Signup extends React.Component {
             gid: this.state.googleUserId,
             fBAccessCode: this.state.fbAccessToken,
             facebookUserID: this.state.fbUserID,
+            appleUserID: this.state.appleUserId,
             deviceID: fcm_token,
             deviceType: isPlatform,
             latitude: "'" + this.state.setLatitude + "'",
-            longitude: "'" + this.state.setLongitude + "'"
+            longitude: "'" + this.state.setLongitude + "'",
           },
           context: {
             headers: {
@@ -207,16 +196,31 @@ export default class Signup extends React.Component {
         .then(async result => {
           console.log(result);
           this.setState({ loading: false });
-
           if (result.data.registerUser.success) {
             Alert.alert('', 'Registration Successfull', [
               {
                 text: 'LOGIN',
-                onPress: () => {
-                  this.props.navigation.goBack();
+                onPress: async () => {
+                  // this.props.navigation.goBack();
+                  await AsyncStorage.setItem(
+                    'userToken',
+                    result.data.registerUser.result.token,
+                  );
+                  await AsyncStorage.setItem('IsLogin', 'true');
+                  let decoded = decode(result.data.registerUser.result.token.split('.')[1]);
+                  decoded = JSON.parse(decoded);
+                  let userInfo = result.data.registerUser.result;
+                  userInfo.id = decoded.Id;
+                  await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
+                  this.props.setUserData(userInfo);
+                  this.props.setUserRole(decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']);
+                  this.props.setUserToken(result.data.registerUser.result.token);
+                  this.props.navigation.navigate('Main');
                 },
               },
             ]);
+          } else {
+            alert(result.data.registerUser.message);
           }
         })
         .catch(err => {
@@ -227,7 +231,6 @@ export default class Signup extends React.Component {
   }
   async handleSignUpBusiness() {
     this.setState({ loading: true });
-    console.log('business')
     if (this.state.contact.length < 10) {
       ToastAndroid.show('Please enter valid contact', ToastAndroid.SHORT);
       this.setState({ loading: false });
@@ -356,6 +359,35 @@ export default class Signup extends React.Component {
     }
   }
 
+  onAppleButtonPress = async () => {
+    const appleAuthRequestResponse = await appleAuth.performRequest({
+      requestedOperation: appleAuth.Operation.LOGIN,
+      requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+    });
+    
+    console.log("Apple Auth Request Response:", appleAuthRequestResponse);
+    // get current authentication state for user
+    // /!\ This method must be tested on a real device. On the iOS simulator it always throws an error.
+    const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user);
+
+    console.log("Credential State:", credentialState);
+    // use credentialState response to ensure the user is authenticated
+    if (credentialState === appleAuth.State.AUTHORIZED) {
+      // user is authenticated
+      this.setState({
+        email: appleAuthRequestResponse.email,
+        fname: appleAuthRequestResponse.fullName.givenName,
+        lname: appleAuthRequestResponse.fullName.familyName,
+        appleUserId: appleAuthRequestResponse.user,
+        fbAccessToken: appleAuthRequestResponse.identityToken,
+        password: '2',
+        cpassword: '2',
+        track: 8,
+        phoneModal: true,
+      });
+    }
+  }
+
   render() {
     return (
       <SafeAreaView style={styles.container}>
@@ -366,23 +398,13 @@ export default class Signup extends React.Component {
               style={{ opacity: 0.2 }}
               animationType="fade"
               visible={this.state.isVisible}
-              onRequestClose={() => {
-                console.log('Modal has been closed.');
-              }}>
+             >
               <View style={styles.newmodal} >
                 <View style={styles.modalInner}>
                   <Text style={styles.text}>Select Account Type</Text>
                   <View
-                    style={{
-                      flex: 1,
-                      flexDirection: 'row',
-                      padding: 20,
-                      alignSelf: 'center',
-                      backgroundColor: 'white',
-                    }}>
-                    <TouchableOpacity onPress={() => {
-                      this.setState({ showResultsNew: 'true' })
-                    }}>
+                    style={{ flex: 1, flexDirection: 'row', padding: 20, alignSelf: 'center', backgroundColor: 'white' }}>
+                    <TouchableOpacity onPress={() => { this.setState({ showResultsNew: 'true' }) }}>
                       <View
                         style={{
                           padding: 20,
@@ -393,13 +415,9 @@ export default class Signup extends React.Component {
                           borderRadius: 10,
                         }}>
                         <Image
-                          style={{
-                            width: 70,
-                            height: 90,
-                            marginBottom: 17,
-                            marginLeft: 10,
-                          }}
+                          style={{ width: 70, height: 90, marginBottom: 17, marginLeft: 10 }}
                           source={require('../../assets/Group49.png')}
+                          resizeMode="contain"
                         />
                         <Text style={{ color: '#323232', fontSize: 20 }}>
                           Individual
@@ -418,13 +436,9 @@ export default class Signup extends React.Component {
                           borderRadius: 10,
                         }}>
                         <Image
-                          style={{
-                            width: 70,
-                            height: 90,
-                            marginBottom: 15,
-                            marginLeft: 7,
-                          }}
+                          style={{ width: 70, height: 90, marginBottom: 15, marginLeft: 7 }}
                           source={require('../../assets/Group47.png')}
+                          resizeMode="contain"
                         />
                         <Text style={{ color: '#323232', fontSize: 20 }}>
                           Business
@@ -436,12 +450,12 @@ export default class Signup extends React.Component {
                     this.setState({ isVisible: false });
                     if (this.state.showResultsNew == 'false') {
                       this.props.navigation.push('SetSubscriptionPlan');
-                    } else {
-                    }
+                    } 
                   }}>
                     <Image
                       style={{ marginLeft: 7, marginBottom: 10 }}
                       source={require('../../assets/button.png')}
+                      resizeMode="contain"
                     />
                   </TouchableOpacity>
                 </View>
@@ -520,13 +534,7 @@ export default class Signup extends React.Component {
                   }}
                 />
               </View>
-              <Text
-                style={{
-                  color: '#919191',
-                  marginLeft: 37,
-                  marginTop: -22,
-                  opacity: 0.5,
-                }}>
+              <Text style={{ color: '#919191', marginLeft: 37, marginTop: -22, opacity: 0.5 }}>
                 I Agree With the
               </Text>
               <Text style={{ color: '#919191', marginLeft: 135, marginTop: -19 }}>
@@ -545,48 +553,38 @@ export default class Signup extends React.Component {
               )}
             </TouchableOpacity>
 
-            <View
-              style={{
-                borderBottomColor: 'black',
-                borderBottomWidth: 1,
-                marginTop: 50,
-              }}
-            />
+            <View style={{ borderBottomColor: 'black', borderBottomWidth: 1, marginTop: 50, }} />
             <View>
-              <Text
-                style={{
-                  color: '#AAA',
-                  fontSize: 14,
-                  marginVertical: 15,
-                  alignSelf: 'center',
-                }}>
+              <Text style={{ color: '#AAA', fontSize: 14, marginVertical: 15, alignSelf: 'center', }}>
                 Sign up with
               </Text>
 
+              {Platform.OS ==='ios' && <View style={{ width: '100%', alignItems:'center', marginBottom : 20}}>
+                <AppleButton 
+                  buttonStyle={AppleButton.Style.BLACK}
+                  buttonType={AppleButton.Type.CONTINUE}
+                  style={{
+                    width: 250, 
+                    height: 45,
+                  }}
+                  onPress={() => this.onAppleButtonPress()}
+                />
+              </View>}
+
               <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-around',
-                  width: '100%',
-                  marginTop: 10,
-                  marginBottom: 10,
-                }}>
-                <TouchableOpacity
-                  onPress={() => {
-                    this.facebookSignIn();
-                  }}>
+                style={{ flexDirection: 'row', justifyContent: 'space-around', width: '100%', marginTop: 10, marginBottom: 10 }}>
+                <TouchableOpacity onPress={() => { this.facebookSignIn() }}>
                   <Image
                     style={{ width: 30, height: 30 }}
                     source={require('../../assets/facebook.png')}
+                    resizeMode="contain"
                   />
                 </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    this.googleSignIn();
-                  }}>
+                <TouchableOpacity onPress={() => { this.googleSignIn(); }}>
                   <Image
                     style={{ width: 33, height: 33 }}
                     source={require('../../assets/google.png')}
+                    resizeMode="contain"
                   />
                 </TouchableOpacity>
 
@@ -606,34 +604,43 @@ export default class Signup extends React.Component {
                 <Text>Please enter detail below</Text>
                 <TextInput
                   style={styles.textinput}
+                  onChangeText={text => this.setState({ fname: text })}
+                  underlineColorAndroid="gray"
+                  placeholder="FIRST NAME"
+                  placeholderTextColor="gray"
+                  value={this.state.fname}
+                />
+                <TextInput
+                  style={styles.textinput}
+                  onChangeText={text => this.setState({ lname: text })}
+                  underlineColorAndroid="gray"
+                  placeholder="LAST NAME"
+                  placeholderTextColor="gray"
+                  value={this.state.lname}
+                />
+                <TextInput
+                  style={styles.textinput}
                   onChangeText={text => this.setState({ contact: text })}
                   underlineColorAndroid="gray"
                   placeholder="CONTACT NUMBER"
                   placeholderTextColor="gray"
                   keyboardType="number-pad"
                   maxLength={10}
+                  value={this.state.contact}
                 />
-                {this.state.email === '' && (
-                  <TextInput
-                    style={styles.textinput}
-                    onChangeText={text => this.setState({ email: text })}
-                    underlineColorAndroid="gray"
-                    placeholder="EMAIL"
-                    placeholderTextColor="gray"
-                    autoCapitalize="none"
-                  />
-                )}
+                <TextInput
+                  style={styles.textinput}
+                  onChangeText={text => this.setState({ email: text })}
+                  underlineColorAndroid="gray"
+                  placeholder="EMAIL"
+                  placeholderTextColor="gray"
+                  autoCapitalize="none"
+                  value={this.state.email}
+                />
+               
                 <TouchableOpacity
                   onPress={() => {
-                    if (this.state.contact === '' || this.state.email === '') {
-                      ToastAndroid.show(
-                        'Please enter contact number and email',
-                        ToastAndroid.SHORT,
-                      );
-                    } else {
-                      this.setState({ phoneModal: false });
                       this.handleSignUp();
-                    }
                   }}>
                   <View style={styles.button}>
                     <Text style={styles.buttonText}>Submit</Text>
@@ -647,6 +654,29 @@ export default class Signup extends React.Component {
     );
   }
 }
+
+const mapDispatchToProps = dispatch => ({
+  setUserToken: value => {
+    dispatch({
+      type: 'SET_TOKEN',
+      payload: value,
+    });
+  },
+  setUserData: user => {
+    dispatch({
+      type: 'SET_USER',
+      payload: user
+    })
+  },
+  setUserRole : role => {
+    dispatch({
+      type : 'SET_USER_ROLE',
+      payload: role
+    })
+  }
+});
+
+export default connect(null, mapDispatchToProps)(Signup);
 
 const styles = StyleSheet.create({
   modal: {

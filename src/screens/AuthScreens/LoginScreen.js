@@ -11,6 +11,7 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import LinkedInModal from 'react-native-linkedin';
 import { Icon } from 'native-base';
 import { useTwitter } from 'react-native-simple-twitter';
+import { appleAuth, AppleButton } from '@invertase/react-native-apple-authentication';
 
 function LoginScreen(props) {
   const [email, setEmail] = useState('');
@@ -99,7 +100,7 @@ function LoginScreen(props) {
     const apipayload = await response.json();
     setSocialId(apipayload?.id);
     setTrack(7)
-    sociallogin();
+    sociallogin(apipayload?.id, 7);
   };
 
   const getLinkedinUserEmailId = async data => {
@@ -114,7 +115,6 @@ function LoginScreen(props) {
       },
     );
     const emailpayload = await response.json();
-    console.log(emailpayload.elements[0]['handle~'].emailAddress);
 
   };
 
@@ -122,7 +122,7 @@ function LoginScreen(props) {
     onSuccess: (user, accessToken) => {
       setSocialId(user?.id);
       setTrack(6);
-      sociallogin();
+      sociallogin(user?.id, 6);
     },
   });
 
@@ -136,12 +136,6 @@ function LoginScreen(props) {
   };
 
   useEffect(() => {
-    console.log(loggedInUser);
-    console.log(accessToken);
-  }, [loggedInUser, accessToken]);
-
-  useEffect(() => {
-    console.log(twitter.getAccessToken(), 'check if access toen');
     GoogleSignin.configure({
       scopes: ['https://www.googleapis.com/auth/user.birthday.read'],
       webClientId:
@@ -245,7 +239,7 @@ function LoginScreen(props) {
       });
   };
 
-  const sociallogin = async () => {
+  const sociallogin = async (_socialId = socialId, _track = track) => {
     let token = await AsyncStorage.getItem('userToken');
     const decodedJWT = JSON.parse(decode(token.split('.')[1]));
     const jti = decodedJWT.jti;
@@ -256,7 +250,7 @@ function LoginScreen(props) {
         fetchPolicy: 'no-cache',
         context: {
           headers: {
-            Authorization: `Basic ${encode(socialId + ':' + track)}`,
+            Authorization: `Basic ${encode(_socialId + ':' + _track)}`,
             'Content-Length': 0,
           },
           variables: {
@@ -282,10 +276,10 @@ function LoginScreen(props) {
           props.setUserToken(result.data.oAuth.result.token);
           props.navigation.navigate('Main');
         } else {
-          console.log(result.data.oAuth.message);
           if(Platform.OS === 'android'){
             ToastAndroid.show(result.data.oAuth.message, ToastAndroid.SHORT);
           } else {
+            console.log(result.data.oAuth);
             alert(result.data.oAuth.message);
           }
         }
@@ -324,7 +318,7 @@ function LoginScreen(props) {
       const getToken = await GoogleSignin.getTokens();
       setSocialId(userInfo.user.id);
       setTrack(4);
-      sociallogin();
+      sociallogin(userInfo.user.id, 4);
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         console.log('e 1');
@@ -338,6 +332,33 @@ function LoginScreen(props) {
     }
   };
 
+  const onAppleButtonPress = async () => {
+    try{
+      const appleAuthRequestResponse = await appleAuth.performRequest({
+        requestedOperation: appleAuth.Operation.LOGIN,
+        requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+      });
+      
+      // get current authentication state for user
+      // /!\ This method must be tested on a real device. On the iOS simulator it always throws an error.
+      const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user);
+
+      console.log("Credential State:", credentialState);
+
+      // use credentialState response to ensure the user is authenticated
+      if (credentialState === appleAuth.State.AUTHORIZED) {
+        // user is authenticated
+        console.log("Apple Auth Request ResponseTEST:", appleAuthRequestResponse);
+        setSocialId(() => appleAuthRequestResponse.user);
+        setTrack(() => 8);
+        sociallogin(appleAuthRequestResponse.user, 8)
+      }
+    } catch (e){
+      console.log("Apple Login Error:", e);
+    }
+    
+  }
+
   return (
     <ScrollView style={{ flex: 1, backgroundColor: '#fff' }}>
       <View style={{ flex: 1 }}>
@@ -350,12 +371,7 @@ function LoginScreen(props) {
           <Image
             source={require('../../assets/logo.jpg')}
             resizeMode="contain"
-            style={{
-              width: 210,
-              height: 170,
-              marginBottom: 10,
-              alignSelf: 'center',
-            }}
+            style={{ width: 210, height: 170, marginBottom: 10, alignSelf: 'center' }}
           />
           <View style={{ alignSelf: 'flex-start', marginBottom: 20 }}>
             <Text style={{ color: '#AAA', fontSize: 25 }}>SIGN IN</Text>
@@ -364,9 +380,7 @@ function LoginScreen(props) {
           <View style={styles.searchSection}>
             <TextInput
               style={[styles.input]}
-              onChangeText={text => {
-                setEmail(text);
-              }}
+              onChangeText={setEmail}
               onBlur={() => emailVlidator()}
               placeholder="Email"
               placeholderTextColor="#ccc"
@@ -377,47 +391,23 @@ function LoginScreen(props) {
           <View style={styles.searchSection}>
             <TextInput
               style={[styles.input]}
-              onChangeText={text => {
-                setPassword(text);
-              }}
+              onChangeText={setPassword}
               onBlur={() => passVlidator()}
               placeholder="Password"
               placeholderTextColor="#ccc"
               autoCapitalize="none"
               secureTextEntry={passwordState}
             />
-            <Icon
-              style={styles.searchIcon}
-              name={icon}
-              size={20}
-              color="#000"
-              onPress={() => changeIcon()}
-            />
+            <Icon style={styles.searchIcon} name={icon} size={20} color="#000" onPress={() => changeIcon()} />
           </View>
           <Text style={{ color: 'red', marginLeft: 15 }}>{passwordError}</Text>
-          <TouchableOpacity
-            onPress={() => {
-              props.navigation.navigate('ForgotPassword');
-            }}>
-            <Text
-              style={{
-                color: '#AAA',
-                fontSize: 14,
-                marginVertical: 20,
-                alignSelf: 'center',
-              }}>
+          <TouchableOpacity onPress={() => { props.navigation.navigate('ForgotPassword'); }}>
+            <Text style={{ color: '#AAA', fontSize: 14, marginVertical: 20, alignSelf: 'center' }}>
               Forgot Your Password?
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={() => {
-              submit();
-            }}
-            disabled={loading}
-            style={styles.auth_btn}
-            underlayColor="gray"
-            activeOpacity={0.8}>
+          <TouchableOpacity onPress={submit} disabled={loading} style={styles.auth_btn} underlayColor="gray" activeOpacity={0.8}>
             {loading ? (
               <ActivityIndicator color="#fff" />
             ) : (
@@ -425,56 +415,52 @@ function LoginScreen(props) {
             )}
           </TouchableOpacity>
 
-          <Text
-            style={{
-              color: '#AAA',
-              fontSize: 14,
-              marginVertical: 15,
-              alignSelf: 'center',
-            }}>
+          <Text style={{ color: '#AAA', fontSize: 14, marginVertical: 15, alignSelf: 'center',}}>
             Sign In with
           </Text>
 
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-around',
-              width: '100%',
-              marginTop: 10,
-              marginBottom: 10,
-            }}>
-            <TouchableOpacity
-              onPress={() => {
-                facebookSignIn();
-              }}>
+          {Platform.OS ==='ios' && <View style={{ width: '100%', alignItems:'center', marginBottom : 20}}>
+            <AppleButton 
+              buttonStyle={AppleButton.Style.BLACK}
+              buttonType={AppleButton.Type.CONTINUE}
+              style={{
+                width: 250, // You must specify a width
+                height: 45, // You must specify a height
+              }}
+              onPress={() => onAppleButtonPress()}
+            />
+          </View>}
+          
+          <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: '100%', marginTop: 10, marginBottom: 10 }}>
+            <TouchableOpacity onPress={facebookSignIn}>
               <Image
-                style={{ width: 30, height: 30 }}
+                style={{ width: 40, height: 40 }}
                 source={require('../../assets/facebook.png')}
+                resizeMode="contain"
               />
             </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                googleSignIn();
-              }}>
+            <TouchableOpacity onPress={googleSignIn}>
               <Image
-                style={{ width: 33, height: 33 }}
+                style={{ width: 43, height: 43 }}
                 source={require('../../assets/google.png')}
+                resizeMode="contain"
               />
             </TouchableOpacity>
             <LinkedInModal
               animationType="slide"
               linkImage={require('../../assets/linkdin.png')}
-              wrapperStyle={{
-                borderRadius: 0,
-                borderWidth: 30,
-                borderColor: 'white',
-              }}
-              containerStyle={{
-                flex: 1,
-                paddingVertical: 0,
-                paddingHorizontal: 0,
-              }}
               ref={linkedRef}
+              renderButton={(props) => {
+                return (
+                  <TouchableOpacity onPress={() => linkedRef.current.open()}>
+                    <Image 
+                      source={require("../../assets/linkdin.png")} 
+                      style={{ width: 43, height: 43 }}
+                      resizeMode="contain"
+                    />
+                  </TouchableOpacity>
+                )
+              }}
               clientID="77jk3h838ss2tn"
               clientSecret="iCFuONohOAucHBYx"
               redirectUri="https://www.ezyfind.co.za/oauthlinkedin"
@@ -483,13 +469,11 @@ function LoginScreen(props) {
                 getLinkedinUserEmailId(token);
               }}
             />
-            <TouchableOpacity
-              onPress={() => {
-                onLoginPress();
-              }}>
+            <TouchableOpacity onPress={onLoginPress}>
               <Image
-                style={{ width: 33, height: 33 }}
+                style={{ width: 43, height: 43 }}
                 source={require('../../assets/twitter.png')}
+                resizeMode="contain"
               />
             </TouchableOpacity>
             <TWModal />
@@ -497,18 +481,10 @@ function LoginScreen(props) {
           <TouchableOpacity
             style={{ marginTop: 15 }}
             activeOpacity={0.7}
-            onPress={() => {
-              props.navigation.navigate('SignUp');
-            }}>
+            onPress={() => { props.navigation.navigate('SignUp'); }}>
             <Text style={{ color: '#CCC', alignSelf: 'center' }}>
               Dont have an account?{' '}
-              <Text
-                style={{
-                  fontSize: 16,
-                  color: '#CCC',
-                  fontWeight: 'bold',
-                  alignSelf: 'center',
-                }}>
+              <Text style={{ fontSize: 16, color: '#CCC', fontWeight: 'bold', alignSelf: 'center' }}>
                 SIGN UP
               </Text>
             </Text>

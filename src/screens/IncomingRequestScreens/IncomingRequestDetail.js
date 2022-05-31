@@ -13,6 +13,8 @@ import FontawesomeIcon from "react-native-vector-icons/FontAwesome";
 import { connect } from "react-redux";
 import { ApolloClient, InMemoryCache } from '@apollo/client';
 import url from '../../constants/api';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+
 
 const client = new ApolloClient({
   uri: url,
@@ -170,7 +172,7 @@ const IncomingRequestDetail = ({ navigation, route, userState }) => {
 
   return (
     <SafeAreaView style={{ paddingTop: 10}}>
-      <ScrollView>
+      <KeyboardAwareScrollView>
         <View>
         {images.length === 0 ?<Image
             style={{ height: 190, width: 360, alignSelf: 'center' }}
@@ -296,11 +298,12 @@ const IncomingRequestDetail = ({ navigation, route, userState }) => {
 
                   <TouchableOpacity style={styles.btnSend}
                     onPress={() => {
-                      navigation.navigate('IncomingRequestChat' , { requestData: data, mainChat: { msgs: []} });
+                      navigation.navigate('IncomingRequestChat' , { requestData: data, mainChat: [], msg : name_address });
                     }}>
                     <Image
                       source={require('../../assets/M26_3.png')}
                       style={styles.iconSend}
+                      resizeMode="contain"
                     />
                   </TouchableOpacity>
                 </View>
@@ -332,7 +335,7 @@ const IncomingRequestDetail = ({ navigation, route, userState }) => {
             }
           </View>
         </View>}
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 };
