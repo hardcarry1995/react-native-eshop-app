@@ -15,8 +15,9 @@ const Header = () => {
     <View style={{height: '10%', flexDirection: 'row', elevation: 9}}>
       <TouchableOpacity>
         <Image
-          style={{ height: 25, width: 15, alignItems: 'flex-start', margin: 15, marginTop: 35 }}
+          style={{ height: 25, width: 15, alignItems: 'center', margin: 15, marginTop: 35 }}
           source={require('./../assets/left-arrow.png')}
+          resizeMode="cotain"
         />
       </TouchableOpacity>
       <View style={{justifyContent: 'center', padding: 10}}>

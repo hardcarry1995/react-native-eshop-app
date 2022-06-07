@@ -1,4 +1,4 @@
-package com.innovolvedupdated;
+package com.INNOVEzyFind;
 
 import com.facebook.react.ReactActivity;
 

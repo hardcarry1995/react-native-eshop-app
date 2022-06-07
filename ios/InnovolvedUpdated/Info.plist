@@ -41,6 +41,8 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>FacebookAppID</key>
 	<string>635396299882798</string>
+	<key>FacebookClientToken</key>
+	<string>3f30ed2ddc0ab9a674f14191ed88cbba</string>
 	<key>FacebookDisplayName</key>
 	<string>EzyFind</string>
 	<key>LSApplicationQueriesSchemes</key>

@@ -108,7 +108,6 @@ class TabBar extends React.Component {
   render() {
     const { navigation } = this.props;
     const navigationState = this.props.state;
-    console.log(this.props.userState.carts);
     return this.state.isVisible ? (
         <View style={styles.tabBarContainer}>
           {this.props.state.routes.map((route, index) => {

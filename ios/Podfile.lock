@@ -353,8 +353,8 @@ PODS:
   - BoringSSL-GRPC/Interface (0.0.7)
   - CocoaAsyncSocket (7.6.5)
   - DoubleConversion (1.1.6)
-  - FBAEMKit (12.3.2):
-    - FBSDKCoreKit_Basics (= 12.3.2)
+  - FBAEMKit (13.2.0):
+    - FBSDKCoreKit_Basics (= 13.2.0)
   - FBLazyVector (0.67.3)
   - FBReactNativeSpec (0.67.3):
     - RCT-Folly (= 2021.06.28.00-v2)
@@ -363,22 +363,23 @@ PODS:
     - React-Core (= 0.67.3)
     - React-jsi (= 0.67.3)
     - ReactCommon/turbomodule/core (= 0.67.3)
-  - FBSDKCoreKit (12.3.2):
-    - FBAEMKit (= 12.3.2)
-    - FBSDKCoreKit_Basics (= 12.3.2)
-  - FBSDKCoreKit_Basics (12.3.2)
-  - FBSDKLoginKit (12.3.2):
-    - FBSDKCoreKit (= 12.3.2)
-  - FBSDKShareKit (12.3.2):
-    - FBSDKCoreKit (= 12.3.2)
+  - FBSDKCoreKit (13.2.0):
+    - FBAEMKit (= 13.2.0)
+    - FBSDKCoreKit_Basics (= 13.2.0)
+  - FBSDKCoreKit_Basics (13.2.0)
+  - FBSDKGamingServicesKit (13.2.0):
+    - FBSDKCoreKit (= 13.2.0)
+    - FBSDKCoreKit_Basics (= 13.2.0)
+    - FBSDKShareKit (= 13.2.0)
+  - FBSDKLoginKit (13.2.0):
+    - FBSDKCoreKit (= 13.2.0)
+  - FBSDKShareKit (13.2.0):
+    - FBSDKCoreKit (= 13.2.0)
   - Firebase/Auth (8.12.1):
     - Firebase/CoreOnly
     - FirebaseAuth (~> 8.12.0)
   - Firebase/CoreOnly (8.12.1):
     - FirebaseCore (= 8.12.1)
-  - Firebase/Crashlytics (8.12.1):
-    - Firebase/CoreOnly
-    - FirebaseCrashlytics (~> 8.12.0)
   - Firebase/Firestore (8.12.1):
     - Firebase/CoreOnly
     - FirebaseFirestore (~> 8.12.1)
@@ -394,18 +395,11 @@ PODS:
     - FirebaseCoreDiagnostics (~> 8.0)
     - GoogleUtilities/Environment (~> 7.7)
     - GoogleUtilities/Logger (~> 7.7)
-  - FirebaseCoreDiagnostics (8.14.0):
+  - FirebaseCoreDiagnostics (8.15.0):
     - GoogleDataTransport (~> 9.1)
     - GoogleUtilities/Environment (~> 7.7)
     - GoogleUtilities/Logger (~> 7.7)
     - nanopb (~> 2.30908.0)
-  - FirebaseCrashlytics (8.12.0):
-    - FirebaseCore (~> 8.0)
-    - FirebaseInstallations (~> 8.0)
-    - GoogleDataTransport (~> 9.1)
-    - GoogleUtilities/Environment (~> 7.7)
-    - nanopb (~> 2.30908.0)
-    - PromisesObjC (< 3.0, >= 1.2)
   - FirebaseFirestore (8.12.1):
     - abseil/algorithm (= 0.20200225.0)
     - abseil/base (= 0.20200225.0)
@@ -419,7 +413,7 @@ PODS:
     - "gRPC-C++ (~> 1.28.0)"
     - leveldb-library (~> 1.22)
     - nanopb (~> 2.30908.0)
-  - FirebaseInstallations (8.14.0):
+  - FirebaseInstallations (8.15.0):
     - FirebaseCore (~> 8.0)
     - GoogleUtilities/Environment (~> 7.7)
     - GoogleUtilities/UserDefaults (~> 7.7)
@@ -495,9 +489,9 @@ PODS:
     - FlipperKit/FlipperKitNetworkPlugin
   - fmt (6.2.1)
   - glog (0.3.5)
-  - GoogleDataTransport (9.1.2):
-    - GoogleUtilities/Environment (~> 7.2)
-    - nanopb (~> 2.30908.0)
+  - GoogleDataTransport (9.1.4):
+    - GoogleUtilities/Environment (~> 7.7)
+    - nanopb (< 2.30910.0, >= 2.30908.0)
     - PromisesObjC (< 3.0, >= 1.2)
   - GoogleSignIn (6.1.0):
     - AppAuth (~> 1.4)
@@ -544,10 +538,10 @@ PODS:
     - BoringSSL-GRPC (= 0.0.7)
     - gRPC-Core/Interface (= 1.28.2)
   - gRPC-Core/Interface (1.28.2)
-  - GTMAppAuth (1.2.3):
+  - GTMAppAuth (1.3.0):
     - AppAuth/Core (~> 1.4)
     - GTMSessionFetcher/Core (~> 1.5)
-  - GTMSessionFetcher/Core (1.7.1)
+  - GTMSessionFetcher/Core (1.7.2)
   - leveldb-library (1.22.1)
   - libevent (2.1.12)
   - nanopb (2.30908.0):
@@ -572,7 +566,7 @@ PODS:
     - RNPermissions
   - Permission-PhotoLibraryAddOnly (3.3.0):
     - RNPermissions
-  - PromisesObjC (2.0.0)
+  - PromisesObjC (2.1.0)
   - RCT-Folly (2021.06.28.00-v2):
     - boost
     - DoubleConversion
@@ -783,19 +777,20 @@ PODS:
     - React-Core
   - react-native-document-picker (8.0.0):
     - React-Core
-  - react-native-fbsdk-next (7.3.2):
+  - react-native-fbsdk-next (8.0.5):
     - React-Core
-    - react-native-fbsdk-next/Core (= 7.3.2)
-    - react-native-fbsdk-next/Login (= 7.3.2)
-    - react-native-fbsdk-next/Share (= 7.3.2)
-  - react-native-fbsdk-next/Core (7.3.2):
-    - FBSDKCoreKit (~> 12.3.2)
+    - react-native-fbsdk-next/Core (= 8.0.5)
+    - react-native-fbsdk-next/Login (= 8.0.5)
+    - react-native-fbsdk-next/Share (= 8.0.5)
+  - react-native-fbsdk-next/Core (8.0.5):
+    - FBSDKCoreKit (~> 13.2.0)
     - React-Core
-  - react-native-fbsdk-next/Login (7.3.2):
-    - FBSDKLoginKit (~> 12.3.2)
+  - react-native-fbsdk-next/Login (8.0.5):
+    - FBSDKLoginKit (~> 13.2.0)
     - React-Core
-  - react-native-fbsdk-next/Share (7.3.2):
-    - FBSDKShareKit (~> 12.3.2)
+  - react-native-fbsdk-next/Share (8.0.5):
+    - FBSDKGamingServicesKit (~> 13.2.0)
+    - FBSDKShareKit (~> 13.2.0)
     - React-Core
   - react-native-geolocation (2.0.2):
     - React
@@ -895,10 +890,6 @@ PODS:
     - React-Core
   - RNFBAuth (14.5.0):
     - Firebase/Auth (= 8.12.1)
-    - React-Core
-    - RNFBApp
-  - RNFBCrashlytics (14.5.0):
-    - Firebase/Crashlytics (= 8.12.1)
     - React-Core
     - RNFBApp
   - RNFBFirestore (14.5.0):
@@ -1049,7 +1040,6 @@ DEPENDENCIES:
   - "RNCPicker (from `../node_modules/@react-native-picker/picker`)"
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
   - "RNFBAuth (from `../node_modules/@react-native-firebase/auth`)"
-  - "RNFBCrashlytics (from `../node_modules/@react-native-firebase/crashlytics`)"
   - "RNFBFirestore (from `../node_modules/@react-native-firebase/firestore`)"
   - "RNFBMessaging (from `../node_modules/@react-native-firebase/messaging`)"
   - RNFileViewer (from `../node_modules/react-native-file-viewer`)
@@ -1073,13 +1063,13 @@ SPEC REPOS:
     - FBAEMKit
     - FBSDKCoreKit
     - FBSDKCoreKit_Basics
+    - FBSDKGamingServicesKit
     - FBSDKLoginKit
     - FBSDKShareKit
     - Firebase
     - FirebaseAuth
     - FirebaseCore
     - FirebaseCoreDiagnostics
-    - FirebaseCrashlytics
     - FirebaseFirestore
     - FirebaseInstallations
     - FirebaseMessaging
@@ -1219,8 +1209,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-firebase/app"
   RNFBAuth:
     :path: "../node_modules/@react-native-firebase/auth"
-  RNFBCrashlytics:
-    :path: "../node_modules/@react-native-firebase/crashlytics"
   RNFBFirestore:
     :path: "../node_modules/@react-native-firebase/firestore"
   RNFBMessaging:
@@ -1255,20 +1243,20 @@ SPEC CHECKSUMS:
   BoringSSL-GRPC: 8edf627ee524575e2f8d19d56f068b448eea3879
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
   DoubleConversion: 831926d9b8bf8166fd87886c4abab286c2422662
-  FBAEMKit: 955ca52eba8219c20f90774e8c6ff8bc7b3192a3
+  FBAEMKit: c2b2895363b7e57192013d1dc49fdf498b28624c
   FBLazyVector: 808f741ddb0896a20e5b98cc665f5b3413b072e2
   FBReactNativeSpec: 94473205b8741b61402e8c51716dea34aa3f5b2f
-  FBSDKCoreKit: 678f64eda3f0ff25c189c2ebbfe87b1d96a85a6d
-  FBSDKCoreKit_Basics: 6bee7c1f0932432901781203fa5e587ec5099148
-  FBSDKLoginKit: 56d55e23fe66a6db045826190b0b4dbc0e1ca0a0
-  FBSDKShareKit: 4ef957addab76816116ea92bd872e792f7137669
+  FBSDKCoreKit: 58139803d861e72c7661dc875611a759352a55ac
+  FBSDKCoreKit_Basics: 1ffc68326a5ece051d85574f02a0adcf27c2a5f2
+  FBSDKGamingServicesKit: 2af7e19dcfc3459581dec011a230d1eeddc17861
+  FBSDKLoginKit: 19e2a878556c2ee4f20486dc406e582783cd7578
+  FBSDKShareKit: 079497bb0cfeb049dc8ff6aee2702698680a2806
   Firebase: 580d09e8edafc3073ebf09c03fd42e4d80d35fe9
   FirebaseAuth: 5250d7bdba35e57cc34ec7ddc525f82b2757f2a0
   FirebaseCore: 8138de860a90ca7eec5e324da5788fb0ebf1d93c
-  FirebaseCoreDiagnostics: fd0c8490f34287229c1d6c103d3a55f81ec85712
-  FirebaseCrashlytics: 7952ffd988006128325510664b99dc8ca5851dff
+  FirebaseCoreDiagnostics: 92e07a649aeb66352b319d43bdd2ee3942af84cb
   FirebaseFirestore: dfeb58916ee3ae0ef2453d4849a683672705920c
-  FirebaseInstallations: 7d1d967a307c12f1aadd76844fc321cef699b1ce
+  FirebaseInstallations: 40bd9054049b2eae9a2c38ef1c3dd213df3605cd
   FirebaseMessaging: 23db8bf05585e929ada8af0f0968933c25252808
   Flipper: 30e8eeeed6abdc98edaf32af0cda2f198be4b733
   Flipper-Boost-iOSX: fd1e2b8cbef7e662a122412d7ac5f5bea715403c
@@ -1281,13 +1269,13 @@ SPEC CHECKSUMS:
   FlipperKit: d8d346844eca5d9120c17d441a2f38596e8ed2b9
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 85ecdd10ee8d8ec362ef519a6a45ff9aa27b2e85
-  GoogleDataTransport: 629c20a4d363167143f30ea78320d5a7eb8bd940
+  GoogleDataTransport: 5fffe35792f8b96ec8d6775f5eccd83c998d5a3b
   GoogleSignIn: c90b5bec45e780f54c6a8e1e3c182a86e3dda69d
   GoogleUtilities: e0913149f6b0625b553d70dae12b49fc62914fd1
   "gRPC-C++": 13d8ccef97d5c3c441b7e3c529ef28ebee86fad2
   gRPC-Core: 4afa11bfbedf7cdecd04de535a9e046893404ed5
-  GTMAppAuth: 987526d41b07efb1bedda5e936fe0cb718a03113
-  GTMSessionFetcher: 4577a4cc914a5a07c40a8a0ad0acc22080418c2d
+  GTMAppAuth: 4d8f864896f3646f0c33baf38a28362f4c601e15
+  GTMSessionFetcher: 5595ec75acf5be50814f81e9189490412bad82ba
   leveldb-library: 50c7b45cbd7bf543c81a468fe557a16ae3db8729
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
@@ -1300,7 +1288,7 @@ SPEC CHECKSUMS:
   Permission-Notifications: ae00347c7a9efdfaa1a0138e59e37c8f0f3ede0b
   Permission-PhotoLibrary: 33911b5522ee5978fcabe25d604756135325d067
   Permission-PhotoLibraryAddOnly: 4d5e8e4b193221641dedcc9d640375f9429e87b0
-  PromisesObjC: 68159ce6952d93e17b2dfe273b8c40907db5ba58
+  PromisesObjC: 99b6f43f9e1044bd87a95a60beff28c2c44ddb72
   RCT-Folly: 803a9cfd78114b2ec0f140cfa6fa2a6bafb2d685
   RCTRequired: 3c77b683474faf23920fbefc71c4e13af21470c0
   RCTTypeSafety: 720b1841260dac692444c2822b27403178da8b28
@@ -1316,7 +1304,7 @@ SPEC CHECKSUMS:
   react-native-blob-util: 7ac01cd4a4ba81016864727a756ce2c1af995e35
   react-native-camera: 3eae183c1d111103963f3dd913b65d01aef8110f
   react-native-document-picker: 429972f7ece4463aa5bcdd789622b3a674a3c5d1
-  react-native-fbsdk-next: 5d8803a1a933e0522a0ecb86eb4f750397e0ca54
+  react-native-fbsdk-next: 79815a5b8f66ab0990fbb370b4a4b5bdf0a15e6c
   react-native-geolocation: c956aeb136625c23e0dce0467664af2c437888c9
   react-native-image-picker: 4e6008ad8c2321622affa2c85432a5ebd02d480c
   react-native-maps: d752b0dd0e1951d815b1336332835aab6b4a836f
@@ -1343,7 +1331,6 @@ SPEC CHECKSUMS:
   RNCPicker: 0991c56da7815c0cf946d6f63cf920b25296e5f6
   RNFBApp: 06c8447270d295edc431bccd55970d8711a07a42
   RNFBAuth: e248a56b1d28d3b53b54b72a296cf9270df1d96e
-  RNFBCrashlytics: 0cfb53fcd558969ee498eb7030ee7065c7dacf8d
   RNFBFirestore: 7e4fe3b009a193d2f2fb0a19d1d6ab06355d4a09
   RNFBMessaging: 8e3575bb0303b43a852bf5decbe99c3272035048
   RNFileViewer: ce7ca3ac370e18554d35d6355cffd7c30437c592

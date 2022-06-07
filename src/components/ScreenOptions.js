@@ -8,10 +8,12 @@ const screenOptions = ({ navigation }) => ({
     <View style={{ flex: 1, backgroundColor: '#fff' }} />
   ),
   headerStyle: textHeader.header_style,
+  headerTitleAlign: 'center',
   headerTitle: () => (
     <Image
       source={require('../assets/img/LoginIcon.png')}
-      style={{ width: 100, height: 45, resizeMode: 'contain' }}
+      style={{ width: 100, height: 45 }}
+      resizeMode ='contain'
     />
   ),
   headerLeft: () => <Menu navigationProps={navigation} />,

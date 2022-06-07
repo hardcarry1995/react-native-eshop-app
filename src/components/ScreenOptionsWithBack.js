@@ -5,13 +5,15 @@ import HeaderBackLeft from './HeaderBackLeft';
 
 const ScreenOptionsWithBack = ({ navigation }) => ({
   headerBackground: () => (
-    <View style={{ flex: 1, backgroundColor: '#fff' }} />
+    <View style={{ flex: 1, backgroundColor: '#fff', }} />
   ),
   headerStyle: textHeader.header_style,
+  headerTitleAlign: 'center',
   headerTitle: () => (
     <Image
       source={require('../assets/img/LoginIcon.png')}
-      style={{ width: 100, height: 45, resizeMode: 'contain' }}
+      style={{ width: 100, height: 45  }}
+      resizeMode = 'contain'
     />
   ),
   headerLeft: () => <HeaderBackLeft navigationProps={navigation} />,

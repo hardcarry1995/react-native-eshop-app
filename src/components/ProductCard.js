@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
     borderRadius: 15,
-    elevation: 5,
+    // elevation: 5,
   },
   productItemContainer: {
     flex: 1,
@@ -65,7 +65,6 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
     borderRadius: 15,
-    elevation: 5,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,

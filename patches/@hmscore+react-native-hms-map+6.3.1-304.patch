@@ -1,0 +1,11 @@
+diff --git a/node_modules/@hmscore/react-native-hms-map/android/build.gradle b/node_modules/@hmscore/react-native-hms-map/android/build.gradle
+index 6543ebe..9545d08 100644
+--- a/node_modules/@hmscore/react-native-hms-map/android/build.gradle
++++ b/node_modules/@hmscore/react-native-hms-map/android/build.gradle
+@@ -1,5 +1,5 @@
+ apply plugin: 'com.android.library'
+-apply plugin: 'maven'
++apply plugin: 'maven-publish'
+ 
+ buildscript {
+     repositories {

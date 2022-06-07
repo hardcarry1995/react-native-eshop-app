@@ -11,7 +11,8 @@ export default class HeaderBackLeft extends Component {
         style={textHeader.leftIcon}>
         <Image
           source={require('./../assets/images/arrow-left_3x.png')}
-          style={{ width: 11, height: 20, alignSelf: 'flex-start', tintColor: '#000' }}
+          style={{ width: 11, height: 20, tintColor: '#000' }}
+          resizeMode="contain"
         />
       </TouchableOpacity>
     );

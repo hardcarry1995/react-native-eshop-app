@@ -1,7 +1,11 @@
-package com.innovolvedupdated;
+package com.INNOVEzyFind;
 
 import android.app.Application;
 import android.content.Context;
+
+import com.facebook.FacebookSdk;
+import com.facebook.LoggingBehavior;
+import com.facebook.appevents.AppEventsLogger;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
 import com.oblador.vectoricons.VectorIconsPackage;
@@ -70,7 +74,7 @@ public class MainApplication extends Application implements ReactApplication {
          We use reflection here to pick up the class that initializes Flipper,
         since Flipper library is not available in release mode
         */
-        Class<?> aClass = Class.forName("com.innovolvedupdated.ReactNativeFlipper");
+        Class<?> aClass = Class.forName("com.INNOVEzyFind.ReactNativeFlipper");
         aClass
             .getMethod("initializeFlipper", Context.class, ReactInstanceManager.class)
             .invoke(null, context, reactInstanceManager);
