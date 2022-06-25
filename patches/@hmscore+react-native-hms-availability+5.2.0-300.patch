@@ -1,0 +1,11 @@
+diff --git a/node_modules/@hmscore/react-native-hms-availability/android/build.gradle b/node_modules/@hmscore/react-native-hms-availability/android/build.gradle
+index eeba120..97376a0 100644
+--- a/node_modules/@hmscore/react-native-hms-availability/android/build.gradle
++++ b/node_modules/@hmscore/react-native-hms-availability/android/build.gradle
+@@ -1,5 +1,5 @@
+ apply plugin: 'com.android.library'
+-apply plugin: 'maven'
++apply plugin: 'maven-publish'
+ 
+ buildscript {
+     repositories {

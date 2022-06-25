@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react'
-import { StyleSheet, Text, View, Image } from 'react-native'
+import { StyleSheet, Text, View, Image, Platform} from 'react-native'
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import messaging from "@react-native-firebase/messaging";
 import AsyncStorage from '@react-native-community/async-storage';
+import { getBrand, getManufacturer } from 'react-native-device-info';
 
 const SplashScreen = ({ navigation }) => {
   useEffect(() => {
     init();
-  }, [])
+  }, []);
+
   useEffect(() => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
       console.log(remoteMessage);
@@ -16,35 +18,49 @@ const SplashScreen = ({ navigation }) => {
   }, []);
 
   const init = async () => {
-    GoogleSignin.configure();
-    if( await requestUserPermission()) {
-      const fcmToken = await messaging().getToken();
-      if (fcmToken) {
-        AsyncStorage.setItem('fcm_token', fcmToken);
-      } else {
-        console.log('fcm_token', fcmToken);
-      }
-      messaging().onNotificationOpenedApp(remoteMessage => {
-        console.log(
-          'Notification caused app to open from background state:',
-          remoteMessage.notification,
-        );
-        // navigation.navigate(remoteMessage.data.type);
-      });
-  
-      // Check whether an initial notification is available
-      messaging()
-        .getInitialNotification()
-        .then(remoteMessage => {
-          if (remoteMessage) {
-            console.log(
-              'Notification caused app to open from quit state:',
-              remoteMessage.notification,
-            );
-            // setInitialRoute(remoteMessage.data.type); // e.g. "Settings"
-          }
+    GoogleSignin.configure({
+      scopes: ['https://www.googleapis.com/auth/user.birthday.read'],
+      webClientId:
+        '232834789917-0i6u709vc27u2bo5idli0hgv1v9jhcp9.apps.googleusercontent.com',
+      offlineAccess: true, // if you want to access Google API on behalf
+      hostedDomain: '',
+      forceConsentPrompt: true,
+    });
+    const deviceBrand = getBrand();
+    console.log("Device Brand:", deviceBrand);
+    if(deviceBrand == "HUAWEI"){
+      
+    } else {
+      if( await requestUserPermission()) {
+        const fcmToken = await messaging().getToken();
+        if (fcmToken) {
+          AsyncStorage.setItem('fcm_token', fcmToken);
+        } else {
+          console.log('fcm_token', fcmToken);
+        }
+        messaging().onNotificationOpenedApp(remoteMessage => {
+          console.log(
+            'Notification caused app to open from background state:',
+            remoteMessage.notification,
+          );
+          // navigation.navigate(remoteMessage.data.type);
         });
+    
+        // Check whether an initial notification is available
+        messaging()
+          .getInitialNotification()
+          .then(remoteMessage => {
+            if (remoteMessage) {
+              console.log(
+                'Notification caused app to open from quit state:',
+                remoteMessage.notification,
+              );
+              // setInitialRoute(remoteMessage.data.type); // e.g. "Settings"
+            }
+          });
+      }
     }
+    
     setTimeout(() => {
       navigation.reset({
         index: 0,

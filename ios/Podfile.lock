@@ -885,6 +885,8 @@ PODS:
     - React-Core
   - RNCPicker (1.16.8):
     - React-Core
+  - RNDeviceInfo (9.0.2):
+    - React-Core
   - RNFBApp (14.5.0):
     - Firebase/CoreOnly (= 8.12.1)
     - React-Core
@@ -1038,6 +1040,7 @@ DEPENDENCIES:
   - "RNAppleAuthentication (from `../node_modules/@invertase/react-native-apple-authentication`)"
   - "RNCAsyncStorage (from `../node_modules/@react-native-community/async-storage`)"
   - "RNCPicker (from `../node_modules/@react-native-picker/picker`)"
+  - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
   - "RNFBAuth (from `../node_modules/@react-native-firebase/auth`)"
   - "RNFBFirestore (from `../node_modules/@react-native-firebase/firestore`)"
@@ -1205,6 +1208,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-community/async-storage"
   RNCPicker:
     :path: "../node_modules/@react-native-picker/picker"
+  RNDeviceInfo:
+    :path: "../node_modules/react-native-device-info"
   RNFBApp:
     :path: "../node_modules/@react-native-firebase/app"
   RNFBAuth:
@@ -1329,6 +1334,7 @@ SPEC CHECKSUMS:
   RNAppleAuthentication: cbe1ab5c0f398ce07a215e6b247048092bf4feb3
   RNCAsyncStorage: b03032fdbdb725bea0bd9e5ec5a7272865ae7398
   RNCPicker: 0991c56da7815c0cf946d6f63cf920b25296e5f6
+  RNDeviceInfo: 1e3f62b9ec32f7754fac60bd06b8f8a27124e7f0
   RNFBApp: 06c8447270d295edc431bccd55970d8711a07a42
   RNFBAuth: e248a56b1d28d3b53b54b72a296cf9270df1d96e
   RNFBFirestore: 7e4fe3b009a193d2f2fb0a19d1d6ab06355d4a09

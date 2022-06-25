@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { connect } from 'react-redux';
 import { gql } from '@apollo/client';
 import client from '../../constants/client';
+import { HANDLE_SIGNUP, CHECK_MAIL } from '../../constants/queries';
 import { decode } from 'base-64';
 import { LoginManager, Profile, AccessToken } from 'react-native-fbsdk-next';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
@@ -12,6 +13,10 @@ import LinkedInModal from 'react-native-linkedin';
 import { Icon } from 'native-base';
 import { useTwitter } from 'react-native-simple-twitter';
 import { appleAuth, AppleButton } from '@invertase/react-native-apple-authentication';
+import Modal from 'react-native-modal';
+import Geolocation from '@react-native-community/geolocation';
+import { bearerToken } from '../../constants/utils';
+
 
 function LoginScreen(props) {
   const [email, setEmail] = useState('');
@@ -19,7 +24,7 @@ function LoginScreen(props) {
   const [lname, setLname] = useState('');
   const [fbUserID, setFbUserID] = useState('');
   const [fbAccessToken, setFbAccessToken] = useState('');
-  const [phoneModal, setPhoneModal] = useState('');
+  const [phoneModal, setPhoneModal] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [emailcon, setEmailcon] = useState('');
   const [password, setPassword] = useState('');
@@ -30,6 +35,10 @@ function LoginScreen(props) {
   const [track, setTrack] = useState('');
   const [icon, setIcon] = useState('eye-off');
   const [passwordState, setPasswordState] = useState(true);
+  const [contact, setContact] = useState("");
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
+  const [socialType, setSocialType] = useState("");
   const linkedRef = useRef();
   const TwitterKeys = {
     TWITTER_COMSUMER_KEY: 'zqgVlMDyoBWRGVNNj6FSpIkKb',
@@ -98,6 +107,7 @@ function LoginScreen(props) {
       },
     );
     const apipayload = await response.json();
+    setSocialType("linkedin");
     setSocialId(apipayload?.id);
     setTrack(7)
     sociallogin(apipayload?.id, 7);
@@ -120,6 +130,7 @@ function LoginScreen(props) {
 
   const { twitter, TWModal, loggedInUser, accessToken } = useTwitter({
     onSuccess: (user, accessToken) => {
+      setSocialType("twitter");
       setSocialId(user?.id);
       setTrack(6);
       sociallogin(user?.id, 6);
@@ -136,25 +147,33 @@ function LoginScreen(props) {
   };
 
   useEffect(() => {
-    GoogleSignin.configure({
-      scopes: ['https://www.googleapis.com/auth/user.birthday.read'],
-      webClientId:
-        '232834789917-0i6u709vc27u2bo5idli0hgv1v9jhcp9.apps.googleusercontent.com',
-      offlineAccess: true, // if you want to access Google API on behalf
-      hostedDomain: '',
-      forceConsentPrompt: true,
-    });
     twitter.setConsumerKey(
       TwitterKeys.TWITTER_COMSUMER_KEY,
       TwitterKeys.TWITTER_CONSUMER_SECRET,
     );
   }, []);
 
+  useEffect(() => {
+    Geolocation.getCurrentPosition((position) => {
+      console.log('position', position);
+      let latitude = position.coords.latitude;
+      let longitude = position.coords.longitude;
+      setLatitude(latitude);
+      setLongitude(longitude);
+    }, (error) => {
+      console.log(error.code, error.message);
+    },
+      {
+        enableHighAccuracy: false,
+        timeout: 10000,
+        maximumAge: 100000
+      });
+  }, [])
+
   const facebookSignIn = async () => {
     let result = await LoginManager.logInWithPermissions([
       'public_profile',
       'email',
-      'user_friends',
     ]);
     if (result.isCancelled) {
       console.log('Login cancelled');
@@ -166,7 +185,10 @@ function LoginScreen(props) {
       setLname(fbProfile.lastName);
       setFbUserID(fbProfile.userID);
       setFbAccessToken(token.accessToken);
-      setPhoneModal(true);
+      setSocialType("facebook");
+      setSocialId(() => fbProfile.userID);
+      setTrack(() => 3);
+      sociallogin(fbProfile.userID, 3)
     }
   };
 
@@ -266,7 +288,6 @@ function LoginScreen(props) {
           await AsyncStorage.setItem('IsLogin', 'true');
           let decoded = decode(result.data.oAuth.result.token.split('.')[1]);
           decoded = JSON.parse(decoded);
-          console.log(decoded);
           let userInfo = result.data.oAuth.result;
           userInfo.id = decoded.Id;
           await AsyncStorage.setItem('userRole', decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']);
@@ -283,8 +304,9 @@ function LoginScreen(props) {
             ToastAndroid.show(result.data.oAuth.message, ToastAndroid.SHORT);
           } else {
             console.log(result.data.oAuth);
-            alert(result.data.oAuth.message);
           }
+          // props.navigation.navigate('SignUp');
+          setPhoneModal(true);
         }
       })
       .catch(err => {
@@ -317,8 +339,8 @@ function LoginScreen(props) {
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
-      console.log(userInfo);
       const getToken = await GoogleSignin.getTokens();
+      setSocialType("google");
       setSocialId(userInfo.user.id);
       setTrack(4);
       sociallogin(userInfo.user.id, 4);
@@ -352,6 +374,7 @@ function LoginScreen(props) {
       if (credentialState === appleAuth.State.AUTHORIZED) {
         // user is authenticated
         console.log("Apple Auth Request ResponseTEST:", appleAuthRequestResponse);
+        setSocialType("apple");
         setSocialId(() => appleAuthRequestResponse.user);
         setTrack(() => 8);
         sociallogin(appleAuthRequestResponse.user, 8)
@@ -360,6 +383,124 @@ function LoginScreen(props) {
       console.log("Apple Login Error:", e);
     }
     
+  }
+
+  const checkEmailExist = async () => {
+    try {
+      let result = await client.query({
+        query: CHECK_MAIL,
+        fetchPolicy: 'network-only',
+        context: {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+            'Content-Type': 'application/json',
+            Accept: '*/*',
+          },
+        },
+        variables: {
+          email: email,
+        },
+      });
+      return result.data.emailCheck.success;
+    } catch (error) {
+      console.log('checkEmailExist', error);
+    }
+  }
+
+  const handleSignUp = async () => {
+      setLoading(true);
+      if (contact.length < 10) {
+        alert("Please enter valid contact");
+        setLoading(false)
+        return;
+      }
+      let rjx = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+      let isValid = rjx.test(email);
+      if (!isValid) {
+        alert("Please enter valid email");
+        setLoading(false);
+        return;
+      }
+
+      if (email === '' || contact === '' || fname === '' || lname === '') {
+        alert("Please enter all details");
+        setLoading(false);
+        return;
+      }
+      let isEmailExist = await checkEmailExist();
+      if (isEmailExist) {
+        alert("Email already exists");
+        setLoading(false);
+        return;
+      }
+      setPhoneModal(false);
+      let token = await AsyncStorage.getItem('userToken');
+      let fcm_token = await AsyncStorage.getItem('fcm_token');
+      let isPlatform = 1;
+      if (Platform.OS == 'android') {
+        isPlatform = 1;
+      }
+      else if (Platform.OS == 'ios') {
+        isPlatform = 2;
+      } else {
+        isPlatform = 3;
+      }
+      client
+        .mutate({
+          mutation: HANDLE_SIGNUP,
+          fetchPolicy: 'no-cache',
+          variables: {
+            name: fname,
+            lname: lname,
+            email: email,
+            contactNo: contact,
+            password: "2",
+            track: track,
+            gid: socialType == "google" ? socialId : "",
+            fBAccessCode: fbAccessToken,
+            facebookUserID: fbUserID,
+            appleUserID: socialType=="apple" ? socialId : "",
+            deviceID: fcm_token,
+            deviceType: isPlatform,
+            latitude:latitude.toString(),
+            longitude: longitude.toString(),
+          },
+          context: {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          },
+        })
+        .then(async result => {
+          setLoading(false);
+          if (result.data.registerUser.success) {
+            await AsyncStorage.setItem(
+              'userToken',
+              result.data.registerUser.result.token,
+            );
+            await AsyncStorage.setItem('IsLogin', 'true');
+            let decoded = decode(result.data.registerUser.result.token.split('.')[1]);
+            decoded = JSON.parse(decoded);
+            let userInfo = result.data.registerUser.result;
+            userInfo.id = decoded.Id;
+            await AsyncStorage.setItem('userRole', decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']);
+            await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
+            props.setUserData(userInfo);
+            props.setUserRole(decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']);
+            props.setUserToken(result.data.registerUser.result.token);
+            props.navigation.reset({
+              index: 0,
+              routes: [{ name : 'Main'}]
+            });
+          } else {
+            alert(result.data.registerUser.message);
+          }
+        })
+        .catch(err => {
+          setLoading(false);
+          console.log('handleSignUp', err);
+        });
   }
 
   return (
@@ -464,8 +605,8 @@ function LoginScreen(props) {
                   </TouchableOpacity>
                 )
               }}
-              clientID="77jk3h838ss2tn"
-              clientSecret="iCFuONohOAucHBYx"
+              clientID="772vv6i0tvu4lf"
+              clientSecret="kQL4XpLSa8Pmjzer"
               redirectUri="https://www.ezyfind.co.za/oauthlinkedin"
               onSuccess={token => {
                 getLinkedinUser(token);
@@ -494,6 +635,53 @@ function LoginScreen(props) {
           </TouchableOpacity>
         </View>
       </View>
+
+      <Modal isVisible={phoneModal}>
+        <View style={{ backgroundColor: '#fff', padding: 20 }}>
+          <Text>Please enter detail below</Text>
+          <TextInput
+            style={styles.textinput}
+            onChangeText={setFname}
+            underlineColorAndroid="gray"
+            placeholder="FIRST NAME"
+            placeholderTextColor="gray"
+            value={fname}
+          />
+          <TextInput
+            style={styles.textinput}
+            onChangeText={setLname}
+            underlineColorAndroid="gray"
+            placeholder="LAST NAME"
+            placeholderTextColor="gray"
+            value={lname}
+          />
+          <TextInput
+            style={styles.textinput}
+            onChangeText={setContact}
+            underlineColorAndroid="gray"
+            placeholder="CONTACT NUMBER"
+            placeholderTextColor="gray"
+            keyboardType="number-pad"
+            maxLength={10}
+            value={contact}
+          />
+          <TextInput
+            style={styles.textinput}
+            onChangeText={setEmail}
+            underlineColorAndroid="gray"
+            placeholder="EMAIL"
+            placeholderTextColor="gray"
+            autoCapitalize="none"
+            value={email}
+          />
+          
+          <TouchableOpacity onPress={() => { handleSignUp(); }}>
+            <View style={styles.button}>
+              <Text style={styles.buttonText}>Submit</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
@@ -566,5 +754,23 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     borderBottomWidth: 1,
     color: '#000',
+  },
+  textinput: {
+    marginTop: 16,
+    fontSize: 15,
+  },
+
+  button: {
+    backgroundColor: '#db3236',
+    padding: 15,
+    borderRadius: 20,
+    width: 220,
+    marginTop: 20,
+    alignSelf: 'center',
+  },
+
+  buttonText: {
+    color: 'white',
+    alignSelf: 'center',
   },
 });

@@ -12,7 +12,10 @@
   },
   "dependencies": {
     "@apollo/client": "^3.5.9",
+    "@hmscore/react-native-hms-availability": "^5.2.0-300",
+    "@hmscore/react-native-hms-location": "^6.4.0-300",
     "@hmscore/react-native-hms-map": "^6.3.1-304",
+    "@hmscore/react-native-hms-push": "^6.3.0-304",
     "@invertase/react-native-apple-authentication": "^2.2.0",
     "@react-native-community/async-storage": "^1.12.1",
     "@react-native-community/geolocation": "^2.0.2",
@@ -48,6 +51,7 @@
     "react-native-countdown-component": "^2.7.1",
     "react-native-datepicker": "^1.7.2",
     "react-native-deep-linking": "^2.2.0",
+    "react-native-device-info": "^9.0.2",
     "react-native-document-picker": "^8.0.0",
     "react-native-elements": "^3.4.2",
     "react-native-fbsdk-next": "^8.0.5",
