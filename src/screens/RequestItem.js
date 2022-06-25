@@ -9,6 +9,10 @@ import { PermissionsAndroid } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import RNPickerSelect from 'react-native-picker-select';
 import CategorySelector from "../components/CategorySelector";
+import { getBrand } from 'react-native-device-info';
+import HMSMap, { HMSMarker, MapTypes } from "@hmscore/react-native-hms-map";
+import HMSLocation from "@hmscore/react-native-hms-location"
+
 
 const RequestItem = ({ navigation, route }) => {
   const [switchValue, setSwitchValue] = useState(false);
@@ -36,13 +40,20 @@ const RequestItem = ({ navigation, route }) => {
   const startdate = "";
   const mapSpecialUpload = "";
   const mapRef = useRef(null);
+  const isHuawei = getBrand() === "HUAWEI";
+
 
   const toggleSwitch = value => {
     setSwitchValue(value);
     if (value == true) {
-      getLocation();
-      getLocationData();
-      getOneTimeLocation();
+      if(isHuawei) {
+        getLocationHMS();
+      } else {
+        getLocation();
+      // getLocationData();
+      // getOneTimeLocation();
+      }
+      
     } else {
       setTheAllData();
       setSelectProvince('')
@@ -116,7 +127,6 @@ const RequestItem = ({ navigation, route }) => {
         setSelectCity(searchCity ? searchCity.cityId : null);
         const searchSub = allSubs.find((p) => p.suburbName === addressComponent[addressComponent.length-5].long_name);
         setSelectSub(searchSub ? searchSub.suburbId : null);
-        
       }).catch(error => console.warn(error));
     }, (error) => {
       console.log(error.code, error.message);
@@ -133,7 +143,7 @@ const RequestItem = ({ navigation, route }) => {
     const requestLocationPermission = async () => {
       if (Platform.OS === 'ios') {
         getOneTimeLocation();
-        subscribeLocationLocation();
+        // subscribeLocationLocation();
       } else {
         try {
           const granted = await PermissionsAndroid.request(
@@ -146,7 +156,7 @@ const RequestItem = ({ navigation, route }) => {
           if (granted === PermissionsAndroid.RESULTS.GRANTED) {
             //To Check, If Permission is granted
             getOneTimeLocation();
-            subscribeLocationLocation();
+            // subscribeLocationLocation();
           } else {
             setLocationStatus('Permission Denied');
           }
@@ -157,7 +167,7 @@ const RequestItem = ({ navigation, route }) => {
     };
     requestLocationPermission();
     return () => {
-      Geolocation.clearWatch(watchID);
+      console.log("return")
     };
   }
   const getOneTimeLocation = () => {
@@ -197,7 +207,7 @@ const RequestItem = ({ navigation, route }) => {
   };
 
   const subscribeLocationLocation = () => {
-    watchID = Geolocation.watchPosition(
+    const watchID = Geolocation.watchPosition(
       (position) => {
         setLocationStatus('You are Here');
         const tcurrentLongitude = parseFloat(position.coords.longitude);
@@ -385,11 +395,34 @@ const RequestItem = ({ navigation, route }) => {
       });
   };
 
+  const getLocationHMS = async () => {
+    HMSLocation.FusedLocation.Native.getLastLocation()
+      .then(pos => { 
+        console.log("Last location:", JSON.stringify(pos, null, 2)) 
+        const getFromLocationRequest = {
+          longitude: 116.501717,
+          latitude: 39.985071,
+          maxResults: 3
+        };
+        const locale = {
+          language: "en",
+          country: "us"
+        };
+        HMSLocation.Geocoder.Native.getFromLocation(getFromLocationRequest, locale)
+        .then((hwLocationList) => {
+          this.setState({result: JSON.stringify(hwLocationList, null, 3)})
+          console.log('Result: ' + this.state.result)
+        })
+        .catch((err) => alert(err.message));
+      })      
+      .catch(err => console.log('Failed to get last location', err));
+  }
+
 
   return (
     <View style={{ flex: 1}}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.con}>
+        {!isHuawei && <View style={styles.con}>
           <Switch
             onValueChange={toggleSwitch}
             value={switchValue}
@@ -397,23 +430,53 @@ const RequestItem = ({ navigation, route }) => {
           <Text style={{ color: '#323232', padding: 15, fontSize: 15 }}>
             Set Location
           </Text>
-        </View>
+        </View> }
         <View style={{ height: 200, margin: 20, }}>
-          <MapView
-            style={styles.mapStyle}
-            initialRegion={initialRegion}
-            region={mapRegion}
-            followUserLocation={true}
-            ref={mapRef}
-            zoomEnabled={true}
-            showsUserLocation={true}
-            customMapStyle={mapStyle}>
-            <Marker
-              draggable
-              coordinate={mapRegion}
-              title={'Current location'}
-            />
-          </MapView>
+          {(isHuawei && mapRegion ) ? <HMSMap 
+              camera={{
+                target: { latitude: mapRegion.latitude, longitude: mapRegion.longitude, },
+                zoom: 11,
+              }}
+              mapType={MapTypes.NORMAL}
+              minZoomPreference={1}
+              maxZoomPreference={24}
+              rotateGesturesEnabled={true}
+              tiltGesturesEnabled={true}
+              zoomControlsEnabled={true}
+              zoomGesturesEnabled={true}
+              mapStyle={
+                '[{"mapFeature":"all","options":"labels.icon","paint":{"icon-type":"night"}}]'
+              }
+              myLocationEnabled={true}
+              markerClustering={true}
+              myLocationButtonEnabled={true}
+              scrollGesturesEnabledDuringRotateOrZoom={true}
+              onMapReady={(e) => console.log("HMSMap onMapReady: ", e.nativeEvent)}
+              onMapClick={(e) => console.log("HMSMap onMapClick: ", e.nativeEvent)}
+              onMapLoaded={(e) => console.log("HMSMap onMapLoaded: ", e.nativeEvent)}
+            >
+              <HMSMarker
+                  coordinate={{ latitude: mapRegion.latitude, longitude: mapRegion.longitude }}
+                  onInfoWindowClose={(e) => console.log("HMSMarker onInfoWindowClose")}
+                ></HMSMarker>
+            </HMSMap> 
+            :  <MapView
+                style={styles.mapStyle}
+                initialRegion={initialRegion}
+                region={mapRegion}
+                followUserLocation={true}
+                ref={mapRef}
+                zoomEnabled={true}
+                showsUserLocation={true}
+                customMapStyle={mapStyle}
+              >
+              <Marker
+                draggable
+                coordinate={mapRegion}
+                title={'Current location'}
+              />
+          </MapView>}
+         
         </View>
 
         <TouchableOpacity style={styles.categorySelectorButton} onPress={() => setShowCategorySelector(true)}>

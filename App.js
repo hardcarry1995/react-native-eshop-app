@@ -9,11 +9,14 @@ import AppNavigator from './src/navigations/AppNavigator';
 import Toast from 'react-native-toast-message';
 import Geocoder from 'react-native-geocoding';
 import { googleMapApiKey } from "./src/constants/googlemap";
-
+import { getBrand } from 'react-native-device-info';
 
 function App() {
   useEffect(() => {
-    Geocoder.init(googleMapApiKey) //rescue
+    const isHuawei = getBrand() === "HUAWEI";
+    if(!isHuawei) {
+      Geocoder.init(googleMapApiKey) //rescue
+    }
   }, [])
   return (
     <ApolloProvider client={client}>

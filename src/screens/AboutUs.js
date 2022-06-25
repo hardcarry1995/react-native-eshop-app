@@ -13,7 +13,7 @@ import ProductSearchInput from '../components/ProductSearchInput';
 import CategorySelector from "../components/CategorySelector";
 import { connect } from "react-redux";
 import { Chip } from "react-native-elements";
-
+import { getBrand } from 'react-native-device-info';
 
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
@@ -30,6 +30,8 @@ const ProductsMap = ({ navigation, token }) => {
   const [showCategorySelector, setShowCategorySelector] = useState(false); 
   const [keyword, setKeyword] = useState("");
   const [categories, setCategories] = useState([]);
+
+  const isHuawei = getBrand() === "HUAWEI";
 
   const getLocation = async () => {
     Geolocation.getCurrentPosition(
@@ -77,23 +79,64 @@ const ProductsMap = ({ navigation, token }) => {
   const renderMapView = () => {
     if (!currentLatitude) return <></>;
     return (
-      platformType == 'huawei' ? <HMSMap camera={{ target: { latitude: 41, longitude: 29 }, zoom: 10 }}>
-        <HMSMarker
-          coordinate={{ latitude: 41, longitude: 29 }}
-          onInfoWindowClose={(e) => console.log("HMSMarker onInfoWindowClose")}
-        >
-          <HMSInfoWindow>
-            <TouchableHighlight
-              onPress={(e) => console.log("HMSMarker onInfoWindowClick: ", e.nativeEvent)}
-              onLongPress={(e) => console.log("HMSMarker onInfoWindowLongClick: ", e.nativeEvent)}
-            >
-              <View style={{ backgroundColor: "yellow" }}>
-                <Text style={{ backgroundColor: "orange" }}>Hello</Text>
-                <Text>I am a marker</Text>
-              </View>
-            </TouchableHighlight>
-          </HMSInfoWindow>
-        </HMSMarker>
+      isHuawei ? <HMSMap 
+      camera={{
+        target: { latitude: parseFloat(currentLatitude), longitude: parseFloat(currentLongitude), },
+        zoom: 11,
+      }}
+      mapType={MapTypes.NORMAL}
+      minZoomPreference={1}
+      maxZoomPreference={24}
+      rotateGesturesEnabled={true}
+      tiltGesturesEnabled={true}
+      zoomControlsEnabled={true}
+      zoomGesturesEnabled={true}
+      mapStyle={
+        '[{"mapFeature":"all","options":"labels.icon","paint":{"icon-type":"night"}}]'
+      }
+      myLocationEnabled={true}
+      markerClustering={true}
+      myLocationButtonEnabled={true}
+      scrollGesturesEnabledDuringRotateOrZoom={true}
+      onMapReady={(e) => console.log("HMSMap onMapReady: ", e.nativeEvent)}
+      onMapClick={(e) => console.log("HMSMap onMapClick: ", e.nativeEvent)}
+      onMapLoaded={(e) => console.log("HMSMap onMapLoaded: ", e.nativeEvent)}
+      >
+        {specialData.length > 0 &&
+          specialData.map((marker, index) => {
+            let markerImage = '';
+            if (marker.mapProductImages.length > 0) {
+              markerImage = marker.mapProductImages[0].imagePath;
+            } else {
+              markerImage = '';
+            }
+            if (marker?.latitude && marker?.longitude) {
+              return (
+                <HMSMarker
+                  coordinate={{  latitude: parseFloat(marker?.latitude), longitude: parseFloat(marker?.longitude)}}
+                  onInfoWindowClose={(e) => console.log("HMSMarker onInfoWindowClose")}
+                  icon={{
+                    uri : markerImage ? `${imagePrefix}${markerImage}` :Image.resolveAssetSource(require('../assets/NoImage.jpeg')).uri
+                  }}
+                >
+                <HMSInfoWindow>
+                  <TouchableHighlight
+                    onPress={(e) => console.log("HMSMarker onInfoWindowClick: ", e.nativeEvent)}
+                    onLongPress={(e) => console.log("HMSMarker onInfoWindowLongClick: ", e.nativeEvent)}
+                  >
+                    <View style={{ backgroundColor: "white" }}>
+                      <Text style={{ backgroundColor: "white" }}>{marker?.specialName}</Text>
+                      <Text>{marker?.specialDescription}</Text>
+                    </View>
+                  </TouchableHighlight>
+                </HMSInfoWindow>
+              </HMSMarker>
+              );
+            } else {
+              return <></>;
+            }
+          })
+        }
       </HMSMap> :
         <MapView
           style={styles.mapStyle}
@@ -319,12 +362,12 @@ const ProductsMap = ({ navigation, token }) => {
     fetchSpecialProduct(token);
   }, [keyword, categories])
 
-  _onSelectCategoryDone = (categories) => {
+  const _onSelectCategoryDone = (categories) => {
     setShowCategorySelector(false);
     setCategories(categories);
   }
 
-  _onPressSelectedCategory = (category) => {
+  const _onPressSelectedCategory = (category) => {
     setCategories(prevState => prevState.filter((cat) => cat.categoryId != category.categoryId));
   }
 

@@ -903,10 +903,25 @@
   dependencies:
     "@hapi/hoek" "^9.0.0"
 
+"@hmscore/react-native-hms-availability@^5.2.0-300":
+  version "5.2.0-300"
+  resolved "https://registry.yarnpkg.com/@hmscore/react-native-hms-availability/-/react-native-hms-availability-5.2.0-300.tgz#fe2cd36ba8fb3ac84fffd9ab59a0a90166f4ea07"
+  integrity sha512-Rhg7DzCnO0QvF68NpPzpJTrCMRfjPPLDjZGvjSf9rTha59DZMWWf0OBjv3tOkbt9emHbtXeOH2P2CH37hwnPng==
+
+"@hmscore/react-native-hms-location@^6.4.0-300":
+  version "6.4.0-300"
+  resolved "https://registry.yarnpkg.com/@hmscore/react-native-hms-location/-/react-native-hms-location-6.4.0-300.tgz#07ed3dc0181dfeb365be70c09b473023e95ce7ce"
+  integrity sha512-V0emLDmYO0td1xyRGfjZ8eCIZz5l6eGlX0u/73eUtI4p9nmQIVZ/I14aMSbq4EvT6iHVtZG+he0a693f/pH6HQ==
+
 "@hmscore/react-native-hms-map@^6.3.1-304":
   version "6.3.1-304"
   resolved "https://registry.yarnpkg.com/@hmscore/react-native-hms-map/-/react-native-hms-map-6.3.1-304.tgz#53863823a93f12024521f8c818d79703ff70ed35"
   integrity sha512-VMIBp9k/IHu3VEI5gE8iWsg1Jg07lCFoEkSBiKMHirAd6ZjO2Oz8dbFMSWdCuKA9pwRYkZ3JUVqzdsCHj2Vg0Q==
+
+"@hmscore/react-native-hms-push@^6.3.0-304":
+  version "6.3.0-304"
+  resolved "https://registry.yarnpkg.com/@hmscore/react-native-hms-push/-/react-native-hms-push-6.3.0-304.tgz#543efb504818007ecff5161339addeb865e7afcb"
+  integrity sha512-bxtyUemP+KInrrvJv5yl5M06Dt552iquXPzTFqySf1Q62C8F6LAz7FYqyqg+SmGbMy8iU0RMbg2sN2sRIVE/4g==
 
 "@humanwhocodes/config-array@^0.9.2":
   version "0.9.5"
@@ -7043,6 +7058,11 @@ react-native-deep-linking@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/react-native-deep-linking/-/react-native-deep-linking-2.2.0.tgz#45451c4ebcbe7307e094b8df38979d0bd745bb54"
   integrity sha512-PKShbOsa/oxjSzZ/Bag98O/J+jaZOI6ic5YdanPirTpRAraAvKUzJWQUhE5Yy0Isl9yfIkSogOClE9BRfSyUbA==
+
+react-native-device-info@^9.0.2:
+  version "9.0.2"
+  resolved "https://registry.yarnpkg.com/react-native-device-info/-/react-native-device-info-9.0.2.tgz#00c7ab139a620ac9650852cd0ef0fb69d9a4418d"
+  integrity sha512-+IfYZ/OuKjnFf7SFfgIzEqynSeFngrIHc5KgHUIfXusLDXIFJ+LhRBCD7skqnraHrfmESUOMjLbNcvy4SVdwSA==
 
 react-native-document-picker@^8.0.0:
   version "8.0.0"

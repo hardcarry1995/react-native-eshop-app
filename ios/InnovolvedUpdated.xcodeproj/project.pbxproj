@@ -596,7 +596,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = InnovolvedUpdated/InnovolvedUpdated.entitlements;
-				CURRENT_PROJECT_VERSION = 35;
+				CURRENT_PROJECT_VERSION = 38;
 				DEVELOPMENT_TEAM = TT5588X6TM;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = InnovolvedUpdated/Info.plist;
@@ -604,7 +604,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.5;
+				MARKETING_VERSION = 0.7;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -627,14 +627,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = InnovolvedUpdated/InnovolvedUpdated.entitlements;
-				CURRENT_PROJECT_VERSION = 35;
+				CURRENT_PROJECT_VERSION = 38;
 				DEVELOPMENT_TEAM = TT5588X6TM;
 				INFOPLIST_FILE = InnovolvedUpdated/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.5;
+				MARKETING_VERSION = 0.7;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

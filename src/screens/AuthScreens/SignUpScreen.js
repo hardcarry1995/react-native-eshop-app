@@ -13,11 +13,7 @@ import Geolocation from '@react-native-community/geolocation';
 import Geocoder from 'react-native-geocoding';
 import { decode } from 'base-64';
 import { connect } from 'react-redux';
-
-Geocoder.init("AIzaSyCNjKB84RyfVRuvuU8sCcQT6uWB_wVY03s")
-
-// {"authorizationCode": "cba4e68cad88c494b9df81acaea7fcedc.0.rzxz.ud8e42aY42vyCVtKilds7Q", "authorizedScopes": [], "email": null, "fullName": {"familyName": null, "givenName": null, "middleName": null, "namePrefix": null, "nameSuffix": null, "nickname": null}, "identityToken": "eyJraWQiOiJXNldjT0tCIiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJodHRwczovL2FwcGxlaWQuYXBwbGUuY29tIiwiYXVkIjoiY29tLmlubm8uZXp5ZmluZCIsImV4cCI6MTY1Mzk5MDE4MywiaWF0IjoxNjUzOTAzNzgzLCJzdWIiOiIwMDA5NzkuNjg2MmQ0OTg5ODRjNDg3ZWFmZjdkZWRmNjk3MTI5YmUuMTQwNyIsIm5vbmNlIjoiYTMzZGM4YzFiNTBlODZiMzZjMDBmN2RiOWYwMDZjMGIyN2QyMmI1YWZmOGEwMDdiYjgzZTEzZjMzZmQ4Mzk5ZSIsImNfaGFzaCI6Il95OW1KcnBuRzh4UEVnV0xaaFByN3ciLCJlbWFpbCI6Imh0aGpieGJmNXBAcHJpdmF0ZXJlbGF5LmFwcGxlaWQuY29tIiwiZW1haWxfdmVyaWZpZWQiOiJ0cnVlIiwiaXNfcHJpdmF0ZV9lbWFpbCI6InRydWUiLCJhdXRoX3RpbWUiOjE2NTM5MDM3ODMsIm5vbmNlX3N1cHBvcnRlZCI6dHJ1ZX0.JZapEoVKvXF55SovVpnOtPYZgooByXHE-ZcrTkxotuX9sFayoWJS4VKbsLoxvsOoVQQLVtDqnL7WFTbnWuqxRZA16C31HF8iSnR2cmeVDqNX_tLAqgjqc2sVxkJ1gDZ5as9irm3EYAi4_oV7KSAjQIWz6oeaGyUAab0emOCxy7pZvfS12JjA8DEZ8ELDwYcCbLSPTADuqWlU1qoHPYfPuB5CnWYTSugcjTdsq3vS6vDmXscr0osYPfEFfJS5cUbCN29oj3wZA4BZ99eqYj2_qx30PrGhfZQLRyGL46whJ1HopkuCX3FwTpMAHPxsl1jiL9Bbnq5Zz5-GZbqh-P0DAA", "nonce": "yTppwCaiw.iwsVwTMrgasZrFULztvay6", "realUserStatus": 1, "state": null, "user": "000979.6862d498984c487eaff7dedf697129be.1407"}
-
+import LinkedInModal from 'react-native-linkedin';
 
 class Signup extends React.Component {
   constructor(props) {
@@ -38,6 +34,7 @@ class Signup extends React.Component {
       googleUserId: '',
       appleUserId: '',
       fbUserID: '',
+      linkedInUserID: '',
       fbAccessToken: '',
       showResultsNew: 'true',
       bgcolor: '#F39B9D',
@@ -46,6 +43,8 @@ class Signup extends React.Component {
       setLongitude: ''
     };
     this.facebookSignIn = this.facebookSignIn.bind(this);
+    this.linkedRef = null;
+
   }
 
   validate = text => {
@@ -64,14 +63,6 @@ class Signup extends React.Component {
     }
   };
   componentDidMount() {
-
-    GoogleSignin.configure({
-      scopes: ["https://www.googleapis.com/auth/user.birthday.read"],
-      webClientId: '232834789917-0i6u709vc27u2bo5idli0hgv1v9jhcp9.apps.googleusercontent.com',
-      offlineAccess: true, // if you want to access Google API on behalf 
-      hostedDomain: '',
-      forceConsentPrompt: true,
-    });
     this.getLocation();
   }
 
@@ -194,8 +185,8 @@ class Signup extends React.Component {
           },
         })
         .then(async result => {
-          console.log(result);
           this.setState({ loading: false });
+          console.log(result.data.registerUser);
           if (result.data.registerUser.success) {
             Alert.alert('', 'Registration Successfull', [
               {
@@ -387,6 +378,47 @@ class Signup extends React.Component {
       });
     }
   }
+
+  getLinkedinUser = async data => {
+    const { access_token } = data;
+    const response = await fetch(
+      'https://api.linkedin.com/v2/me?projection=(id,firstName,lastName, profilePicture(displayImage~:playableStreams))',
+      {
+        method: 'GET',
+        headers: {
+          Authorization: 'Bearer ' + access_token,
+        },
+      },
+    );
+    const apipayload = await response.json();
+    console.log(apipayload);
+    const firstName = apipayload.firstName.localized[apipayload.firstName.preferredLocale.language + "_" + apipayload.firstName.preferredLocale.country];
+    const lastName = apipayload.lastName.localized[apipayload.lastName.preferredLocale.language + "_" + apipayload.lastName.preferredLocale.country];
+    this.setState({
+      fname: firstName,
+      lname: lastName,
+      track: 7,
+      googleUserId: apipayload?.id,
+      password: '2',
+      cpassword: '2',
+      phoneModal: true,
+    });
+  };
+
+  getLinkedinUserEmailId = async data => {
+    const { access_token } = data;
+    const response = await fetch(
+      'https://api.linkedin.com/v2/clientAwareMemberHandles?q=members&projection=(elements*(primary,type,handle~))',
+      {
+        method: 'GET',
+        headers: {
+          Authorization: 'Bearer ' + access_token,
+        },
+      },
+    );
+    const emailpayload = await response.json();
+
+  };
 
   render() {
     return (
@@ -588,9 +620,28 @@ class Signup extends React.Component {
                   />
                 </TouchableOpacity>
 
-                <Image
-                  style={{ width: 33, height: 33 }}
-                  source={require('../../assets/linkdin.png')}
+                <LinkedInModal
+                  animationType="slide"
+                  linkImage={require('../../assets/linkdin.png')}
+                  ref={(ref) => this.linkedRef = ref}
+                  renderButton={(props) => {
+                    return (
+                      <TouchableOpacity onPress={() => this.linkedRef.open()}>
+                        <Image 
+                          source={require("../../assets/linkdin.png")} 
+                          style={{ width: 33, height: 33 }}
+                          resizeMode="contain"
+                        />
+                      </TouchableOpacity>
+                    )
+                  }}
+                  clientID="772vv6i0tvu4lf"
+                  clientSecret="kQL4XpLSa8Pmjzer"
+                  redirectUri="https://www.ezyfind.co.za/oauthlinkedin"
+                  onSuccess={token => {
+                    this.getLinkedinUser(token);
+                    this.getLinkedinUserEmailId(token);
+                  }}
                 />
                 <Image
                   style={{ width: 33, height: 33 }}
