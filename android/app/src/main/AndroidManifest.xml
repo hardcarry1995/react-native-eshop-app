@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.INNOVEzyFind">
+  package="com.inno.ezyfind">
 
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
@@ -26,7 +26,9 @@
         android:label="@string/app_name"
         android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
         android:launchMode="singleTask"
-        android:windowSoftInputMode="adjustResize">
+        android:windowSoftInputMode="adjustResize"
+        android:exported="true"
+      >
         <intent-filter>
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
@@ -42,12 +44,20 @@
           <data android:scheme="https" />
       </intent-filter>
       </activity>
-      <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
-      <meta-data android:name="com.huawei.hms.client.appid" android:value="appid=com.INNOVEzyFind" />
+      <activity 
+        android:name="com.facebook.react.devsupport.DevSettingsActivity" 
+        android:exported="true"
+      />
+      <meta-data android:name="com.huawei.hms.client.appid" android:value="appid=com.inno.ezyfind" />
       <meta-data android:name="com.google.android.geo.API_KEY" android:value="@string/geo_api_key"/>
       <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
       <meta-data android:name="com.facebook.sdk.ClientToken" android:value="@string/fb_client_token"/>
-      <activity android:name="com.facebook.FacebookActivity" android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation" android:label="@string/app_name" />
+      <activity 
+        android:name="com.facebook.FacebookActivity"
+        android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation" 
+        android:label="@string/app_name" 
+        android:exported="true"
+      />
       <activity
         android:name="com.facebook.CustomTabActivity"
         android:exported="true">

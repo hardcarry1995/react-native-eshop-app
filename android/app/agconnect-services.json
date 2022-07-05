@@ -31,17 +31,17 @@
 		"client_id":"529706039705088384",
 		"client_secret":"F75F823335893E1AB4BAF270AE443B1DC896F2BD70C68250644804028A9BE95A",
 		"project_id":"736430079244765181",
-		"app_id":"103600385",
+		"app_id":"106621241",
 		"api_key":"CwEAAAAAF8MZbnJcZ/ZB9qQvpyonAAMuVcK5DquXtaGf6dOgOxcIcHu869/jSQfsmgOd1smws3FjrAsUIPPgm2OJSwkYVyr4OCE=",
-		"package_name":"com.INNOVEzyFind"
+		"package_name":"com.inno.ezyfind"
 	},
 	"oauth_client":{
-		"client_id":"103600385",
+		"client_id":"106621241",
 		"client_type":1
 	},
 	"app_info":{
-		"app_id":"103600385",
-		"package_name":"com.INNOVEzyFind"
+		"app_id":"106621241",
+		"package_name":"com.inno.ezyfind"
 	},
 	"service":{
 		"analytics":{
@@ -57,7 +57,15 @@
 			"url":"https://search-drcn.cloud.huawei.com"
 		},
 		"cloudstorage":{
-			"storage_url":"https://agc-storage-drcn.platform.dbankcloud.cn"
+			"storage_url_sg_back":"https://agc-storage-dra.cloud.huawei.asia",
+			"storage_url_ru_back":"https://agc-storage-drru.cloud.huawei.ru",
+			"storage_url_ru":"https://agc-storage-drru.cloud.huawei.ru",
+			"storage_url_de_back":"https://agc-storage-dre.cloud.huawei.eu",
+			"storage_url_de":"https://ops-dre.agcstorage.link",
+			"storage_url":"https://agc-storage-drcn.platform.dbankcloud.cn",
+			"storage_url_sg":"https://ops-dra.agcstorage.link",
+			"storage_url_cn_back":"https://agc-storage-drcn.cloud.huawei.com.cn",
+			"storage_url_cn":"https://agc-storage-drcn.platform.dbankcloud.cn"
 		},
 		"ml":{
 			"mlservice_url":"ml-api-drcn.ai.dbankcloud.com,ml-api-drcn.ai.dbankcloud.cn"
@@ -67,17 +75,17 @@
 	"configuration_version":"3.0",
 	"appInfos":[
 		{
-			"package_name":"com.INNOVEzyFind",
+			"package_name":"com.inno.ezyfind",
 			"client":{
-				"app_id":"103600385"
+				"app_id":"106621241"
 			},
 			"app_info":{
-				"package_name":"com.INNOVEzyFind",
-				"app_id":"103600385"
+				"package_name":"com.inno.ezyfind",
+				"app_id":"106621241"
 			},
 			"oauth_client":{
 				"client_type":1,
-				"client_id":"103600385"
+				"client_id":"106621241"
 			}
 		}
 	]
