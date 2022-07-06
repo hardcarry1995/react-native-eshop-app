@@ -76,13 +76,13 @@ const HomeStack = () => (
       component={ProductDetail}
       options={({ navigation }) => ({
         headerStyle: textHeader.header_style,
-        headerRight: () => (
-          <Image
-            style={{ height: 22, width: 25, padding: 5, alignSelf: 'flex-end' }}
-            source={require('../assets/share.png')}
-            resizeMode="contain"
-          />
-        ),
+        // headerRight: () => (
+        //   <Image
+        //     style={{ height: 22, width: 25, padding: 5, alignSelf: 'flex-end' }}
+        //     source={require('../assets/share.png')}
+        //     resizeMode="contain"
+        //   />
+        // ),
         headerLeft: () => <HeaderBackLeft navigationProps={navigation} />,
       })} />
   </Stack.Navigator>

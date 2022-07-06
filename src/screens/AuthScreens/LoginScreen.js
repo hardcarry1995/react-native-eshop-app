@@ -374,10 +374,11 @@ function LoginScreen(props) {
       if (credentialState === appleAuth.State.AUTHORIZED) {
         // user is authenticated
         console.log("Apple Auth Request ResponseTEST:", appleAuthRequestResponse);
-        setSocialType("apple");
-        setSocialId(() => appleAuthRequestResponse.user);
-        setTrack(() => 8);
-        sociallogin(appleAuthRequestResponse.user, 8)
+        
+        // setSocialType("apple");
+        // setSocialId(() => appleAuthRequestResponse.user);
+        // setTrack(() => 8);
+        // sociallogin(appleAuthRequestResponse.user, 8)
       }
     } catch (e){
       console.log("Apple Login Error:", e);

@@ -65,13 +65,13 @@
 	<key>NSAppleMusicUsageDescription</key>
 	<string>EzyFind requires to access your Media Library</string>
 	<key>NSCameraUsageDescription</key>
-	<string>$(PRODUCT_NAME) would like to use your camera</string>
+	<string>$(PRODUCT_NAME) would like to use your camera to get product photos or vehicle numbers.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>MiniCarta uses your location to accurately position points on the map when you add them</string>
+	<string>EzyFind uses your location to get your current location when you request item and search company on map</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>MiniCarta uses your location to accurately position points on the map when you add them</string>
+	<string>EzyFind uses your location to get your current location when you request item and search company on map</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>$(PRODUCT_NAME) would like access to your photo gallery</string>
+	<string>$(PRODUCT_NAME) would like access to your photo gallery to get product photos or vehicle numbers.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>

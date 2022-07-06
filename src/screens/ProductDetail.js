@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator, ToastAndroid, Platform } from 'react-native';
+import { Text, View, Image, TouchableOpacity, ActivityIndicator, ToastAndroid, Platform } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { imagePrefix } from '../constants/utils';
 import { ADD_TO_CART, ADD_TO_CART_NULL, CREATE_FAVOURITES_PRODUCT, GET_PRODUCT_RATING } from '../constants/queries';
@@ -15,13 +15,14 @@ class ProductDetail extends React.Component {
     super(props);
     this.state = {
       cartLoading: false,
+      favLoading: false,
       genderIndex: -1,
       exerciseTypeIndex: -1,
       sliderOneValue: [4],
       multiSliderValue: [10, 30],
       reviewScore : 0,
       reviewCount: 0,
-      ratings : []
+      ratings : [],
     };
   }
 
@@ -50,6 +51,8 @@ class ProductDetail extends React.Component {
     if (IsLogin !== 'true') {
       this.props.navigation.navigate('Auth');
     } else {
+      
+      this.setState({ favLoading: true })
       let userInfo = await AsyncStorage.getItem('userInfo');
       let token = await AsyncStorage.getItem('userToken');
       client
@@ -74,9 +77,12 @@ class ProductDetail extends React.Component {
               alert('Product added to Favourites');
             }
           }
+          this.setState({ favLoading: false })
         })
         .catch(err => {
+          alert("Something went wrong!")
           console.log(err);
+          this.setState({ favLoading: false })
         });
     }
   }
@@ -84,8 +90,8 @@ class ProductDetail extends React.Component {
   addToCart = async (id) => {
     let IsLogin = await AsyncStorage.getItem('IsLogin');
     let userToken = await AsyncStorage.getItem('userToken');
+    this.setState({ cartLoading: true });
     if (IsLogin !== 'true') {
-      this.setState({ cartLoading: true });
       client
         .mutate({
           mutation: ADD_TO_CART_NULL,
@@ -109,6 +115,7 @@ class ProductDetail extends React.Component {
               text2: 'Product added to cart'
             })
             this.props.addProductToCart(result.data.postPrdShoppingCartOptimized.result.prdShoppingCartDto)
+            this.setState({ cartLoading: false });
             this.props.navigation.navigate('CartStack')
           }
         })
@@ -143,6 +150,7 @@ class ProductDetail extends React.Component {
               text2: 'Product added to cart'
             })
             this.props.addProductToCart(result.data.postPrdShoppingCartOptimized.result.prdShoppingCartDto)
+            this.setState({ cartLoading: false });
             this.props.navigation.navigate('CartStack')
           } else {
             console.log(result.data.postPrdShoppingCartOptimized);
@@ -220,7 +228,7 @@ class ProductDetail extends React.Component {
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}>
-                <Image
+               {!this.state.favLoading ? <Image
                   style={{
                     height: 25,
                     width: 25,
@@ -229,7 +237,7 @@ class ProductDetail extends React.Component {
                     resizeMode: 'contain',
                   }}
                   source={require('../assets/img/Path182.png')}
-                />
+                /> : <ActivityIndicator color="red" style={{ alignItems: 'center' }} />}
               </View>
             </TouchableOpacity>
 
