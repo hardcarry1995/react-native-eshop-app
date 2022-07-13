@@ -508,6 +508,7 @@ export const HANDLE_SIGNUP = gql`
     $deviceType: Int
     $latitude:String
     $longitude:String
+    $twitterUserId: String
   ) {
     registerUser(
       userDto: {
@@ -515,7 +516,7 @@ export const HANDLE_SIGNUP = gql`
         facebookUserID: $facebookUserID
         googleUserID: $gid
         linkedInUserID: ""
-        twitterUserId: ""
+        twitterUserId: $twitterUserId
         instagramUserID: ""
         appleUserID: $appleUserID
         email: $email
