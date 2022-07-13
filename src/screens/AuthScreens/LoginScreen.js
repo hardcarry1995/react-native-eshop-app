@@ -31,6 +31,7 @@ function LoginScreen(props) {
   const [passwordError, setPasswordError] = useState('');
   const [passwordcon, setPasswordcon] = useState('');
   const [loading, setLoading] = useState('');
+  const [twitterUserId, setTwitterUserId] = useState('');
   const [socialId, setSocialId] = useState('');
   const [track, setTrack] = useState('');
   const [icon, setIcon] = useState('eye-off');
@@ -131,9 +132,13 @@ function LoginScreen(props) {
   const { twitter, TWModal, loggedInUser, accessToken } = useTwitter({
     onSuccess: (user, accessToken) => {
       setSocialType("twitter");
-      setSocialId(user?.id);
+      setEmail(user.email);
+      setFname(user.name.split(" ")[0]);
+      setLname(user.name.split(" ")[1]);
+      setTwitterUserId(user?.id_str);
+      setSocialId(user?.id_str);
       setTrack(6);
-      sociallogin(user?.id, 6);
+      sociallogin(user?.id_str, 6);
     },
   });
 
@@ -375,10 +380,15 @@ function LoginScreen(props) {
         // user is authenticated
         console.log("Apple Auth Request ResponseTEST:", appleAuthRequestResponse);
         
-        // setSocialType("apple");
-        // setSocialId(() => appleAuthRequestResponse.user);
-        // setTrack(() => 8);
-        // sociallogin(appleAuthRequestResponse.user, 8)
+        setSocialType("apple");
+        setEmail(appleAuthRequestResponse.email);
+        setFname(appleAuthRequestResponse.fullName.givenName);
+        setLname(appleAuthRequestResponse.fullName.familyName);
+        setPassword('2');
+        setPasswordcon('2');
+        setSocialId(() => appleAuthRequestResponse.user);
+        setTrack(() => 8);
+        sociallogin(appleAuthRequestResponse.user, 8)
       }
     } catch (e){
       console.log("Apple Login Error:", e);
@@ -461,6 +471,7 @@ function LoginScreen(props) {
             fBAccessCode: fbAccessToken,
             facebookUserID: fbUserID,
             appleUserID: socialType=="apple" ? socialId : "",
+            twitterUserId:twitterUserId,
             deviceID: fcm_token,
             deviceType: isPlatform,
             latitude:latitude.toString(),
@@ -680,6 +691,10 @@ function LoginScreen(props) {
             <View style={styles.button}>
               <Text style={styles.buttonText}>Submit</Text>
             </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={{ position: 'absolute', top: 10, right: 5}} onPress={() => setPhoneModal(false) }>
+            <Icon name="close" size={20} />
           </TouchableOpacity>
         </View>
       </Modal>

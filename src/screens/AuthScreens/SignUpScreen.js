@@ -10,7 +10,9 @@ import { LoginManager, Profile, AccessToken } from 'react-native-fbsdk-next';
 import { HANDLE_SIGNUP, CHECK_MAIL, HANDLE_SIGNUP_BUSINESS } from '../../constants/queries';
 import { appleAuth, AppleButton } from '@invertase/react-native-apple-authentication';
 import Geolocation from '@react-native-community/geolocation';
+import twitter, { TWLoginButton, decodeHTMLEntities, getRelativeTime } from 'react-native-simple-twitter';
 import Geocoder from 'react-native-geocoding';
+import Icon from "react-native-vector-icons/Ionicons";
 import { decode } from 'base-64';
 import { connect } from 'react-redux';
 import LinkedInModal from 'react-native-linkedin';
@@ -35,6 +37,9 @@ class Signup extends React.Component {
       appleUserId: '',
       fbUserID: '',
       linkedInUserID: '',
+      twitterToken: '',
+      twitterTokenSecret: '',
+      twitterUserId: '',
       fbAccessToken: '',
       showResultsNew: 'true',
       bgcolor: '#F39B9D',
@@ -73,7 +78,6 @@ class Signup extends React.Component {
 
   getLocation = () => {
     Geolocation.getCurrentPosition((position) => {
-      console.log('position', position);
       let latitude = position.coords.latitude;
       let longitude = position.coords.longitude;
       this.setState({ setLatitude: latitude });
@@ -172,6 +176,7 @@ class Signup extends React.Component {
             fBAccessCode: this.state.fbAccessToken,
             facebookUserID: this.state.fbUserID,
             appleUserID: this.state.appleUserId,
+            twitterUserId:this.state.twitterUserId,
             deviceID: fcm_token,
             deviceType: isPlatform,
             latitude: "'" + this.state.setLatitude + "'",
@@ -420,6 +425,28 @@ class Signup extends React.Component {
 
   };
 
+
+  onGetTwitterAccessToken = ({ oauth_token: twittrToken, oauth_token_secret: twitterTokenSecret }) => {
+    this.setState({
+      twittrToken: twittrToken,
+      twitterTokenSecret: twitterTokenSecret
+    })
+  }
+
+  onSuccessTwitterLogin = async (user) => {
+    const { email, id_str, name } = user;
+    this.setState({
+      email : email,
+      fname: name.split(" ")[0],
+      lname: name.split(" ")[1],
+      twitterUserId: id_str,
+      track: 6,
+      password: '2',
+      cpassword: '2',
+      phoneModal: true,
+    })
+  }
+
   render() {
     return (
       <SafeAreaView style={styles.container}>
@@ -643,10 +670,18 @@ class Signup extends React.Component {
                     this.getLinkedinUserEmailId(token);
                   }}
                 />
-                <Image
-                  style={{ width: 33, height: 33 }}
-                  source={require('../../assets/twitter.png')}
-                />
+                <TWLoginButton
+                  type="TouchableOpacity"
+                  onGetAccessToken={this.onGetTwitterAccessToken}
+                  onSuccess={this.onSuccessTwitterLogin}
+                  onClose={() => {console.log("closed")}}
+                  onError={(error) => console.log(error)}
+                >
+                  <Image
+                    style={{ width: 33, height: 33 }}
+                    source={require('../../assets/twitter.png')}
+                  />
+                </TWLoginButton>
               </View>
             </View>
             {/* )} */}
@@ -688,14 +723,11 @@ class Signup extends React.Component {
                   autoCapitalize="none"
                   value={this.state.email}
                 />
-               
-                <TouchableOpacity
-                  onPress={() => {
-                      this.handleSignUp();
-                  }}>
-                  <View style={styles.button}>
-                    <Text style={styles.buttonText}>Submit</Text>
-                  </View>
+                <TouchableOpacity onPress={() => { this.handleSignUp();}} style={styles.button}>
+                  <Text style={styles.buttonText}>Submit</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={{ position: 'absolute', top: 10, right: 5}} onPress={() => this.setState({ phoneModal : false }) }>
+                  <Icon name="close" size={20} />
                 </TouchableOpacity>
               </View>
             </Modal>
@@ -781,7 +813,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#db3236',
     padding: 15,
     borderRadius: 20,
-    width: 220,
+    width: 180,
     marginTop: 20,
     alignSelf: 'center',
   },
