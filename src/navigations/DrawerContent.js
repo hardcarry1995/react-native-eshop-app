@@ -32,7 +32,7 @@ class DrawerContent extends Component {
       { screen: "MyOrders", title: 'My Orders', image: cont.my_Reviews, isLoggedIn : true },
       { screen: Constant.rate_the_app, title: Constant.rate_the_app, image: cont.rate_the_app, isLoggedIn : false },
       { screen: Constant.give_feedback, title: Constant.give_feedback, image: cont.give_feedback, isLoggedIn : false },
-      { screen: Constant.share_app, title: Constant.share_app, image: cont.share_app, isLoggedIn : false },
+      // { screen: Constant.share_app, title: Constant.share_app, image: cont.share_app, isLoggedIn : false },
     ],
     selectedRoute: '',
     IsLoginData: 'false',
@@ -90,7 +90,7 @@ class DrawerContent extends Component {
       case Constant.share_app:
         this.setState({ selectedRoute: Constant.feed_sidemenu });
         this.props.navigation.navigate('Feed');
-        this._ShareApp();
+        // this._ShareApp();
         break;
 
       case Constant.my_request_stack:

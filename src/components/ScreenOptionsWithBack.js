@@ -17,6 +17,9 @@ const ScreenOptionsWithBack = ({ navigation }) => ({
     />
   ),
   headerLeft: () => <HeaderBackLeft navigationProps={navigation} />,
+  headerBackVisible: false,
+  headerBackButtonMenuEnabled : false,
+
 })
 
 export default ScreenOptionsWithBack

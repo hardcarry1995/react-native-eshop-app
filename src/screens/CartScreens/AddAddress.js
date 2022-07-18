@@ -12,6 +12,9 @@ import Geocoder from 'react-native-geocoding';
 import { PermissionsAndroid } from 'react-native';
 import Loader from "../../components/loader";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { getBrand } from 'react-native-device-info';
+import HMSMap, { HMSMarker, MapTypes } from "@hmscore/react-native-hms-map";
+import HMSLocation from "@hmscore/react-native-hms-location"
 
 
 const mapStyle = [
@@ -49,13 +52,24 @@ export default class AddAddress extends React.Component {
 			zipcode: '',
 			loading: false,
 			setLocatin: false,
-			initialRegion : null,
-			mapRegion: null,
+			initialRegion : {
+				latitude: -28.4793,
+				longitude: 24.6727,
+				latitudeDelta: 0.1015,
+				longitudeDelta: 0.10121,
+			},
+			mapRegion: {
+				latitude: -28.4793,
+				longitude: 24.6727,
+				latitudeDelta: 0.0922,
+				longitudeDelta: 0.0421
+			},
 			allCities : [],
 			allSubs: []
 
 		};
 		this.mapRef = null;
+  	this.isHuawei = getBrand() !== "HUAWEI";
 	}
 	async componentDidMount() {
 		this.setState({ loading : true})
@@ -462,16 +476,44 @@ export default class AddAddress extends React.Component {
 			<KeyboardAwareScrollView>
 				<View style={{ backgroundColor: 'white', flex: 1 }}>
 					<View style={styles.con}>
-						<Switch
+						{!this.isHuawei && <Switch
 							onValueChange={(value) => this.toggleSwitch(value)}
 							value={this.state.setLocatin}
-						/>
+						/> }
 						<Text style={{ color: '#323232', padding: 15, fontSize: 15 }}>
 							Set Location
 						</Text>
 					</View>
 					<View style={{ height: 200, margin: 20, }}>
-						<MapView
+						{this.isHuawei ? <HMSMap 
+              camera={{
+                target: { latitude: this.state.mapRegion.latitude, longitude: this.state.mapRegion.longitude, },
+                zoom: 11,
+              }}
+              mapType={MapTypes.NORMAL}
+              minZoomPreference={1}
+              maxZoomPreference={24}
+              rotateGesturesEnabled={true}
+              tiltGesturesEnabled={true}
+              zoomControlsEnabled={true}
+              zoomGesturesEnabled={true}
+              mapStyle={
+                '[{"mapFeature":"all","options":"labels.icon","paint":{"icon-type":"night"}}]'
+              }
+              myLocationEnabled={true}
+              markerClustering={true}
+              myLocationButtonEnabled={true}
+              scrollGesturesEnabledDuringRotateOrZoom={true}
+              onMapReady={(e) => console.log("HMSMap onMapReady: ", e.nativeEvent)}
+              onMapClick={(e) => console.log("HMSMap onMapClick: ", e.nativeEvent)}
+              onMapLoaded={(e) => console.log("HMSMap onMapLoaded: ", e.nativeEvent)}
+            >
+              <HMSMarker
+                  coordinate={{ latitude: this.state.mapRegion.latitude, longitude: this.state.mapRegion.longitude }}
+                  onInfoWindowClose={(e) => console.log("HMSMarker onInfoWindowClose")}
+                ></HMSMarker>
+            </HMSMap> 
+						: <MapView
 							style={styles.mapStyle}
 							initialRegion={this.state.initialRegion}
 							region={this.state.mapRegion}
@@ -485,7 +527,7 @@ export default class AddAddress extends React.Component {
 								coordinate={this.state.mapRegion}
 								title={'Current location'}
 							/>
-          </MapView>
+          </MapView> }
         </View>
 					<View style={{ marginTop: 2 }}>
 						<View style={styles.paddingview}>
