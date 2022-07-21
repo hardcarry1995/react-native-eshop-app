@@ -1,4 +1,5 @@
 import { gql } from '@apollo/client';
+import { mainCategoryId } from "./categories";
 
 export const SPECIAL_PRODUCT = gql`
  query GetSpecialProductList($productName: String = null, $domainCategoryIds: String = null, $size: Int = 10)  {
@@ -158,7 +159,7 @@ query GetPrdProductList($size: Int!, $categories: String = null) {
     getPrdProductList(
        productName: null,
        productId: null,
-       categoryId: null,
+       categoryId: ${mainCategoryId},
        domainCategoryIds:$categories,
        status: null,
        salesTypeId: null,
@@ -1969,7 +1970,7 @@ query GetPrdProductList( $categories: String = null){
   getPrdProductList(
      productName: null,
      productId: null,
-     categoryId: null,
+     categoryId: ${mainCategoryId},
      domainCategoryIds:$categories,
      status: null,
      salesTypeId: 2,
@@ -2061,7 +2062,7 @@ query GetPrdProductList( $categories: String = null) {
   getPrdProductList(
      productName: null,
      productId: null,
-     categoryId: null,
+     categoryId: ${mainCategoryId},
      domainCategoryIds:$categories,
      status: null,
      salesTypeId: 3,

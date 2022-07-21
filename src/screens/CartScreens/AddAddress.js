@@ -69,7 +69,7 @@ export default class AddAddress extends React.Component {
 
 		};
 		this.mapRef = null;
-  	this.isHuawei = getBrand() !== "HUAWEI";
+  	this.isHuawei = getBrand() === "HUAWEI";
 	}
 	async componentDidMount() {
 		this.setState({ loading : true})

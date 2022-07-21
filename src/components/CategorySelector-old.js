@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { imagePrefix } from '../constants/utils';
 import Colors from '../constants/colors';
 import { Chip } from "react-native-elements";
-import categories, { mainCategoryId } from "../constants/categories";
+import categories from "../constants/categories";
 
 const { height } = Dimensions.get('window');
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -23,7 +23,7 @@ function actuatedNormalize(size) {
   }
 }
 
-const mainCategoryIndex = categories.findIndex((category) => category.categoryId === mainCategoryId); // 0 - 5
+const mainCategoryIndex = 0; // 0 - 5
 
 export default class CategorySelector extends React.Component {
   constructor(props) {
@@ -33,8 +33,8 @@ export default class CategorySelector extends React.Component {
       loading: '',
       sub: [],
       subCategoryId: '',
-      categoryId: categories[mainCategoryIndex].categoryId,
-      catIcon: categories[mainCategoryIndex].categoryIcon,
+      categoryId: '',
+      catIcon: '',
       selectedCategories : []
     };
 
@@ -42,7 +42,40 @@ export default class CategorySelector extends React.Component {
   }
 
   componentDidMount() {
-    this.fetchSubCategory(this.state.categoryId);
+    this.fetchMainCategory();
+  }
+
+
+  async fetchMainCategory() {
+    let token = await AsyncStorage.getItem('userToken');
+    this.setState({ loading: 'main' });
+    client
+      .query({
+        query: MAIN_CATEGORY,
+        context: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      })
+      .then(async result => {
+        this.setState({ loading: '' });
+        if (result.data.getMstCategoryMain.success) {
+          this.setState({ data: result.data.getMstCategoryMain.result });
+          console.log(result.data.getMstCategoryMain.result);
+          this.setState({ catIcon: result.data.getMstCategoryMain.result[0].categoryIcon });
+          this.fetchSubCategory(result.data.getMstCategoryMain.result[0].categoryId);
+        } else {
+          ToastAndroid.show(
+            result.data.getMstCategoryMain.message,
+            ToastAndroid.SHORT,
+          );
+        }
+      })
+      .catch(err => {
+        this.setState({ loading: '' });
+        console.log(err);
+      });
   }
 
   async fetchSubCategory(id) {
@@ -64,7 +97,6 @@ export default class CategorySelector extends React.Component {
         this.setState({ loading: '' });
         if (result.data.getMstCategoryByParentId.success) {
           this.setState({ sub: result.data.getMstCategoryByParentId.result });
-          console.log(result.data.getMstCategoryByParentId.result);
         } else {
           ToastAndroid.show(
             result.data.getMstCategoryByParentId.message,
@@ -145,7 +177,6 @@ export default class CategorySelector extends React.Component {
             iconRight
             titleStyle={{ fontSize: 10 }}
             buttonStyle={{ backgroundColor: '#F54D30', marginBottom: 5}}
-            key={item.categoryId}
           />
         ))}
       </View>
@@ -170,19 +201,19 @@ export default class CategorySelector extends React.Component {
       >
         <SafeAreaView style={styles.modalContainer}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%', paddingHorizontal: 10}}>
-            <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom : 10 }}> Select categories - {categories[mainCategoryIndex].categoryName}</Text>
+            <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom : 10 }}> Select categories</Text>
             <TouchableOpacity style={styles.doneButton} onPress={this._onPressDone}>
               <Text style={styles.doneText}>Done</Text>
             </TouchableOpacity>
           </View>
-          <ScrollView horizontal={false} contentContainerStyle={{ flex : 1, width : SCREEN_WIDTH}} style={{ width: "100%"}}>
+          <ScrollView horizontal={false} contentContainerStyle={{ flex : 1, width : SCREEN_WIDTH}}>
             {this._renderSelectedCategories()}
-            <View style={{ flexDirection: 'row', width: "100%"}}>
+            <View style={{ flexDirection: 'row'}}>
               <View style={{ paddingHorizontal: 10 }}>
                 {this._renderCategories()}
               </View>
               <View style={styles.subcategoryContainer}>
-                <Text style={styles.subcategoryTitle}></Text>
+                <Text style={styles.subcategoryTitle}>SubCategory</Text>
                 <View style={styles.divider} />
                 {this.state.loading === 'sub' && (
                   <ActivityIndicator color="#000" size="large" />
@@ -214,8 +245,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     borderColor: 'rgba(0, 0, 0, 0.1)',
     height: height,
-    paddingHorizontal: 10,
-    width: "100%"
+    paddingHorizontal: 10
   },
   view: {
     justifyContent: 'flex-end',
@@ -241,7 +271,7 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: 'lightgrey',
-    width: SCREEN_WIDTH - 40,
+    width: '68%',
     marginTop: 5,
   },
   subcategoryContentContainer: {

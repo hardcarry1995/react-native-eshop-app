@@ -524,7 +524,11 @@ const RequestItem = ({ navigation, route }) => {
           <Text style={{ color: '#FAFAFA' }}> PROCEED </Text>
         </TouchableOpacity>
       </ScrollView>
-      <CategorySelector visible={showCategorySelector} multiple={false} onDone={setCategory} />
+      <CategorySelector 
+        visible={showCategorySelector} 
+        multiple={false} 
+        onDone={setCategory} 
+      />
     </View>
   );
 };
