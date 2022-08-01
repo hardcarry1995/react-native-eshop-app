@@ -167,13 +167,11 @@ export default class CategorySelector extends React.Component {
       <Modal
         isVisible={this.props.visible}
         style={styles.view}
+        onModalWillShow={() => this.fetchSubCategory(this.state.categoryId)}
       >
         <SafeAreaView style={styles.modalContainer}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%', paddingHorizontal: 10}}>
-            <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom : 10 }}> Select categories - {categories[mainCategoryIndex].categoryName}</Text>
-            <TouchableOpacity style={styles.doneButton} onPress={this._onPressDone}>
-              <Text style={styles.doneText}>Done</Text>
-            </TouchableOpacity>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%', paddingHorizontal: 10, marginTop: 10}}>
+            <Text style={{ fontSize: 20, fontWeight: 'bold' }}> Select categories - {categories[mainCategoryIndex].categoryName}</Text>
           </View>
           <ScrollView horizontal={false} contentContainerStyle={{ flex : 1, width : SCREEN_WIDTH}} style={{ width: "100%"}}>
             {this._renderSelectedCategories()}
@@ -193,6 +191,9 @@ export default class CategorySelector extends React.Component {
               </View>
             </View>
           </ScrollView>
+          <TouchableOpacity style={styles.doneButton} onPress={this._onPressDone}>
+            <Text style={styles.doneText}>Done</Text>
+          </TouchableOpacity>
         </SafeAreaView>
       </Modal>
     );
@@ -208,7 +209,7 @@ CategorySelector.defaultProps = {
 const styles = StyleSheet.create({
   modalContainer : {
     backgroundColor: 'white',
-    padding: 22,
+    paddingTop: 22,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 4,
@@ -232,6 +233,7 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   subcategoryContainer: {
+    paddingBottom: 30
   },
   subcategoryTitle: {
     color: '#323232',
@@ -284,12 +286,13 @@ const styles = StyleSheet.create({
     marginHorizontal: '2%',
   },
   doneButton : {
-    width : 80, 
-    height : 30,
+    width : 120, 
+    height : 40,
     backgroundColor: "#F54D30",
     justifyContent : 'center',
     alignItems : 'center',
     borderRadius : 10,
+    marginVertical: 10,
   },
   doneText : {
     color: "#fff",
