@@ -221,14 +221,15 @@ export default class SettingsScreen extends React.Component {
       maxRating: [1, 2, 3, 4, 5],
       showCategorySelector: false,
       categoriesForSearch : [],
-      searchText : ""
+      searchText : "",
+      refreshing: false
     };
   }
 
   componentDidMount() {
     this.fetchToken();
   }
-  async fetchToken() {
+  fetchToken = async () => {
     let token = await AsyncStorage.getItem('userToken');
     let userInfo = await AsyncStorage.getItem('userInfo');
     let IsLogin = await AsyncStorage.getItem('IsLogin');
@@ -341,30 +342,14 @@ export default class SettingsScreen extends React.Component {
       this.props.navigation.navigate('AuthStack')
     }
   }
-  updateUser = user => {
-    this.setState(
-      prevState => ({
-        user: user,
-      }),
-      () => {
-        if (this.state.user == 'Buy') {
-          this.props.navigation.navigate('ProductStack')
-        } if (this.state.user == 'Bid') {
-          this.props.navigation.navigate(Constants.settings)
-        } if (this.state.user == 'Hire') {
-          this.props.navigation.navigate(Constants.privacy_policy)
-        }
-      },
-    );
-
-  };
-  getAllBidProduct = (Token, catIds = '') => {
+  getAllBidProduct = async (Token, catIds = '') => {
+    let categoryIdsJson = await AsyncStorage.getItem('categories');
     client
       .query({
         query: GET_BID_ALL_PRODUCT,
         fetchPolicy: 'no-cache',
         variables: {
-          categories: catIds
+          categories: (catIds == "" || catIds == null) ? categoryIdsJson : catIds
         },
         context: {
           headers: {
@@ -417,11 +402,16 @@ export default class SettingsScreen extends React.Component {
      this.getAllBidProduct(this.state.userTokenData, catIds);
   }
 
+  refreshList = () => {
+    this.setState({ refreshing : true });
+    this.fetchToken();
+    this.setState({ refreshing : false });
+  }
   render() {
     return (
       <View style={{ flex: 1, backgroundColor: '#fff' }}>
         <StatusBar translucent backgroundColor="transparent" barStyle="dark-content" />
-        <ScrollView style={{ padding: 5, flex: 1 }}>
+        <View style={{ padding: 5, flex: 1 }}>
           <ProductSearchInput 
             onChangeText={(search) => this.filterItems(search)} 
             onPressFilterIcon={() => this.setState({ showCategorySelector : true})} 
@@ -444,12 +434,6 @@ export default class SettingsScreen extends React.Component {
             ))}
           </View>}
           <View>
-            <RNPickerSelect
-              value={this.state.user}
-              onValueChange={this.updateUser}
-              items={filterItems}
-              textInputProps={styles.pickerContainer}
-            />
           </View>
           <View style={{ justifyContent: 'center', padding: 18, alignItems: 'center', flex: 1 }}>
             <FlatList
@@ -466,9 +450,11 @@ export default class SettingsScreen extends React.Component {
                   ) : null
                 )
               }}
+              onRefresh={this.refreshList}
+              refreshing={this.state.refreshing}
             />
           </View>
-        </ScrollView>
+        </View>
         <CategorySelector 
           visible={this.state.showCategorySelector} 
           onDone={(values) => this._onSelectCategoryDone(values)}

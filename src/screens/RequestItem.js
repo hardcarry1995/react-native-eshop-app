@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, View, Text, Switch, TouchableOpacity, ScrollView, ToastAndroid, Alert } from 'react-native';
-import { GET_PROVINCE, GET_CITY, GET_SUBURB, GET_ALL_STATE, GET_ALL_CITY_NEW, GET_ALL_SUBURB } from '../constants/queries';
+import { GET_PROVINCE, GET_CITY, GET_SUBURB, GET_ALL_STATE, GET_ALL_CITY_NEW, GET_ALL_SUBURB, GET_COUNTRIES, GET_PROVINCE_BY_COUNTRY_ID } from '../constants/queries';
 import client from '../constants/client';
 import AsyncStorage from '@react-native-community/async-storage';
 import Geolocation from '@react-native-community/geolocation';
@@ -11,8 +11,8 @@ import RNPickerSelect from 'react-native-picker-select';
 import CategorySelector from "../components/CategorySelector";
 import { getBrand } from 'react-native-device-info';
 import HMSMap, { HMSMarker, MapTypes } from "@hmscore/react-native-hms-map";
-import HMSLocation from "@hmscore/react-native-hms-location"
-
+import HMSLocation from "@hmscore/react-native-hms-location";
+import VersionNumber from 'react-native-version-number';
 
 const RequestItem = ({ navigation, route }) => {
   const [switchValue, setSwitchValue] = useState(false);
@@ -34,6 +34,8 @@ const RequestItem = ({ navigation, route }) => {
   const [subCategoryId, setSubCategoryId] = useState('');
   const [subCategoryName, setSubCategoryName] = useState('');
   const [mapRegion, setMapReson] = useState();
+  const [countries, setCountries] = useState([]);
+  const [country, setCountry] = useState(null);
 
   const title = "";
   const desc = "";
@@ -41,7 +43,7 @@ const RequestItem = ({ navigation, route }) => {
   const mapSpecialUpload = "";
   const mapRef = useRef(null);
   const isHuawei = getBrand() === "HUAWEI";
-
+  const showCountry = VersionNumber.bundleIdentifier === "com.inno.ezyfind.brics";
 
   const toggleSwitch = value => {
     setSwitchValue(value);
@@ -63,11 +65,42 @@ const RequestItem = ({ navigation, route }) => {
   };
 
   useEffect(() => {
+    if(showCountry){
+      fetchAllCountry();
+    } else {
+      fetchProvince();
+    }
     fetchAllCity();
     fetchAllSub();
-    fetchProvince();
     setTheAllData();
   }, []);
+
+  const fetchAllCountry = async () => {
+    let token = await AsyncStorage.getItem('userToken');
+    client
+      .query({
+        query: GET_COUNTRIES,
+        context: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      })
+      .then(async result => {
+        if (result.data.mstCountries) {
+            const _countries = result.data.mstCountries.data.map(c => ({
+              label: c.countryName,
+              value: c.countryId
+            }));
+            setCountries(_countries);
+        } else {
+          ToastAndroid.show( result.data.getProvince.message, ToastAndroid.SHORT );
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
 
   const setTheAllData = () => {
     let initialRegion = {
@@ -224,6 +257,38 @@ const RequestItem = ({ navigation, route }) => {
     );
   };
 
+  const fetchProvinceByCountry = async () => {
+    let token = await AsyncStorage.getItem('userToken');
+    client
+      .query({
+        query: GET_PROVINCE_BY_COUNTRY_ID,
+        context: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+        variables: {
+          id: Number(country),
+        },
+      })
+      .then(async result => {
+        if (result.data.getProvinceByCountry.success) {
+          const updateProvinces = result.data.getProvinceByCountry.result.map((item ) => {
+            return {
+              ...item,
+              label: item.provinceName,
+              value: item.provinceId
+            }
+          })
+          setProvince(updateProvinces);
+        } else {
+          ToastAndroid.show( result.data.getProvince.message, ToastAndroid.SHORT );
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
   const fetchProvince = async () => {
     let token = await AsyncStorage.getItem('userToken');
     client
@@ -340,6 +405,12 @@ const RequestItem = ({ navigation, route }) => {
     setShowCategorySelector(false);
 
   }
+
+  useEffect(() => {
+    if(country && showCountry){
+      fetchProvinceByCountry();
+    }
+  }, [country]);
 
   useEffect(() => {
     fetchCity(selectProvince);
@@ -483,6 +554,18 @@ const RequestItem = ({ navigation, route }) => {
           <Text style={styles.categoryButtonText}>{ subCategoryName === "" ? `Select a category` : subCategoryName }</Text>
         </TouchableOpacity>
 
+        { showCountry && <View style={{ borderRadius: 10, paddingHorizontal: 20, marginTop : 10 }}>
+          <RNPickerSelect
+            value={country}
+            onValueChange={(itemValue, itemIndex) => {
+              setCountry(itemValue);
+            }}
+            items={countries}
+            textInputProps={styles.pickerContainer}            
+            placeholder= {{ label: "Select a country...", value: null }}
+          />
+        </View> }
+
         <View style={{ borderRadius: 10,height: 50, paddingHorizontal: 20, marginTop: 10 }}>
           <RNPickerSelect
             value={selectProvince}
@@ -524,7 +607,11 @@ const RequestItem = ({ navigation, route }) => {
           <Text style={{ color: '#FAFAFA' }}> PROCEED </Text>
         </TouchableOpacity>
       </ScrollView>
-      <CategorySelector visible={showCategorySelector} multiple={false} onDone={setCategory} />
+      <CategorySelector 
+        visible={showCategorySelector} 
+        multiple={false} 
+        onDone={setCategory} 
+      />
     </View>
   );
 };

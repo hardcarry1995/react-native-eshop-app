@@ -48,7 +48,8 @@ export default class PrivacyPolicy extends React.Component {
       starImageFilled: 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_filled.png',
       starImageCorner: 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png',
       showCategorySelector: false,
-      categoriesForSearch : []
+      categoriesForSearch : [],
+      refreshing: false
     };
   }
 
@@ -58,7 +59,7 @@ export default class PrivacyPolicy extends React.Component {
     this.setState({ todayDate: todayDate })
   }
 
-  async fetchToken() {
+  fetchToken = async () => {
     let token = await AsyncStorage.getItem('userToken');
     let userInfo = await AsyncStorage.getItem('userInfo');
     let IsLogin = await AsyncStorage.getItem('IsLogin');
@@ -204,13 +205,15 @@ export default class PrivacyPolicy extends React.Component {
     this.setState({ hireData: item, quantity : 1 })
   }
 
-  getAllHireProduct = (Token, catIds = '') => {
+  getAllHireProduct = async(Token, catIds = '') => {
+    let categoryIdsJson = await AsyncStorage.getItem('categories');
+
     client
       .query({
         query: GET_ALL_HIRE_PRODUCT,
         fetchPolicy: 'no-cache',
         variables: {
-          categories: catIds
+          categories: (catIds == "" || catIds == null ) ? categoryIdsJson : catIds
         },
         context: {
           headers: {
@@ -231,24 +234,6 @@ export default class PrivacyPolicy extends React.Component {
         console.log(err);
       });
   }
-
-  updateUser = user => {
-    this.setState(
-      prevState => ({
-        user: user,
-      }),
-      () => {
-        if (this.state.user == 'Buy') {
-          this.props.navigation.navigate('ProductStack')
-        } if (this.state.user == 'Bid') {
-          this.props.navigation.navigate(Constants.settings)
-        } if (this.state.user == 'Hire') {
-          this.props.navigation.navigate(Constants.privacy_policy)
-        }
-      },
-    );
-
-  };
 
   renderItem = ({ item, index }) => (
     <View style={{ flex: 1, backgroundColor: '#fff', padding: 5 }} key={index}>
@@ -373,11 +358,17 @@ export default class PrivacyPolicy extends React.Component {
      this.getAllHireProduct(this.state.userTokenData, catIds);
   }
 
+  refreshList = async() => {
+    this.setState({ refreshing: true });
+    this.fetchToken();
+    this.setState({ refreshing: false });
+  } 
+
   render() {
     const { modalVisible } = this.state;
     return (
       <View style={{ flex: 1, backgroundColor: '#fff' }}>
-        <ScrollView style={{ padding: 5, flex: 1 }}>
+        <View style={{ padding: 5, flex: 1 }}>
           <ProductSearchInput 
             onChangeText={(search) => this.filterItems(search)} 
             onPressFilterIcon={() => this.setState({ showCategorySelector : true})} 
@@ -400,12 +391,6 @@ export default class PrivacyPolicy extends React.Component {
             ))}
           </View>}
           <View>
-            <RNPickerSelect
-              value={this.state.user}
-              onValueChange={this.updateUser}
-              items={filterItems}
-              textInputProps={styles.pickerContainer}
-            />
           </View>
           <View style={{ justifyContent: 'center', padding: 21, alignItems: 'center', flex: 1 }}>
             <Modal
@@ -553,9 +538,11 @@ export default class PrivacyPolicy extends React.Component {
                   ) : null
                 )
               }}
+              onRefresh={this.refreshList}
+              refreshing={this.state.refreshing}
             />
           </View>
-        </ScrollView>
+        </View>
         <CategorySelector 
           visible={this.state.showCategorySelector} 
           onDone={(values) => this._onSelectCategoryDone(values)}

@@ -4,11 +4,70 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import messaging from "@react-native-firebase/messaging";
 import AsyncStorage from '@react-native-community/async-storage';
 import { getBrand, getManufacturer } from 'react-native-device-info';
+import { GUEST_LOGIN, SUB_CATEGORY } from '../constants/queries';
+import { mainCategoryId } from "../constants/categories";
+import client from '../constants/client';
+import { bearerToken } from '../constants/utils';
+
+
 
 const SplashScreen = ({ navigation }) => {
-  useEffect(() => {
-    init();
-  }, []);
+
+  const requestUserPermission = async () => {
+    const authStatus = await messaging().requestPermission();
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+  
+    if (enabled) {
+      console.log('Authorization status:', authStatus);
+    }
+
+    return enabled;
+  }
+
+  const checkLogin = async () => {
+    let token = await AsyncStorage.getItem('userToken');
+    let IsLogin = await AsyncStorage.getItem('IsLogin');
+    if (token == '' || token == null) {
+      token = await getQuestToken();
+    } 
+
+    const categoryQueryResult = await client
+                                        .query({
+                                          query: SUB_CATEGORY,
+                                          context: {
+                                            headers: {
+                                              Authorization: `Bearer ${token}`,
+                                              'Content-Length': 0,
+                                            },
+                                          },
+                                          variables: {
+                                            id: mainCategoryId,
+                                          },
+                                        });
+    const subCategoryIds = categoryQueryResult.data.getMstCategoryByParentId.result.map(category => category.categoryId);
+    console.log(subCategoryIds);
+    await AsyncStorage.setItem("categories", subCategoryIds.join(","));
+  }
+
+  getQuestToken = async () => {
+    const result = await client
+      .query({
+        query: GUEST_LOGIN,
+        context: {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+            'Content-Length': 0,
+          },
+        },
+      });
+    await AsyncStorage.setItem('userToken', result.data.guestLogin.result.value);
+
+    return result.data.guestLogin.result.value;
+  }
+
+
 
   useEffect(() => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
@@ -27,60 +86,49 @@ const SplashScreen = ({ navigation }) => {
       forceConsentPrompt: true,
     });
     const deviceBrand = getBrand();
-    console.log("Device Brand:", deviceBrand);
-    if(deviceBrand == "HUAWEI"){
-      
-    } else {
-      if( await requestUserPermission()) {
-        const fcmToken = await messaging().getToken();
-        if (fcmToken) {
-          AsyncStorage.setItem('fcm_token', fcmToken);
-        } else {
-          console.log('fcm_token', fcmToken);
-        }
-        messaging().onNotificationOpenedApp(remoteMessage => {
-          console.log(
-            'Notification caused app to open from background state:',
-            remoteMessage.notification,
-          );
-          // navigation.navigate(remoteMessage.data.type);
-        });
-    
-        // Check whether an initial notification is available
-        messaging()
-          .getInitialNotification()
-          .then(remoteMessage => {
-            if (remoteMessage) {
-              console.log(
-                'Notification caused app to open from quit state:',
-                remoteMessage.notification,
-              );
-              // setInitialRoute(remoteMessage.data.type); // e.g. "Settings"
-            }
-          });
+    if(deviceBrand != "HUAWEI" && await requestUserPermission()){
+      const fcmToken = await messaging().getToken();
+      if (fcmToken) {
+        AsyncStorage.setItem('fcm_token', fcmToken);
+      } else {
+        console.log('fcm_token', fcmToken);
       }
-    }
-    
-    setTimeout(() => {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'MainDrawer' }],
+      messaging().onNotificationOpenedApp(remoteMessage => {
+        console.log(
+          'Notification caused app to open from background state:',
+          remoteMessage.notification,
+        );
+        // navigation.navigate(remoteMessage.data.type);
       });
-    }, 2000)
-  }
-
-  const requestUserPermission = async () => {
-    const authStatus = await messaging().requestPermission();
-    const enabled =
-      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-  
-    if (enabled) {
-      console.log('Authorization status:', authStatus);
+      // Check whether an initial notification is available
+      messaging()
+        .getInitialNotification()
+        .then(remoteMessage => {
+          if (remoteMessage) {
+            console.log(
+              'Notification caused app to open from quit state:',
+              remoteMessage.notification,
+            );
+            // setInitialRoute(remoteMessage.data.type); // e.g. "Settings"
+          }
+        });
     }
 
-    return enabled;
+    await checkLogin();
+
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'MainDrawer' }],
+    });
   }
+  useEffect(() => {
+    init();
+  }, []);
+
+
+
+
+
   return (
     <View style={styles.container}>
       <Image  

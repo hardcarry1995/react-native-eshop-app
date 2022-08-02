@@ -49,6 +49,8 @@ import ScreenOptions from "../components/ScreenOptions";
 import ScreenOptionsWithBack from "../components/ScreenOptionsWithBack";
 import RequestStack from "./RequestStack";
 
+import HomeTabs from "./HomeNavigator";
+
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -66,6 +68,8 @@ const screenOptions = ({ navigation }) => ({
     />
   ),
   headerLeft: () => <Menu navigationProps={navigation} />,
+  headerBackButtonMenuEnabled : false,
+  headerBackVisible: false
 })
 // Define HomeStack
 const HomeStack = () => (
@@ -107,7 +111,7 @@ const CategoryStack = () => (
 // Define ItemCart Stack
 // This is same as WorkoutStack
 const CartStack = () => (
-  <Stack.Navigator >
+  <Stack.Navigator screenOptions={screenOptions}>
     <Stack.Screen name="MyCart" component={MyCartScreen} options={screenOptions} />
     <Stack.Screen name="Checkout" component={Checkout} options={ScreenOptionsWithBack}/>
     <Stack.Screen name="AddAddress" component={AddAddress} options={ScreenOptionsWithBack}  />
@@ -173,7 +177,7 @@ const TabBarNavigator = () => (
     tabBar={props => <TabBar {...props} />}
     screenOptions={{ gestureEnabled: false, headerShown: false }}
   >
-    <Tab.Screen name="HomeStack" component={HomeStack} />
+    <Tab.Screen name="HomeStack" component={HomeTabs} />
     <Tab.Screen name={Constants.my_request_stack} component={MyRequestStack}  />
     <Tab.Screen name="CategoryStack" component={RequestStack}  />
     <Tab.Screen name="CartStack" component={CartStack}  />

@@ -8,7 +8,7 @@ import client from '../../constants/client';
 import { HANDLE_SIGNUP, CHECK_MAIL } from '../../constants/queries';
 import { decode } from 'base-64';
 import { LoginManager, Profile, AccessToken } from 'react-native-fbsdk-next';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import LinkedInModal from 'react-native-linkedin';
 import { Icon } from 'native-base';
 import { useTwitter } from 'react-native-simple-twitter';

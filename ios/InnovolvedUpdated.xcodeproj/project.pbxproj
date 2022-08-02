@@ -68,6 +68,8 @@
 		4080665C8A3B4327BCB68929 /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
 		4CFA9B292F0B4B6BB85C821B /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
 		51C7EE77D70F43A08938CFDE /* futur.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = futur.ttf; path = ../assets/fonts/futur.ttf; sourceTree = "<group>"; };
+		58CE6D8876A24623864BA5A2 /* libRNAppInfo.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNAppInfo.a; sourceTree = "<group>"; };
+		5BEFD05A0BB946DBB3A399D6 /* RNAppInfoTests.xctest */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = RNAppInfoTests.xctest; sourceTree = "<group>"; };
 		5C5FA621FAB84EF083087B47 /* Fontisto.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Fontisto.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Fontisto.ttf"; sourceTree = "<group>"; };
 		678757D26E73F86D3692D087 /* libPods-InnovolvedUpdated-InnovolvedUpdatedTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-InnovolvedUpdated-InnovolvedUpdatedTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6FB0233EA23546CB88C99432 /* tt0144m_1.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = tt0144m_1.ttf; path = ../assets/fonts/tt0144m_1.ttf; sourceTree = "<group>"; };
@@ -87,6 +89,7 @@
 		EEE86DD68CE54E6BA1C13AAC /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Feather.ttf"; sourceTree = "<group>"; };
 		EF0E708DCE7A4B3EA230239E /* FutuLt.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FutuLt.ttf; path = ../assets/fonts/FutuLt.ttf; sourceTree = "<group>"; };
 		F274D7F584582917C6FCD3B0 /* Pods-InnovolvedUpdated.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InnovolvedUpdated.release.xcconfig"; path = "Target Support Files/Pods-InnovolvedUpdated/Pods-InnovolvedUpdated.release.xcconfig"; sourceTree = "<group>"; };
+		F9CBABC04467477086BC0AA9 /* RNAppInfo.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNAppInfo.xcodeproj; path = "../node_modules/react-native-app-info/RNAppInfo.xcodeproj"; sourceTree = "<group>"; };
 		FC84E1FA05D9425A90E1F8C0 /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = "../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -155,6 +158,15 @@
 			name = InnovolvedUpdated;
 			sourceTree = "<group>";
 		};
+		22DD2F9B2896C0C9009665C5 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				58CE6D8876A24623864BA5A2 /* libRNAppInfo.a */,
+				5BEFD05A0BB946DBB3A399D6 /* RNAppInfoTests.xctest */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -202,6 +214,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				F9CBABC04467477086BC0AA9 /* RNAppInfo.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -216,6 +229,7 @@
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				0CA7442A7D4DB9AED9DED899 /* Pods */,
 				6C6BA0B60BF94A5FB6FD44FF /* Resources */,
+				22DD2F9B2896C0C9009665C5 /* Recovered References */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -546,12 +560,21 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/../node_modules/react-native-app-info/RNAppInfo",
+				);
 				INFOPLIST_FILE = InnovolvedUpdatedTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -571,12 +594,21 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/../node_modules/react-native-app-info/RNAppInfo",
+				);
 				INFOPLIST_FILE = InnovolvedUpdatedTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -596,21 +628,25 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = InnovolvedUpdated/InnovolvedUpdated.entitlements;
-				CURRENT_PROJECT_VERSION = 43;
+				CURRENT_PROJECT_VERSION = 47;
 				DEVELOPMENT_TEAM = TT5588X6TM;
 				ENABLE_BITCODE = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/../node_modules/react-native-app-info/RNAppInfo",
+				);
 				INFOPLIST_FILE = InnovolvedUpdated/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8;
+				MARKETING_VERSION = 0.9.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.inno.ezyfind;
+				PRODUCT_BUNDLE_IDENTIFIER = com.inno.ezyfind.brics;
 				PRODUCT_NAME = InnovolvedUpdated;
 				SWIFT_OBJC_BRIDGING_HEADER = "InnovolvedUpdated-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -627,20 +663,24 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = InnovolvedUpdated/InnovolvedUpdated.entitlements;
-				CURRENT_PROJECT_VERSION = 43;
+				CURRENT_PROJECT_VERSION = 47;
 				DEVELOPMENT_TEAM = TT5588X6TM;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/../node_modules/react-native-app-info/RNAppInfo",
+				);
 				INFOPLIST_FILE = InnovolvedUpdated/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8;
+				MARKETING_VERSION = 0.9.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.inno.ezyfind;
+				PRODUCT_BUNDLE_IDENTIFIER = com.inno.ezyfind.brics;
 				PRODUCT_NAME = InnovolvedUpdated;
 				SWIFT_OBJC_BRIDGING_HEADER = "InnovolvedUpdated-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;

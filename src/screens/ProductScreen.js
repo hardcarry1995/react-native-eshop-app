@@ -29,6 +29,7 @@ export default class ProductScreen extends React.PureComponent {
       rating: "2",
       maxRating: [1, 2, 3, 4, 5],
       isListEnd: false,
+      refreshing: false
     };
   }
 
@@ -127,14 +128,17 @@ export default class ProductScreen extends React.PureComponent {
 
     // }
   }
-  async fetchToken() {
+  fetchToken = async() => {
     let token = await AsyncStorage.getItem('userToken');
     let userInfo = await AsyncStorage.getItem('userInfo');
     this.setState({
       userInfo: JSON.parse(userInfo),
     });
-    this.fetchProducts(token);
-    this.getPrdSalesType(token);
+
+    await Promise.all([
+      this.fetchProducts(token),
+      this.getPrdSalesType(token)
+    ])
   }
   async getPrdSalesType(token) {
     client
@@ -163,13 +167,15 @@ export default class ProductScreen extends React.PureComponent {
       });
   }
 
-  fetchProducts(token) {
+  fetchProducts = async (token) => {
     this.setState({ loading: true });
+    let categoryIdsJson = await AsyncStorage.getItem('categories');
     client
       .query({
         query: GET_PRODUCT_PURCHASE,
         variables: {
           size: 20,
+          categories: categoryIdsJson
         },
         context: {
           headers: {
@@ -195,23 +201,6 @@ export default class ProductScreen extends React.PureComponent {
       });
   }
 
-  updateUser = user => {
-    this.setState(
-      prevState => ({
-        user: user,
-      }),
-      () => {
-        if (this.state.user == 'Buy') {
-          this.props.navigation.navigate('ProductStack')
-        } if (this.state.user == 'Bid') {
-          this.props.navigation.navigate(Constants.settings)
-        } if (this.state.user == 'Hire') {
-          this.props.navigation.navigate(Constants.privacy_policy)
-        }
-      },
-    );
-
-  };
   renderItem = ({ item, index }) => (
     <ProductCard
       navigation={this.props.navigation}
@@ -226,17 +215,16 @@ export default class ProductScreen extends React.PureComponent {
     this.props.navigation.navigate('CategoryStack');
   }
 
+  refreshList = async () => {
+    this.setState({ refreshing : true })
+    await this.fetchToken();
+    this.setState({ refreshing : false })
+  }
+
   render() {
     return (
       <View style={styles.container}>
         <ProductSearchInput onChangeText={(value) => this.handleSearch(value)} onPressFilterIcon={() => this.props.navigation.navigate('CategoryStack')} />
-
-        <RNPickerSelect
-          value={this.state.user}
-          onValueChange={this.updateUser}
-          items={filterItems}
-          textInputProps={styles.pickerContainer}
-        />
         <View style={styles.productListContainer}>
           <FlatList
             numColumns={2}
@@ -251,6 +239,8 @@ export default class ProductScreen extends React.PureComponent {
                 ) : null
               )
             }}
+            onRefresh={this.refreshList}
+            refreshing={this.state.refreshing}
           />
         </View>
       </View>

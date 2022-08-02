@@ -1,4 +1,5 @@
 import { gql } from '@apollo/client';
+import { mainCategoryId } from "./categories";
 
 export const SPECIAL_PRODUCT = gql`
  query GetSpecialProductList($productName: String = null, $domainCategoryIds: String = null, $size: Int = 10)  {
@@ -295,12 +296,12 @@ query GetPrdProductList($productId: Int!) {
 `;
 
 export const GET_PRODUCT_PURCHASE = gql`
-query GetPrdProductList($size: Int!) {
+query GetPrdProductList($size: Int!, $categories: String) {
   getPrdProductList(
     productName: null,
     productId: null,
     categoryId: null,
-    domainCategoryIds:null,
+    domainCategoryIds:$categories,
     status: null,
     salesTypeId: 1,
     scopeId:null,
@@ -3333,3 +3334,43 @@ mutation UpdateRequestItemResponse(
     itemRequestId
   }
 }`;
+
+export const GET_COUNTRIES = gql`
+{
+ mstCountries{   
+    nextPage,
+    prevPage  
+    data{
+      countryId,
+      createdBy,
+      createdDate,     
+      modifiedBy,
+      modifiedDate,
+      countryId,
+      countryName
+    }
+  }
+}`;
+
+export const GET_PROVINCE_BY_COUNTRY_ID = gql`
+  query getProvinceByCountryId($id : Int) {
+    getProvinceByCountry(id:$id){
+      count,
+      currentPage,
+      message,
+      nextPage,
+      prevPage,
+      success,
+      totalPages,
+      result{
+        countryId,
+        createdBy,
+        createdDate,
+        isActive,
+        modifiedBy,
+        modifiedDate,
+        provinceId,
+        provinceName
+      }
+    }
+  }`

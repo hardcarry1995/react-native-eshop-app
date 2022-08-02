@@ -119,7 +119,10 @@ android/app/src/main/assets/*
 android/build/*
 android/local.properties
 android/app/build.gradle
+android/apks/*.*
 *.xcuserstate
 .DS_Store
 *.xcbkptlist
 src/constants/googlemap.js
+src/components/CategorySelector-old.js.zip
+src/components/CategorySelector-separates.js.zip
