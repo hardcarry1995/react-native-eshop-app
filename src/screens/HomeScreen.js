@@ -19,6 +19,7 @@ import CategorySelector from "../components/CategorySelector";
 import { Chip } from "react-native-elements";
 import Toast from "react-native-toast-message";
 
+
 class HomeScreen extends Component {
   constructor(props) {
     super(props);
@@ -54,24 +55,13 @@ class HomeScreen extends Component {
       starImageCorner:
         'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png',
       showCategorySelector: false,
-      categoriesForSearch : []
+      categoriesForSearch : [],
+      refreshing: false
 
     };
     this.linkingUrlSub = null;
 
-    console.log("Props:", props.state);
   }
-
-  ExecuteQuery = (sql, params = []) => new Promise((resolve, reject) => {
-    var db = SQLite.openDatabase({ name: "testdatabase.db", createFromLocation: "~testdatabase.db" });
-    db.transaction((trans) => {
-      trans.executeSql(sql, params, (trans, results) => {
-        resolve(results);
-      },
-        (error) => {
-        });
-    });
-  });
 
   componentDidMount() {
     const scheme1 = 'https://ezyfind.me/';
@@ -143,7 +133,6 @@ class HomeScreen extends Component {
     let token = await AsyncStorage.getItem('userToken');
     let IsLogin = await AsyncStorage.getItem('IsLogin');
     if (IsLogin === 'true') {
-      console.log("IsLogin:", IsLogin);
       const { refered_by = '' } = this.props.state || {};
       const paredRB = refered_by ? JSON.parse(refered_by) : {};
       if (paredRB?.name) {
@@ -189,7 +178,6 @@ class HomeScreen extends Component {
       })
       .then(async result => {
         await AsyncStorage.setItem('userToken', result.data.guestLogin.result.value);
-        this.CreateTable();
         this.fetchToken();
         setInterval(() => {
           this.checkConnectivity();
@@ -201,78 +189,6 @@ class HomeScreen extends Component {
       });
   }
   
-  async addCounrty(deta) {
-    let countryData = deta;
-    let countryQuery = "INSERT INTO ezyFindProductDetail( activeText , categoryID , categoryName,unitCost  ,description ,documentName ,documentPath,isActive ,productID ,productImage ,productName, productNumber) VALUES";
-    for (let i = 0; i < countryData.length; ++i) {
-      let dataid = i + 1;
-      let escapedSample = countryData[i].description.replace(/\'/g, "")
-      countryQuery = countryQuery + "('"
-        + countryData[i].activeText //user_id
-        + "','"
-        + countryData[i].categoryID //country_name
-        + "','"
-        + countryData[i].categoryName //id
-        + "','"
-        + countryData[i].unitCost //id
-        + "','"
-        + escapedSample  //country_name
-        + "','"
-        + countryData[i].documentName //id
-        + "','"
-        + countryData[i].documentPath //user_id
-        + "','"
-        + countryData[i].isActive //country_name
-        + "','"
-        + countryData[i].productID //id
-        + "','"
-        + countryData[i].productImage //user_id
-        + "','"
-        + countryData[i].productName //country_name
-        + "','"
-        + countryData[i].productNumber //is_deleted
-        + "')";
-      if (i != countryData.length - 1) {
-        countryQuery = countryQuery + ",";
-      }
-    }
-    countryQuery = countryQuery + ";";
-    let countryMultipleInsert = await this.ExecuteQuery(countryQuery, []);
-
-  }
-  // Create Table
-  async CreateTable() {
-    global.db = SQLite.openDatabase(
-      {
-        name: 'testdatabase.db',
-        location: 'default',
-        createFromLocation: '~testdatabase.db',
-      },
-      () => { },
-      error => {
-        console.log("ERROR: " + error);
-      }
-    );
-    await this.ExecuteQuery("CREATE TABLE IF NOT EXISTS ezyFindProductDetail (activeText VARCHAR(16), categoryID INTEGER, categoryName VARCHAR(16),unitCost VARCHAR(16),description TEXT,documentName VARCHAR(225),documentPath VARCHAR(225),isActive VARCHAR(16),productID INTEGER,productImage VARCHAR(225),productName VARCHAR(225), productNumber VARCHAR(225))", []);
-
-  }
-  async SelectQuery() {
-    let selectQuery1 = await this.ExecuteQuery("SELECT * FROM ezyFindProductDetail", []);
-    var rows1 = selectQuery1.rows;
-    for (let i = 0; i < rows1.length; i++) {
-      var item1 = rows1.item(i)
-      this.state.SQLiteProduct.push(item1);
-    }
-    const newArrayList = [];
-    this.state.SQLiteProduct.forEach(obj => {
-      if (!newArrayList.some(o => o.productNumber === obj.productNumber)) {
-        newArrayList.push({ ...obj });
-      }
-    });
-
-    this.setState({ data: newArrayList });
-  }
-
   handleSearch = (text) => {
     this.setState({ textnew: text });
     let vdata = this.state.dataEMP.filter(i =>
@@ -303,10 +219,9 @@ class HomeScreen extends Component {
     }
   };
 
-  async fetchToken() {
+  fetchToken = async() => {
     let token = await AsyncStorage.getItem('userToken');
     let userInfo = await AsyncStorage.getItem('userInfo');
-    console.log("User Info:", userInfo);
     this.setState({
       userInfo: JSON.parse(userInfo),
     });
@@ -314,19 +229,21 @@ class HomeScreen extends Component {
     this.setState({
       loginToken: token
     });
-    this.fetchProducts(token);
-    this.fetchSpecialProduct(token);
-
+    await Promise.all([
+      this.fetchProducts(token),
+      this.fetchSpecialProduct(token)
+    ])
   }
 
-  fetchProducts(token, categories = null) {
+  fetchProducts = async (token, categories = null) => {
     this.setState({ loading: true });
+    let categoryIdsJson = await AsyncStorage.getItem('categories');
     client
       .query({
         query: GET_PRODUCT,
         variables: {
           size: this.state.size,
-          categories : categories
+          categories : (categories == "" || categories == null ) ? categoryIdsJson : categories
         },
         context: {
           headers: {
@@ -342,7 +259,6 @@ class HomeScreen extends Component {
             data = data.filter(i => i.productName.toLowerCase().includes(this.state.textnew.toLowerCase()))
           }
           this.setState({ data: data });
-          this.addCounrty(result.data.getPrdProductList.result);
           this.setState({ loading: false });
         } else {
           this.setState({ dataEMP: [] });
@@ -355,35 +271,18 @@ class HomeScreen extends Component {
         this.setState({ loading: false });
       });
   }
-
-  updateUser = user => {
-    this.setState(
-      prevState => ({
-        user: user,
-      }),
-      () => {
-        if (this.state.user == 'Buy') {
-          this.props.navigation.navigate('ProductStack')
-        } if (this.state.user == 'Bid') {
-          this.props.navigation.navigate(Constants.settings)
-        } if (this.state.user == 'Hire') {
-          this.props.navigation.navigate(Constants.privacy_policy)
-        }
-      },
-    );
-
-  };
-  fetchProductsNext() {
+  fetchProductsNext = async () => {
     if (!this.loading && !this.isListEnd) {
       this.setState({ loading: true });
       const catIds = this.state.categoriesForSearch.map(cat => cat.categoryId).join(",");
+      let categoryIdsJson = await AsyncStorage.getItem('categories');
       client
         .query({
           query: GET_PRODUCT,
           fetchPolicy: 'no-cache',
           variables: {
             size: this.state.size,
-            categories: catIds
+            categories: catIds == "" ? categoryIdsJson : catIds
           },
           context: {
             headers: {
@@ -475,7 +374,6 @@ class HomeScreen extends Component {
     this.setState({ isCartLoading: true })
     this.setState({ isproductID: id })
 
-    console.log(this.state.userInfo);
     if (IsLogin !== 'true') {
       this.setState({ cartLoading: true });
       client
@@ -592,6 +490,12 @@ class HomeScreen extends Component {
     }
   }
 
+  refreshList = async  () => {
+    this.setState({ refreshing : true});
+    await this.fetchToken();
+    this.setState({ refreshing : false});
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -618,17 +522,6 @@ class HomeScreen extends Component {
             ))}
           </View>}
           
-          <RNPickerSelect
-            value={this.state.user}
-            onValueChange={this.updateUser}
-            items={[
-              { label: 'Purchase', value: 'Buy' },
-              { label: 'Bid', value: 'Bid' },
-              { label: 'Hire', value: 'Hire' },
-            ]}
-            textInputProps={styles.pickerContainer}
-          />
-
           <FlatList
             ListEmptyComponent={this.EmptyListMessage('data')}
             numColumns={2}
@@ -656,6 +549,9 @@ class HomeScreen extends Component {
             keyExtractor={(item, index) => index.toString()}
             onEndReached={this.fetchMoreUsers}
             onEndReachedThreshold={0.5}
+            onRefresh={this.refreshList}
+            refreshing={this.state.refreshing}
+
           />
         </View>
         <CategorySelector 

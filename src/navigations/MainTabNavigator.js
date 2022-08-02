@@ -49,6 +49,8 @@ import ScreenOptions from "../components/ScreenOptions";
 import ScreenOptionsWithBack from "../components/ScreenOptionsWithBack";
 import RequestStack from "./RequestStack";
 
+import HomeTabs from "./HomeNavigator";
+
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -175,7 +177,7 @@ const TabBarNavigator = () => (
     tabBar={props => <TabBar {...props} />}
     screenOptions={{ gestureEnabled: false, headerShown: false }}
   >
-    <Tab.Screen name="HomeStack" component={HomeStack} />
+    <Tab.Screen name="HomeStack" component={HomeTabs} />
     <Tab.Screen name={Constants.my_request_stack} component={MyRequestStack}  />
     <Tab.Screen name="CategoryStack" component={RequestStack}  />
     <Tab.Screen name="CartStack" component={CartStack}  />

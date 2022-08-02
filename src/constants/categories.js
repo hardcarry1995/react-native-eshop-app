@@ -96,4 +96,4 @@ export default categories = [{
   "timeDelayException": false
 }]
 
-export const mainCategoryId = 1336;
+export const mainCategoryId = 1402;
