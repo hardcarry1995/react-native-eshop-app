@@ -2,6 +2,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { imagePrefix } from '../constants/utils';
 import { Rating } from 'react-native-elements';
+import ImageWithPlaceholder from './ImageWithPlaceholder';
 
 const ProductCard = ({ item, navigation, addToFavourites, addToCart }) => {
   const onPressItem = () => {
@@ -19,7 +20,11 @@ const ProductCard = ({ item, navigation, addToFavourites, addToCart }) => {
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={onPressItem} style={styles.productItemContainer}>
-        <Image style={styles.productImage} source={item.productImage ? { uri: `${imagePrefix}${item.productImage}` } : require('../assets/NoImage.jpeg')} />
+        <ImageWithPlaceholder 
+          style={styles.productImage} 
+          source={item.productImage ? { uri: `${imagePrefix}${item.productImage}` } : require('../assets/NoImage.jpeg')} 
+          resizeMode="contain"
+        />        
         <View style={styles.productDetailContainer}>
           <View style={styles.productDetail}>
             <Text numberOfLines={1} style={styles.productTitle}>

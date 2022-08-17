@@ -7,6 +7,7 @@ import client from '../../constants/client';
 import Swipeout from 'react-native-swipeout';
 import moment from 'moment';
 import { connect } from "react-redux";
+import ImageWithPlaceholder from '../../components/ImageWithPlaceholder';
 
 class Workout extends React.PureComponent {
 
@@ -215,7 +216,7 @@ class Workout extends React.PureComponent {
           <View style={styles.mainCardView}>
             <View style={{ width: "80%", marginTop: 1 }}>
               <View style={{ flexDirection: 'row', }}>
-                <Image
+                <ImageWithPlaceholder
                   style={styles.proimg}
                   source={item.productImage ? { uri: `${imagePrefix}${item.productImage}` } : require('../../assets/NoImage.jpeg')}
                 />

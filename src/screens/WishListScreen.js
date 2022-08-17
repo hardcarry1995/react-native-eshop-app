@@ -4,6 +4,7 @@ import { Image, ScrollView, StyleSheet, Text, View, FlatList, SafeAreaView, Toas
 import { GET_ALL_FAV_PRODUCT, UPDATE_SHOPPING_CART, REMOVE_FROM_CART } from '../constants/queries';
 import AsyncStorage from '@react-native-community/async-storage';
 import client from '../constants/client';
+import ImageWithPlaceholder from '../components/ImageWithPlaceholder';
 
 class WishListScreen extends React.PureComponent {
   constructor(props) {
@@ -216,7 +217,7 @@ class WishListScreen extends React.PureComponent {
         <View style={styles.mainCardView}>
           <View style={{ width: "90%", marginTop: 1 }}>
             <View style={{ flexDirection: 'row', }}>
-              <Image
+              <ImageWithPlaceholder
                 style={styles.proimg}
                 source={item.productImage
                   ?

@@ -54,26 +54,9 @@ import HomeTabs from "./HomeNavigator";
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-const screenOptions = ({ navigation }) => ({
-  headerBackground: () => (
-    <View style={{ flex: 1, backgroundColor: '#fff' }} />
-  ),
-  headerStyle: textHeader.header_style,
-  headerTitleAlign: 'center',
-  headerTitle: () => (
-    <Image
-      source={require('../assets/logos/logo1.png')}
-      style={{ width: 100, height: 45 }}
-      resizeMode='contain'
-    />
-  ),
-  headerLeft: () => <Menu navigationProps={navigation} />,
-  headerBackButtonMenuEnabled : false,
-  headerBackVisible: false
-})
 // Define HomeStack
 const HomeStack = () => (
-  <Stack.Navigator screenOptions={screenOptions}>
+  <Stack.Navigator screenOptions={ScreenOptions}>
     <Stack.Screen name="Home" component={HomeScreen} />
     <Stack.Screen
       name="Filter"
@@ -95,7 +78,7 @@ const HomeStack = () => (
 // Define Product Stack
 // this is same as Matches Stack from old file
 const ProductStack = () => (
-  <Stack.Navigator screenOptions={screenOptions}>
+  <Stack.Navigator screenOptions={ScreenOptions}>
     <Stack.Screen name="Product" component={ProductScreen} />
   </Stack.Navigator>
 )
@@ -103,7 +86,7 @@ const ProductStack = () => (
 // Define CategoryStack -- Large Icon 
 // This is same as ChatStack from old files
 const CategoryStack = () => (
-  <Stack.Navigator screenOptions={screenOptions}>
+  <Stack.Navigator screenOptions={ScreenOptions}>
     <Stack.Screen name="Category" component={CategoryScreen} />
   </Stack.Navigator>
 )
@@ -111,8 +94,8 @@ const CategoryStack = () => (
 // Define ItemCart Stack
 // This is same as WorkoutStack
 const CartStack = () => (
-  <Stack.Navigator screenOptions={screenOptions}>
-    <Stack.Screen name="MyCart" component={MyCartScreen} options={screenOptions} />
+  <Stack.Navigator screenOptions={ScreenOptions}>
+    <Stack.Screen name="MyCart" component={MyCartScreen} options={ScreenOptions} />
     <Stack.Screen name="Checkout" component={Checkout} options={ScreenOptionsWithBack}/>
     <Stack.Screen name="AddAddress" component={AddAddress} options={ScreenOptionsWithBack}  />
   </Stack.Navigator>
@@ -121,35 +104,35 @@ const CartStack = () => (
 // Defile WishList Stack
 // This is same as AlertStack from old file
 const WishStack = () => (
-  <Stack.Navigator screenOptions={screenOptions}>
+  <Stack.Navigator screenOptions={ScreenOptions}>
     <Stack.Screen name="WishList" component={WishListScreen} />
   </Stack.Navigator>
 )
 
 // Contact Stack
 const ContactStack = () => (
-  <Stack.Navigator screenOptions={screenOptions}>
+  <Stack.Navigator screenOptions={ScreenOptions}>
     <Stack.Screen name="ContactForm" component={ContactFrom} />
   </Stack.Navigator>
 )
 // My Review Staack 
 
 const ReviewStack  = () => (
-  <Stack.Navigator screenOptions={screenOptions}>
+  <Stack.Navigator screenOptions={ScreenOptions}>
     <Stack.Screen name="MyReview" component={MyReviews} />
   </Stack.Navigator>
 )
 
 // MyFavorite Stack
 const FavoriteStack = () => (
-  <Stack.Navigator screenOptions={screenOptions}>
+  <Stack.Navigator screenOptions={ScreenOptions}>
     <Stack.Screen name="MyFavorite" component={MyFavorites} />
   </Stack.Navigator>
 )
 // incoming RequestStack
 
 const IncomingRequestStack = () => (
-  <Stack.Navigator screenOptions={screenOptions}>
+  <Stack.Navigator screenOptions={ScreenOptions}>
     <Stack.Screen name="IncomingRequest" component={IncomingRequest} />
     <Stack.Screen name="IncomingRequestDetail" component={IncomingRequestDetail} options={ScreenOptionsWithBack}/>
     <Stack.Screen name="IncomingRequestChat" component={IncomingRequestChat} options={ScreenOptionsWithBack} />
@@ -159,14 +142,14 @@ const IncomingRequestStack = () => (
 // Orders Stack
 
 const OrderStack = () => (
-  <Stack.Navigator screenOptions={screenOptions}>
+  <Stack.Navigator screenOptions={ScreenOptions}>
     <Stack.Screen name="Orders" component={Orders} />
     <Stack.Screen name="Order" component={Order} options={ScreenOptionsWithBack} />
   </Stack.Navigator>
 )
 
 const ProductMapStack = () => (
-  <Stack.Navigator screenOptions={screenOptions}>
+  <Stack.Navigator screenOptions={ScreenOptions}>
     <Stack.Screen name="product_map" component={AboutUs} options={ScreenOptionsWithBack}/>
   </Stack.Navigator>
 )

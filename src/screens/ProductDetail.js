@@ -9,6 +9,7 @@ import moment from 'moment';
 import { Rating } from 'react-native-elements';
 import Toast from "react-native-toast-message";
 import { connect } from "react-redux";
+import ImageWithPlaceholder from '../components/ImageWithPlaceholder';
 
 class ProductDetail extends React.Component {
   constructor(props) {
@@ -170,7 +171,7 @@ class ProductDetail extends React.Component {
       <ScrollView style={{ flex: 1, backgroundColor: '#fff' }}>
         <View style={{ paddingVertical: 10, paddingHorizontal: 20, flex: 1, marginBottom: 20 }}>
           <View style={{ alignSelf: 'center', marginLeft: 1 }}>
-            <Image
+            <ImageWithPlaceholder
               style={{ height: 250, width: 250, padding: 5 }}
               source={{ uri: imagePath }}
             />

@@ -1,6 +1,21 @@
 import React, { useState } from 'react';
 import CheckBox from 'react-native-check-box';
-import { Text, Image, View, StyleSheet, TextInput, Platform, ScrollView, Modal as MD, SafeAreaView, TouchableOpacity, Alert, ToastAndroid, ActivityIndicator } from 'react-native';
+import { 
+  Text, 
+  Image,
+  View, 
+  StyleSheet, 
+  TextInput, 
+  Platform, 
+  ScrollView, 
+  Modal as MD, 
+  SafeAreaView, 
+  TouchableOpacity, 
+  Alert, 
+  ToastAndroid, 
+  ActivityIndicator,
+  Linking 
+} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import { bearerToken } from '../../constants/utils';
 import client from '../../constants/client';
@@ -447,6 +462,10 @@ class Signup extends React.Component {
     })
   }
 
+  onPressTerms = () => {
+    Linking.openURL("https://brics.ezyfind.co.za/manufacturing/CompanyPDF/BRICS-Privacy-Policy.pdf");
+  }
+
   render() {
     return (
       <SafeAreaView style={styles.container}>
@@ -596,9 +615,11 @@ class Signup extends React.Component {
               <Text style={{ color: '#919191', marginLeft: 37, marginTop: -22, opacity: 0.5 }}>
                 I Agree With the
               </Text>
-              <Text style={{ color: '#919191', marginLeft: 135, marginTop: -19 }}>
-                Terms And Conditions
-              </Text>
+              <TouchableOpacity style={{ marginLeft: 5}} onPress={this.onPressTerms}>
+                <Text style={{ color: '#919191', marginLeft: 139, marginTop: -17 }}>
+                  Terms And Conditions
+                </Text>
+              </TouchableOpacity>
             </View>
             <TouchableOpacity
               style={styles.button}
