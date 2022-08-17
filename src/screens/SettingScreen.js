@@ -6,19 +6,11 @@ import { GetRating } from '../components/GetRating';
 import AsyncStorage from '@react-native-community/async-storage';
 import { GET_BID_ALL_PRODUCT, BID_ON_PRODUCT, CREATE_FAVOURITES_PRODUCT } from '../constants/queries';
 import client from '../constants/client';
-import Constants from "../constants/constant";
-import Moment from 'moment';
-import RNPickerSelect from 'react-native-picker-select';
+import moment from 'moment';
 import CategorySelector from "../components/CategorySelector";
 import { Chip } from "react-native-elements";
 import ProductSearchInput from "../components/ProductSearchInput";
 import Toast from "react-native-toast-message";
-
-const filterItems = [
-  { label: 'Purchase', value: 'Buy' },
-  { label: 'Bid', value: 'Bid' },
-  { label: 'Hire', value: 'Hire' },
-]
 
 function BidItem ({ item, onPressAddBid, onPressAddToFav }) {
 
@@ -43,12 +35,8 @@ function BidItem ({ item, onPressAddBid, onPressAddToFav }) {
     }
 
     const  date = item.endDate;
-    // Moment()
-    //     .utcOffset('+05:30')
-    //     .format('YYYY-MM-DD hh:mm:ss');
-    const expirydate = '2021-12-23 04:00:45';
-    const diffr = Moment.duration(Moment(expirydate) .diff(Moment(date)));
-    // Difference of the expiry date-time
+ 
+    const diffr = moment.duration(moment(date).diff(moment()));
     const hours = parseInt(diffr.asHours());
     const minutes = parseInt(diffr.minutes());
     const seconds = parseInt(diffr.seconds());
