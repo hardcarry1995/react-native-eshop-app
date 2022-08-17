@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>232834789917-a6ftjml3vucanqfslmkeohe4k99udu62.apps.googleusercontent.com</string>
+	<string>232834789917-jih1l4d04sruhf5npvj0ctcm670kc76e.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.232834789917-a6ftjml3vucanqfslmkeohe4k99udu62</string>
+	<string>com.googleusercontent.apps.232834789917-jih1l4d04sruhf5npvj0ctcm670kc76e</string>
 	<key>ANDROID_CLIENT_ID</key>
 	<string>232834789917-7efvvdfujnoi97a6kpf9brrv1png12pr.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
@@ -15,7 +15,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.INNOVEzyFind</string>
+	<string>com.inno.ezyfind</string>
 	<key>PROJECT_ID</key>
 	<string>ezyfind-1544275429812</string>
 	<key>STORAGE_BUCKET</key>
@@ -31,6 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:232834789917:ios:379a21654d998256f1ccf4</string>
+	<string>1:232834789917:ios:26cd3fb302bc11d3f1ccf4</string>
 </dict>
 </plist>
