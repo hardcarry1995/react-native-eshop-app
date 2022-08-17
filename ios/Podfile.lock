@@ -1066,6 +1066,8 @@ PODS:
     - React-Core
   - react-native-camera/RN (4.2.1):
     - React-Core
+  - react-native-date-picker (4.2.5):
+    - React-Core
   - react-native-document-picker (8.1.1):
     - React-Core
   - react-native-fbsdk-next (10.0.0):
@@ -1179,6 +1181,8 @@ PODS:
   - RNCAsyncStorage (1.12.1):
     - React-Core
   - RNCPicker (1.16.8):
+    - React-Core
+  - RNDateTimePicker (6.3.1):
     - React-Core
   - RNDeviceInfo (9.0.2):
     - React-Core
@@ -1308,6 +1312,7 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - react-native-blob-util (from `../node_modules/react-native-blob-util`)
   - react-native-camera (from `../node_modules/react-native-camera`)
+  - react-native-date-picker (from `../node_modules/react-native-date-picker`)
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
   - react-native-fbsdk-next (from `../node_modules/react-native-fbsdk-next`)
   - "react-native-geolocation (from `../node_modules/@react-native-community/geolocation`)"
@@ -1336,6 +1341,7 @@ DEPENDENCIES:
   - "RNAppleAuthentication (from `../node_modules/@invertase/react-native-apple-authentication`)"
   - "RNCAsyncStorage (from `../node_modules/@react-native-community/async-storage`)"
   - "RNCPicker (from `../node_modules/@react-native-picker/picker`)"
+  - "RNDateTimePicker (from `../node_modules/@react-native-community/datetimepicker`)"
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
   - "RNFBAuth (from `../node_modules/@react-native-firebase/auth`)"
@@ -1453,6 +1459,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-blob-util"
   react-native-camera:
     :path: "../node_modules/react-native-camera"
+  react-native-date-picker:
+    :path: "../node_modules/react-native-date-picker"
   react-native-document-picker:
     :path: "../node_modules/react-native-document-picker"
   react-native-fbsdk-next:
@@ -1509,6 +1517,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-community/async-storage"
   RNCPicker:
     :path: "../node_modules/@react-native-picker/picker"
+  RNDateTimePicker:
+    :path: "../node_modules/@react-native-community/datetimepicker"
   RNDeviceInfo:
     :path: "../node_modules/react-native-device-info"
   RNFBApp:
@@ -1610,6 +1620,7 @@ SPEC CHECKSUMS:
   React-logger: 1e10789cb84f99288479ba5f20822ce43ced6ffe
   react-native-blob-util: 7ac01cd4a4ba81016864727a756ce2c1af995e35
   react-native-camera: 3eae183c1d111103963f3dd913b65d01aef8110f
+  react-native-date-picker: 55193347d8d0f40948f441ffd4e5db6f0a8fbe13
   react-native-document-picker: f68191637788994baed5f57d12994aa32cf8bf88
   react-native-fbsdk-next: 75ea1d4b48e047796f3264535a1cab502686a3e2
   react-native-geolocation: 69f4fd37650b8e7fee91816d395e62dd16f5ab8d
@@ -1638,6 +1649,7 @@ SPEC CHECKSUMS:
   RNAppleAuthentication: 0571c08da8c327ae2afc0261b48b4a515b0286a6
   RNCAsyncStorage: b03032fdbdb725bea0bd9e5ec5a7272865ae7398
   RNCPicker: 0991c56da7815c0cf946d6f63cf920b25296e5f6
+  RNDateTimePicker: 95e0cb71cba4c2f08c62444029f834e6168a2b96
   RNDeviceInfo: 1e3f62b9ec32f7754fac60bd06b8f8a27124e7f0
   RNFBApp: 9646e09d041ea159b84584865212e4cf33acd179
   RNFBAuth: af943e3ba071b5f4d18896c31e6cba3a77b1fa08

@@ -64,7 +64,6 @@ export default class CategorySelector extends React.Component {
         this.setState({ loading: '' });
         if (result.data.getMstCategoryByParentId.success) {
           this.setState({ sub: result.data.getMstCategoryByParentId.result });
-          console.log(result.data.getMstCategoryByParentId.result);
         } else {
           ToastAndroid.show(
             result.data.getMstCategoryByParentId.message,

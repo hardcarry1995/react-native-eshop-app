@@ -16,13 +16,12 @@ const ProductCard = ({ item, navigation, addToFavourites, addToCart }) => {
   onPressCart = () => {
     addToCart(item.productID)
   }
-
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={onPressItem} style={styles.productItemContainer}>
         <ImageWithPlaceholder 
           style={styles.productImage} 
-          source={item.productImage ? { uri: `${imagePrefix}${item.productImage}` } : require('../assets/NoImage.jpeg')} 
+          source={item.productImage ? { uri: `${imagePrefix}${item.productImage}`} : require('../assets/NoImage.jpeg')} 
           resizeMode="contain"
         />        
         <View style={styles.productDetailContainer}>

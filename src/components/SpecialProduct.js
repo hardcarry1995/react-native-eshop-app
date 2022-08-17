@@ -7,6 +7,7 @@ import { SPECIAL_PRODUCT, CREATE_FAVOURITES_SPECIAL, ADD_TO_CART_NULL, ADD_TO_CA
 import AsyncStorage from '@react-native-community/async-storage';
 import Toast from "react-native-toast-message";
 import moment from "moment";
+import ImageWithPlaceholder from '../components/ImageWithPlaceholder';
 
 class SpecialProduct extends PureComponent {
   constructor(props) {
@@ -237,7 +238,7 @@ class SpecialProduct extends PureComponent {
       <TouchableOpacity activeOpacity={0.9} style={styles.itemContainer} key={index} onPress={() => this.props.navigation.navigate('Filter', { data: item })}>
         <View style={{ flex: 1, backgroundColor: '#FFF', borderRadius: 15, elevation: 5 }}>
           <View style={{ alignSelf: 'center', flex: 1 }}>
-            <Image
+            <ImageWithPlaceholder
               style={styles.productImage}
               source={imagege ? { uri: `${imagePrefix}${imagege}` } : require('../assets/NoImage.jpeg')}
             />

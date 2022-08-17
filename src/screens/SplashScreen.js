@@ -47,7 +47,6 @@ const SplashScreen = ({ navigation }) => {
                                           },
                                         });
     const subCategoryIds = categoryQueryResult.data.getMstCategoryByParentId.result.map(category => category.categoryId);
-    console.log(subCategoryIds);
     await AsyncStorage.setItem("categories", subCategoryIds.join(","));
   }
 

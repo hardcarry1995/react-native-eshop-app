@@ -1381,6 +1381,13 @@
   dependencies:
     invariant "^2.2.4"
 
+"@react-native-community/datetimepicker@^6.3.1":
+  version "6.3.1"
+  resolved "https://registry.yarnpkg.com/@react-native-community/datetimepicker/-/datetimepicker-6.3.1.tgz#217fc1fa1f989038f88efd6394ec34aa79b60c9d"
+  integrity sha512-WdSc34CwKTK7ied9En9yxs6WHN5bBdw2hGgWr4rqJcfC7qAOQCV+JA7iFxN7Ob1wxE/7gsTX2hZG8tmd62PH1g==
+  dependencies:
+    invariant "^2.2.4"
+
 "@react-native-community/eslint-config@^3.0.1":
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/@react-native-community/eslint-config/-/eslint-config-3.0.3.tgz#a55233c82ae8d07ce84da868184e73ee6649963a"
@@ -7080,6 +7087,13 @@ react-native-countdown-component@^2.7.1:
     prop-types "^15.5.8"
     sprintf-js "^1.1.1"
 
+react-native-date-picker@^4.2.5:
+  version "4.2.5"
+  resolved "https://registry.yarnpkg.com/react-native-date-picker/-/react-native-date-picker-4.2.5.tgz#d2e3ff6c8616313bdd75c48ac56a84a57d8a27a3"
+  integrity sha512-YjwiMpZEnVVS+ymLvmJDicVZ3pSR+nJHgtAhctMl6fO8f7iRNcYhY427gemlTBf2Ji+XIAK0Agyl255DhaemFw==
+  dependencies:
+    prop-types "^15.8.1"
+
 react-native-datepicker@^1.7.2:
   version "1.7.2"
   resolved "https://registry.yarnpkg.com/react-native-datepicker/-/react-native-datepicker-1.7.2.tgz#58d0822591a0ac9b32aba082650222a0ee29669d"
@@ -7359,6 +7373,11 @@ react-native-screens@^3.12.0:
   dependencies:
     react-freeze "^1.0.0"
     warn-once "^0.1.0"
+
+react-native-select-dropdown@^2.0.4:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/react-native-select-dropdown/-/react-native-select-dropdown-2.0.4.tgz#269d1d8d6228d511a2b82a4f110f2a6e655609dd"
+  integrity sha512-bv8iznvf04FThqCkkD4kxlbNjo2d69yLcEe3nUwalQ6ea2NXqUJRQ5uUr1SEDSCH8l6IQlmog8rkHthrLEzQ9A==
 
 react-native-simple-twitter@^3.0.6:
   version "3.0.6"

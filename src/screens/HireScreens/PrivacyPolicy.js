@@ -1,28 +1,26 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image, StatusBar, TouchableOpacity, TextInput, FlatList, ActivityIndicator, ToastAndroid, Modal, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Platform, FlatList, ActivityIndicator, Modal } from 'react-native';
 import DatePicker from 'react-native-datepicker';
 import { imagePrefix } from '../../constants/utils';
 import { GetRating } from '../../components/GetRating';
 import AsyncStorage from '@react-native-community/async-storage';
 import { HIRE_THE_PRODUCT, GET_ALL_HIRE_PRODUCT, CREATE_FAVOURITES_PRODUCT, HIRE_THE_PRODUCT_NULL } from '../../constants/queries';
 import client from '../../constants/client';
-import Constants from "../../constants/constant";
 import Moment from 'moment';
 import { Alert } from 'react-native';
 import { Icon } from 'native-base';
-import RNPickerSelect from 'react-native-picker-select';
 import ProductSearchInput from "../../components/ProductSearchInput";
 import CategorySelector from "../../components/CategorySelector";
 import { Chip } from "react-native-elements";
 import Toast from "react-native-toast-message";
+import SelectDropdown from 'react-native-select-dropdown';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { connect } from 'react-redux';
 
 
-const filterItems = [
-  { label: 'Purchase', value: 'Buy' },
-  { label: 'Bid', value: 'Bid' },
-  { label: 'Hire', value: 'Hire' },
-]
-export default class PrivacyPolicy extends React.Component {
+const quantities = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+class PrivacyPolicy extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -38,8 +36,8 @@ export default class PrivacyPolicy extends React.Component {
       rating: "2",
       hireData: {},
       modalVisible: false,
-      fromDate: Moment().format('YYYY-MM-DD'),
-      toDate: Moment().format('YYYY-MM-DD'),
+      fromDate: new Date(),
+      toDate: new Date(),
       todayDate: '',
       totalDuration: '0',
       searchText : "",
@@ -49,7 +47,9 @@ export default class PrivacyPolicy extends React.Component {
       starImageCorner: 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png',
       showCategorySelector: false,
       categoriesForSearch : [],
-      refreshing: false
+      refreshing: false,
+      showStartDateSelector: false,
+      showEndDateSelector: false
     };
   }
 
@@ -146,13 +146,15 @@ export default class PrivacyPolicy extends React.Component {
           variables: {
             productId: this.state.hireData.productID,
             userId: Number(this.state.userInfo.id),
-            fromDate: Moment(this.state.fromDate + ' 18:30:00.000').format(),
-            toDate: Moment(this.state.toDate + ' 18:30:00.000').format()
+            fromDate: Moment(this.state.fromDate).format(),
+            toDate: Moment(this.state.toDate).format()
           },
         })
         .then(result => {
           this.setState({ cartLoading: false });
           if (result.data.postPrdShoppingCartOptimized.success) {
+            console.log(result.data.postPrdShoppingCartOptimized.result.prdShoppingCartDto)
+            this.props.addProductToCart(result.data.postPrdShoppingCartOptimized.result.prdShoppingCartDto)
             Alert.alert('Success', 'Hire product successfully')
           } else {
             console.log(result.data.postPrdShoppingCartOptimized);
@@ -178,13 +180,14 @@ export default class PrivacyPolicy extends React.Component {
           },
           variables: {
             productId: this.state.hireData.productID,
-            fromDate: this.state.fromDate + ' 18:30:00.000',
-            toDate: this.state.toDate + ' 18:30:00.000'
+            fromDate: Moment(this.state.fromDate).format(),
+            toDate: Moment(this.state.toDate).format()
           },
         })
         .then(result => {
           this.setState({ cartLoading: false });
           if (result.data.postPrdShoppingCartOptimized.success) {
+            this.props.addProductToCart(result.data.postPrdShoppingCartOptimized.result.prdShoppingCartDto)
             Alert.alert('Success', 'Hire product successfully')
           }
           this.setState({ modalVisible: visible });
@@ -416,7 +419,13 @@ export default class PrivacyPolicy extends React.Component {
                     { this.state.hireData.typeID == 1 && 
                     <View>
                       <Text style={{ fontSize: 14, textAlign: 'center', fontWeight: 'bold', width: '100%' }}>Quantity</Text> 
-                      <TextInput value={this.state.quantity.toString()} style={styles.quantityInput} onChangeText={(value) => this.setState({ quantity: value})}/>
+                      {/* <TextInput value={this.state.quantity.toString()} style={styles.quantityInput} onChangeText={(value) => this.setState({ quantity: value})}/> */}
+                      <SelectDropdown  
+                        data={quantities}
+                        onSelect={(selectedItem, index) => this.setState({ quantity: selectedItem })}
+                        defaultValueByIndex={0}
+                        buttonStyle={styles.quantityDropdown}
+                      />
                     </View>
                     } 
                     <View style={{ alignItems: 'center', marginTop: 10 }}>
@@ -434,9 +443,20 @@ export default class PrivacyPolicy extends React.Component {
                     </View>
 
                     <View style={{ flexDirection: 'row', paddingStart: 10 }}>
-                      <View style={{ width: '40%' }}>
-                        <DatePicker
-                          style={{ width: '90%', color: 'red' }}
+                      {Platform.OS == "android" ? <View style={{ width: '40%' }}>
+                        <TouchableOpacity onPress={() => this.setState({ showStartDateSelector: true })}>
+                          <Text>{Moment(this.state.fromDate).format("YYYY-MM-DD")}</Text>
+                        </TouchableOpacity>
+                        {this.state.showStartDateSelector && <DateTimePicker
+                          value={this.state.fromDate}
+                          mode="date"
+                          onChange={(event, date) => { this.setState({ fromDate: date, showStartDateSelector: false }) }}
+                        /> }
+                      </View>
+                      :
+                      <View style={{ width: '40%', justifyContent: 'center' }}>
+                       <DatePicker
+                          style={{ width: '90%' }}
                           date={this.state.fromDate}
                           mode="date"
                           format="YYYY-MM-DD"
@@ -455,15 +475,27 @@ export default class PrivacyPolicy extends React.Component {
                             },
                             dateInput: {
                               borderRadius: 9,
-                              color: 'red'
                             }
                           }}
                           onDateChange={(date) => { this.setState({ fromDate: date }) }}
                         />
                       </View>
+                      }
                       <View style={{ width: '20%' }}>
                         <Text style={{ textAlign: 'center', fontSize: 20 }}>-</Text>
                       </View>
+                      {Platform.OS == "android" ? <View style={{ width: '40%' }}>
+                        <TouchableOpacity onPress={() => this.setState({ showEndDateSelector : true })}>
+                          <Text>{Moment(this.state.toDate).format("YYYY-MM-DD")}</Text>
+                        </TouchableOpacity>
+                        {this.state.showEndDateSelector &&  <DateTimePicker
+                          style={{ width: '90%' }}
+                          value={this.state.toDate}
+                          mode="date"
+                          onChange={(event, date) => { this.setState({ toDate: date, showEndDateSelector: false}) }}
+                        />}
+                      </View>
+                      :
                       <View style={{ width: '40%' }}>
                         <DatePicker
                           style={{ width: '90%' }}
@@ -489,7 +521,8 @@ export default class PrivacyPolicy extends React.Component {
                           }}
                           onDateChange={(date) => { this.setState({ toDate: date }) }}
                         />
-                      </View>
+                      </View>  
+                    }
                     </View>
                     <View style={{ flexDirection: 'row', paddingStart: 10, marginTop: 15 }}>
                       <View style={{ width: '40%' }}>
@@ -551,6 +584,15 @@ export default class PrivacyPolicy extends React.Component {
     );
   }
 }
+
+const mapDispatchToProps = dispatch => ({
+  addProductToCart : value => dispatch({
+    type: "GET_CARTS_ITEMS",
+    payload : value
+  })
+});
+
+export default connect(null, mapDispatchToProps)(PrivacyPolicy);
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -739,5 +781,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'red',
     fontSize: 18
+  },
+  quantityDropdown: {
+    width: "100%",
+    height: 40,
+    backgroundColor: '#FFF',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#888',
   },
 });
