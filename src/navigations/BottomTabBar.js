@@ -7,7 +7,8 @@ import Constants from '../constants/constant';
 import { connect } from "react-redux";
 import client from '../constants/client';
 import { GET_SHOPPING_CART } from '../constants/queries';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-community/async-storage'
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, withSequence } from 'react-native-reanimated';
 
 const Tab = ({ title, activeImage, unactiveImage, onPress, isFocused, isShowBadge, badge_value }) => {
   return (
@@ -35,12 +36,86 @@ const Tab = ({ title, activeImage, unactiveImage, onPress, isFocused, isShowBadg
 //large tab bar icon
 
 const Tablarge = ({ title, activeImage, unactiveImage, onPress, isFocused }) => {
-  return (
+  const offset = useSharedValue(0);
+  const opacityOffset = useSharedValue(0)
+  // const bottomOffset = useSharedValue(200)
+  const flagRef = React.useRef(0)
+
+  const flipCard = () => {
+    if (flagRef.current == 0) {
+      setTimeout(() => {
+        offset.value = withSpring(360)
+        opacityOffset.value = withSequence(withTiming(1, {
+          duration: 1000
+        }), withTiming(0, {
+          duration: 1000
+        }))
+        // opacityOffset.value = withTiming(0)
+      }, 500)
+      flagRef.current = 1
+    } else {
+      setTimeout(() => {
+        offset.value = withSpring(0)
+        // opacityOffset.value = withTiming(0)
+        // opacityOffset.value = withTiming(1)
+        opacityOffset.value = withSequence(withTiming(1, {
+          duration: 1000
+        }), withTiming(0, {
+          duration: 1000
+        }))
+      }, 500)
+      flagRef.current = 0
+    }
+  }
+  const _ms = 5000;
+  React.useEffect(() => {
+    flipCard()
+    const interval = setInterval(() => flipCard(), _ms);
+    return () => clearInterval(interval);
+  }, [])
+
+  const animatedStyles = useAnimatedStyle(() => {
+    return {
+      transform: [{
+        rotateY: `${offset.value}deg`,
+      }]
+    };
+  });
+
+  const animatedPopupStyle = useAnimatedStyle(() => {
+    return {
+      opacity: opacityOffset.value,
+    };
+  });
+
+  const InnerComp = () => <Animated.View style={[styles.largeButtonContainer, animatedStyles]}>
     <TouchableOpacity activeOpacity={0.8} onPress={onPress}>
-      <View style={styles.largeButtonContainer}>
-        <Image style={styles.larginButtonImage} resizeMode="contain" source={isFocused ? activeImage : unactiveImage} />
-      </View>
+      <Image style={styles.larginButtonImage} resizeMode="contain" source={isFocused ? activeImage : unactiveImage} />
     </TouchableOpacity>
+  </Animated.View>
+  return (
+    <View>
+      <Animated.View style={[
+        {
+          backgroundColor: '#db3236',
+          borderRadius: 15,
+          padding: 10,
+          position: 'absolute',
+          width: 150,
+          left: -40,
+          zIndex: 1,
+          bottom: 130
+        }, animatedPopupStyle
+      ]}>
+        <Text
+          style={{
+            color: 'white',
+            fontSize: 14,
+            textAlign: 'center'
+          }}>Request Here!</Text>
+      </Animated.View>
+      <InnerComp />
+    </View>
   );
 };
 
@@ -85,7 +160,7 @@ class TabBar extends React.Component {
           this.props.setCartItems(result?.data?.getPrdShoppingCart.result.prdShoppingCartDto);
         }
       })
-     
+
   }
 
   componentWillUnmount() {
@@ -109,74 +184,74 @@ class TabBar extends React.Component {
     const { navigation } = this.props;
     const navigationState = this.props.state;
     return this.state.isVisible ? (
-        <View style={styles.tabBarContainer}>
-          {this.props.state.routes.map((route, index) => {
-            if (route.name === 'HomeStack') {
-              return (
-                <Tab
-                  title={'Home'}
-                  activeImage={require('../assets/menu/home.png')}
-                  unactiveImage={require('../assets/menu/home.png')}
-                  onPress={() => {
-                    navigation.navigate(route.name, {});
-                  }}
-                  isFocused={navigationState.index == index}
-                />
-              );
-            } else if (route.name === Constants.my_request_stack) {
-              return (
-                <Tab
-                  title={'My Requests'}
-                  activeImage={require('../assets/img/product.png')}
-                  unactiveImage={require('../assets/img/product.png')}
-                  onPress={() => {
-                    navigation.navigate(route.name);
-                  }}
-                  isFocused={navigationState.index == index}
-                />
-              );
-            } else if (route.name === 'CategoryStack') {
-              return (
-                <Tablarge
-                  title={''}
-                  activeImage={require('../assets/menu/request.png')}
-                  unactiveImage={require('../assets/menu/request.png')}
-                  onPress={() => {
-                    navigation.navigate(route.name);
-                  }}
-                  isFocused={navigationState.index == index}
-                />
-              );
-            } else if (route.name === 'CartStack') {
-              // Item Cart
-              return (
-                <Tab
-                  title={'ItemCart'}
-                  activeImage={require('../assets/menu/cart.png')}
-                  unactiveImage={require('../assets/menu/cart.png')}
-                  onPress={() => {
-                    navigation.navigate(route.name);
-                  }}
-                  isShowBadge
-                  badge_value={this.props.userState.carts.length}
-                  isFocused={navigationState.index == index}
-                />
-              );
-            } else if (route.name === 'WishStack') {
-              return (
-                <Tab
-                  title={'Wish List'}
-                  activeImage={require('../assets/menu/heart.png')}
-                  unactiveImage={require('../assets/menu/heart.png')}
-                  onPress={() => {
-                    navigation.navigate(route.name);
-                  }}
-                  isFocused={navigationState.index == index}
-                />
-              );
-            }
-          })}
-        </View>
+      <View style={styles.tabBarContainer}>
+        {this.props.state.routes.map((route, index) => {
+          if (route.name === 'HomeStack') {
+            return (
+              <Tab
+                title={'Home'}
+                activeImage={require('../assets/menu/home.png')}
+                unactiveImage={require('../assets/menu/home.png')}
+                onPress={() => {
+                  navigation.navigate(route.name, {});
+                }}
+                isFocused={navigationState.index == index}
+              />
+            );
+          } else if (route.name === Constants.my_request_stack) {
+            return (
+              <Tab
+                title={'My Requests'}
+                activeImage={require('../assets/img/product.png')}
+                unactiveImage={require('../assets/img/product.png')}
+                onPress={() => {
+                  navigation.navigate(route.name);
+                }}
+                isFocused={navigationState.index == index}
+              />
+            );
+          } else if (route.name === 'CategoryStack') {
+            return (
+              <Tablarge
+                title={''}
+                activeImage={require('../assets/menu/request.png')}
+                unactiveImage={require('../assets/menu/request.png')}
+                onPress={() => {
+                  navigation.navigate(route.name);
+                }}
+                isFocused={navigationState.index == index}
+              />
+            );
+          } else if (route.name === 'CartStack') {
+            // Item Cart
+            return (
+              <Tab
+                title={'ItemCart'}
+                activeImage={require('../assets/menu/cart.png')}
+                unactiveImage={require('../assets/menu/cart.png')}
+                onPress={() => {
+                  navigation.navigate(route.name);
+                }}
+                isShowBadge
+                badge_value={this.props.userState.carts.length}
+                isFocused={navigationState.index == index}
+              />
+            );
+          } else if (route.name === 'WishStack') {
+            return (
+              <Tab
+                title={'Wish List'}
+                activeImage={require('../assets/menu/heart.png')}
+                unactiveImage={require('../assets/menu/heart.png')}
+                onPress={() => {
+                  navigation.navigate(route.name);
+                }}
+                isFocused={navigationState.index == index}
+              />
+            );
+          }
+        })}
+      </View>
     ) : null;
   }
 }
@@ -215,6 +290,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 35,
     shadowRadius: 1,
+    zIndex: 0
   },
   larginButtonImage: {
     width: 55,
@@ -245,7 +321,7 @@ const styles = StyleSheet.create({
 })
 
 const mapStateToProps = state => ({
-  userState : state
+  userState: state
 })
 
 const mapDispatchToProps = (dispatch) => ({

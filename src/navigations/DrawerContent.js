@@ -18,20 +18,20 @@ class DrawerContent extends Component {
     user_email: '',
     setuserRole: '',
     channels: [
-      { screen: Constant.feed, title: Constant.feed, image: cont.feed, isLoggedIn : false },
-      { screen: Constant.near_by, title: Constant.near_by, image: cont.near_by, isLoggedIn : false },
-      { screen: Constant.settings, title: Constant.settings, image: cont.settings, isLoggedIn : false },
-      { screen: Constant.privacy_policy, title: Constant.privacy_policy, image: cont.privacy_policy, isLoggedIn : false },
-      { screen: Constant.term_condition, title: Constant.term_condition, image: cont.term_condition, isLoggedIn : false },
-      { screen: Constant.faq, title: Constant.faq, image: cont.faq, isLoggedIn : false },
-      { screen: Constant.contact_us, title: Constant.contact_us, image: cont.contact_us, isLoggedIn : false },
-      { screen: Constant.about_us, title: Constant.about_us, image: cont.about_us, isLoggedIn : false },
-      { screen: Constant.my_Favirity, title: Constant.my_Favirity, image: cont.my_Favirity ,isLoggedIn : true },
-      { screen: Constant.my_Reviews, title: Constant.my_Reviews, image: cont.my_Reviews, isLoggedIn : true },
-      { screen: "MyBid", title: "My Bids", image: cont.my_Reviews, isLoggedIn : true},
-      { screen: "MyOrders", title: 'My Orders', image: cont.my_Reviews, isLoggedIn : true },
-      { screen: Constant.rate_the_app, title: Constant.rate_the_app, image: cont.rate_the_app, isLoggedIn : false },
-      { screen: Constant.give_feedback, title: Constant.give_feedback, image: cont.give_feedback, isLoggedIn : false },
+      { screen: Constant.feed, title: Constant.feed, image: cont.feed, isLoggedIn: false },
+      { screen: Constant.near_by, title: Constant.near_by, image: cont.near_by, isLoggedIn: false },
+      { screen: Constant.settings, title: Constant.settings, image: cont.settings, isLoggedIn: false },
+      { screen: Constant.privacy_policy, title: Constant.privacy_policy, image: cont.privacy_policy, isLoggedIn: false },
+      { screen: Constant.term_condition, title: Constant.term_condition, image: cont.term_condition, isLoggedIn: false },
+      { screen: Constant.faq, title: Constant.faq, image: cont.faq, isLoggedIn: false },
+      { screen: Constant.contact_us, title: Constant.contact_us, image: cont.contact_us, isLoggedIn: false },
+      { screen: Constant.about_us, title: Constant.about_us, image: cont.about_us, isLoggedIn: false },
+      { screen: Constant.my_Favirity, title: Constant.my_Favirity, image: cont.my_Favirity, isLoggedIn: true },
+      { screen: Constant.my_Reviews, title: Constant.my_Reviews, image: cont.my_Reviews, isLoggedIn: true },
+      { screen: "MyBid", title: "My Bids", image: cont.my_Reviews, isLoggedIn: true },
+      { screen: "MyOrders", title: 'My Orders', image: cont.my_Reviews, isLoggedIn: true },
+      { screen: Constant.rate_the_app, title: Constant.rate_the_app, image: cont.rate_the_app, isLoggedIn: false },
+      { screen: Constant.give_feedback, title: Constant.give_feedback, image: cont.give_feedback, isLoggedIn: false },
       // { screen: Constant.share_app, title: Constant.share_app, image: cont.share_app, isLoggedIn : false },
     ],
     selectedRoute: '',
@@ -40,9 +40,9 @@ class DrawerContent extends Component {
   };
 
   componentDidMount = async () => {
-    if( Object.keys(this.props.user).length > 0){
-      this.setState({ 
-        IsLoginData : 'true',
+    if (Object.keys(this.props.user).length > 0) {
+      this.setState({
+        IsLoginData: 'true',
         user_name: this.props.user.name,
         user_email: this.props.user.email,
         user_image: this.props.user.image,
@@ -68,7 +68,7 @@ class DrawerContent extends Component {
         });
       }
     }
-    
+
   };
 
   navigateToScreen = route => () => {
@@ -104,38 +104,38 @@ class DrawerContent extends Component {
         break;
 
       case Constant.term_condition:
-        this.props.navigation.navigate(Constant.term_condition, { screen : "TermCondition" });
+        this.props.navigation.navigate(Constant.term_condition, { screen: "TermCondition" });
         this.setState({ selectedRoute: Constant.incoming_request });
         break;
-      case "incoming_enquiry": 
+      case "incoming_enquiry":
         this.props.navigation.navigate(Constant.feed, { screen: "IncomingEnquiry" });
         this.setState({ selectedRoute: "IncomingEnquiry" });
         break;
-      case "my_enquiry" : 
+      case "my_enquiry":
         this.props.navigation.navigate(Constant.feed, { screen: "MyEnquiry" });
         this.setState({ selectedRoute: "MyEnquiry" });
         break;
-      case  "Request an Item":
-        this.props.navigation.navigate("RequestStack", {screen: "RequestItem"});
+      case "Request an Item":
+        this.props.navigation.navigate("RequestStack", { screen: "RequestItem" });
         this.setState({ selectedRoute: "Request an Item" });
         break;
-      case Constant.settings: 
+      case Constant.settings:
         this.props.navigation.navigate(Constant.settings, { screen: "SettingScreen" });
         this.setState({ selectedRoute: Constant.settings });
         break;
-      case "MyBid" : 
-        this.props.navigation.navigate(Constant.settings, { screen : "MyBid"});
+      case "MyBid":
+        this.props.navigation.navigate(Constant.settings, { screen: "MyBid" });
         this.setState({ selectedRoute: "MyBid" });
         break;
-      
-      case Constant.give_feedback: 
-        this.props.navigation.navigate("ContactStack", { screen : "ContactForm "});
+
+      case Constant.give_feedback:
+        this.props.navigation.navigate("ContactStack", { screen: "ContactForm " });
         this.setState({ selectedRoute: Constant.give_feedback });
         break;
       case Constant.rate_the_app:
-        if(Platform.OS === 'ios'){
+        if (Platform.OS === 'ios') {
           Linking.openURL('market://details?id=myandroidappid')
-        } else if(Platform.OS === 'android'){
+        } else if (Platform.OS === 'android') {
           Linking.openURL('itms-apps://itunes.apple.com/us/app/ezyfind/id1611700455?mt=8')
         }
         break;
@@ -167,7 +167,7 @@ class DrawerContent extends Component {
         this.props.setUserRole('');
         this.props.navigation.reset({
           index: 0,
-          routes: [{ name : 'Main'}]
+          routes: [{ name: 'Main' }]
         });
       })
       .catch(err => {
@@ -177,6 +177,8 @@ class DrawerContent extends Component {
   }
 
   handleSignOut = async () => {
+    await AsyncStorage.removeItem('guestCartItems')
+    await AsyncStorage.removeItem('guesCartAllDataAdd')
     await AsyncStorage.clear();
     this.getQuestToken();
   };
@@ -205,7 +207,7 @@ class DrawerContent extends Component {
 
   renderChannelButtons() {
     return this.state.channels.map(({ screen, title, image, isLoggedIn }) => {
-      if(isLoggedIn && this.state.IsLoginData === 'false') return null
+      if (isLoggedIn && this.state.IsLoginData === 'false') return null
       return (
         <TouchableOpacity
           key={screen + title + image}
@@ -263,7 +265,7 @@ class DrawerContent extends Component {
           <Card style={{ flex: 0, backgroundColor: 'transparent', marginLeft: 54 }} transparent>
             <CardItem style={{ backgroundColor: 'transparent' }} transparent>
               <Left>
-                <Image source={ this.props.user.image ? { uri: this.props.user.image } : require('../assets/menu/User.png') } style={styles.img_view} />
+                <Image source={this.props.user.image ? { uri: this.props.user.image } : require('../assets/menu/User.png')} style={styles.img_view} />
                 <Body>
                   <Text style={[{ color: '#fff' }, styles.font_applied]}>
                     {this.props.user.name}
@@ -277,7 +279,7 @@ class DrawerContent extends Component {
               </Left>
             </CardItem>
           </Card>
-          { Object.keys(this.props.user).length == 0 &&
+          {Object.keys(this.props.user).length == 0 &&
             <View>
               <TouchableOpacity
                 onPress={this.navigateToScreen("AuthStack")}
@@ -288,7 +290,7 @@ class DrawerContent extends Component {
           }
         </View>
         <ScrollView showsVerticalScrollIndicator={false}>
-          { Object.keys(this.props.user).length > 0 &&
+          {Object.keys(this.props.user).length > 0 &&
             <View>
               <TouchableOpacity
                 key={'Constant.edit_profile' + 'Constant.edit_profile' + 'cont.edit_profile'}
@@ -317,29 +319,29 @@ class DrawerContent extends Component {
                       source={require('../assets/menu/clip.png')}
                       resizeMode="contain"
                     />
-                    <Text style={ { color: '#232323', marginStart: 8, fontFamily: fontFamily.regular}}>
+                    <Text style={{ color: '#232323', marginStart: 8, fontFamily: fontFamily.regular }}>
                       My Request
                     </Text>
                   </CardItem>
                 </View>
               </TouchableOpacity>
               <TouchableOpacity
-                    key='my_enquiry'
-                    onPress={this.navigateToScreen("my_enquiry")}
-                    activeOpacity={0.6}>
-                    <View style={{ backgroundColor: 'transparent', paddingBottom: 1 }}>
-                      <CardItem style={{ backgroundColor: 'transparent' }} transparent>
-                        <Image
-                          style={{ height: 25, width: 25, resizeMode: 'contain' }}
-                          source={require('../assets/menu/clip.png')}
-                          resizeMode="contain"
-                        />
-                        <Text style={{ color: '#232323', marginStart: 8, fontFamily: fontFamily.regular }}>
-                          My Enquiry
-                        </Text>
-                      </CardItem>
-                    </View>
-                  </TouchableOpacity>
+                key='my_enquiry'
+                onPress={this.navigateToScreen("my_enquiry")}
+                activeOpacity={0.6}>
+                <View style={{ backgroundColor: 'transparent', paddingBottom: 1 }}>
+                  <CardItem style={{ backgroundColor: 'transparent' }} transparent>
+                    <Image
+                      style={{ height: 25, width: 25, resizeMode: 'contain' }}
+                      source={require('../assets/menu/clip.png')}
+                      resizeMode="contain"
+                    />
+                    <Text style={{ color: '#232323', marginStart: 8, fontFamily: fontFamily.regular }}>
+                      My Enquiry
+                    </Text>
+                  </CardItem>
+                </View>
+              </TouchableOpacity>
               {this.props.userRole == 'Main Business User' &&
                 <>
                   <TouchableOpacity
@@ -355,7 +357,7 @@ class DrawerContent extends Component {
                         />
                         <Text
                           style={[
-                            {color: '#232323',marginStart: 8,fontFamily: fontFamily.regular},
+                            { color: '#232323', marginStart: 8, fontFamily: fontFamily.regular },
                             styles.font_applied,
                           ]}>
                           Incoming Requests
@@ -363,7 +365,7 @@ class DrawerContent extends Component {
                       </CardItem>
                     </View>
                   </TouchableOpacity>
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     key='incoming_enquiry'
                     onPress={this.navigateToScreen('incoming_enquiry')}
                     activeOpacity={0.6}>
@@ -443,7 +445,7 @@ const styles = {
 };
 
 const mapStateToProps = state => ({
-  user : state.user,
+  user: state.user,
   userRole: state.userRole
 })
 

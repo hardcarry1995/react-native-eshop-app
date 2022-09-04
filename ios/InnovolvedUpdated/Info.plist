@@ -101,6 +101,9 @@
 		<string>tt0142m_1.ttf</string>
 		<string>tt0144m_1.ttf</string>
 		<string>tt0205m_.ttf</string>
+		<string>Roboto_medium.ttf</string>
+		<string>Roboto.ttf</string>
+		<string>rubicon-icon-font.ttf</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>

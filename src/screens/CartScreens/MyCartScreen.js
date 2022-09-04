@@ -31,19 +31,41 @@ class Workout extends React.PureComponent {
     this.interval = null;
   }
 
+  async checkGuestCartItems() {
+    try {
+      const res = await AsyncStorage.getItem('guestCartItems')
+      const res2 = await AsyncStorage.getItem('guesCartAllDataAdd')
+      if (res && res2) {
+        const parsedCartItems = JSON.parse(res)
+        const parsedCartAllDataAdd = JSON.parse(res2)
+        this.setState({ data: parsedCartItems })
+        this.setState({ AllDAtaAdd: parsedCartAllDataAdd })
+        if (parsedCartItems.length > 0) {
+          this.setState({ setAllcartcount: parsedCartItems.length })
+          let totalVal = 0
+          parsedCartItems.map(el => totalVal += el.totalPrice)
+          this.setState({ setTotalValue: totalVal })
+        }
+        // await AsyncStorage.removeItem('guestCartItems')
+      }
+    } catch (e) {
+      console.log('Error getting async values ', e)
+    }
+  }
 
   componentDidMount() {
+    this.checkGuestCartItems()
     this.setState({ firstcartLoading: true });
     this.fetchToken();
     this.interval = setInterval(() => {
-        this.fetchToken()
-      },
+      this.fetchToken()
+    },
       5000
     );
   }
 
-  componentWillUnmount(){
-    if(this.interval){
+  componentWillUnmount() {
+    if (this.interval) {
       clearInterval(this.interval);
     }
   }
@@ -115,7 +137,6 @@ class Workout extends React.PureComponent {
         console.log(err);
       });
   }
-
   getShoppingCart = (Token) => {
     this.setState({ cartLoading: true });
     client
@@ -130,7 +151,7 @@ class Workout extends React.PureComponent {
       })
       .then(result => {
         this.setState({ cartLoading: false });
-        this.setState({ firstcartLoading: false});
+        this.setState({ firstcartLoading: false });
         if (result?.data?.getPrdShoppingCart?.success && result?.data?.getPrdShoppingCart?.count > 0) {
           this.setState({ data: result.data.getPrdShoppingCart.result.prdShoppingCartDto })
           this.setState({ setAllcartcount: result.data.getPrdShoppingCart.count })
@@ -165,6 +186,8 @@ class Workout extends React.PureComponent {
     if (IsLogin === 'true') {
       this.props.navigation.navigate('Checkout', { data: this.state.data, dataAll: this.state.AllDAtaAdd })
     } else {
+      await AsyncStorage.setItem('guestCartItems', JSON.stringify(this.state.data))
+      await AsyncStorage.setItem('guesCartAllDataAdd', JSON.stringify(this.state.AllDAtaAdd))
       this.props.navigation.navigate('AuthStack');
     }
   }
@@ -245,7 +268,7 @@ class Workout extends React.PureComponent {
               </View>
             </View>
             <View style={{ shadowOpacity: 1, width: "20%", alignSelf: "center", }}>
-              <View style={{ flexDirection: 'row', alignSelf: "center", justifyContent: "space-between"}}>
+              <View style={{ flexDirection: 'row', alignSelf: "center", justifyContent: "space-between" }}>
                 <TouchableOpacity onPress={() =>
                   this.removeQuantity(item, index)
                 }>
@@ -256,7 +279,7 @@ class Workout extends React.PureComponent {
                 <Text style={{ color: 'black', fontSize: 18, marginHorizontal: 10, height: 28, paddingHorizontal: 2, }}>
                   {item.quantity}
                 </Text>
-                <TouchableOpacity onPress={() => this.addQuantity(item, index) }>
+                <TouchableOpacity onPress={() => this.addQuantity(item, index)}>
                   <Text style={{ color: 'black', fontSize: 20 }}>
                     +
                   </Text>
@@ -271,7 +294,7 @@ class Workout extends React.PureComponent {
 
   renderCartView() {
     return (<View style={{ flex: 1 }}>
-      <View style={{ flexDirection: 'row', alignSelf: 'flex-end', marginRight: 25, marginTop: -40}}>
+      <View style={{ flexDirection: 'row', alignSelf: 'flex-end', marginRight: 25, marginTop: -40 }}>
         <Text style={{ color: 'gray' }}>Total Items(s): </Text>
         <Text style={{ color: 'black' }}>{this.state.setAllcartcount}</Text>
       </View>
@@ -307,7 +330,7 @@ class Workout extends React.PureComponent {
           <TouchableOpacity
             disabled={this.state.checkoutLoading}
             style={[styles.button, { backgroundColor: this.state.checkoutLoading ? '#ccc' : '#ff5a60' }]}
-            onPress={() => this.checkLogin() }>
+            onPress={() => this.checkLogin()}>
             <Text style={styles.buttonText}>Check Out</Text>
           </TouchableOpacity>
         </View>
@@ -315,7 +338,19 @@ class Workout extends React.PureComponent {
     </View>);
   }
 
+  // shouldComponentUpdate(nextProps) {
+  //   // Rendering the component only if 
+  //   // passed props value is changed
+  //   getItems()
+  //   if (nextProps.value !== this.props.value) {
+  //     return true;
+  //   } else {
+  //     return false;
+  //   }
+  // }
+
   render() {
+    console.log('this.state.data ', this.state.data)
     return (
       <SafeAreaView style={styles.container}>
         <Text style={{ marginTop: -5, fontWeight: 'bold', fontSize: 20, padding: 20, }}>
@@ -329,9 +364,9 @@ class Workout extends React.PureComponent {
 }
 
 const mapDispatchToProps = (dispatch) => ({
-  setCarts : value => dispatch({
+  setCarts: value => dispatch({
     type: "GET_CARTS_ITEMS",
-    payload : value
+    payload: value
   })
 })
 
