@@ -1107,7 +1107,7 @@ PODS:
     - React-Core
   - react-native-version-number (0.3.6):
     - React
-  - react-native-webview (11.23.0):
+  - react-native-webview (11.23.1):
     - React-Core
   - React-perflogger (0.67.3)
   - React-RCTActionSheet (0.67.3):
@@ -1627,7 +1627,7 @@ SPEC CHECKSUMS:
   react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457
   react-native-sqlite-storage: f6d515e1c446d1e6d026aa5352908a25d4de3261
   react-native-version-number: b415bbec6a13f2df62bf978e85bc0d699462f37f
-  react-native-webview: e771bc375f789ebfa02a26939a57dbc6fa897336
+  react-native-webview: d33e2db8925d090871ffeb232dfa50cb3a727581
   React-perflogger: 93d3f142d6d9a46e635f09ba0518027215a41098
   React-RCTActionSheet: 87327c3722203cc79cf79d02fb83e7332aeedd18
   React-RCTAnimation: 009c87c018d50e0b38692699405ebe631ff4872d
@@ -1665,4 +1665,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 1955cf3ae38808c0c872fa8fa4fa29269b8c0a6a
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.11.3

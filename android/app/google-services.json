@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "232834789917",
+    "project_id": "ezyfind-1544275429812",
+    "storage_bucket": "ezyfind-1544275429812.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:232834789917:android:4f5d5db2b36debb0f1ccf4",
+        "android_client_info": {
+          "package_name": "com.inno.ezyfind"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "232834789917-7efvvdfujnoi97a6kpf9brrv1png12pr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.inno.ezyfind",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "232834789917-0i6u709vc27u2bo5idli0hgv1v9jhcp9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNjKB84RyfVRuvuU8sCcQT6uWB_wVY03s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "232834789917-0i6u709vc27u2bo5idli0hgv1v9jhcp9.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "232834789917-a6ftjml3vucanqfslmkeohe4k99udu62.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.inno.ezyfind"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
