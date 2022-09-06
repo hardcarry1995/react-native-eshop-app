@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, FlatList, ActivityIndicator, ToastAndroid, Linking, Platform } from 'react-native';
+import { StyleSheet, Text, View, FlatList, ActivityIndicator, ToastAndroid, Linking } from 'react-native';
 import NetInfo from "@react-native-community/netinfo";
 import AsyncStorage from '@react-native-community/async-storage';
-import RNPickerSelect from 'react-native-picker-select';
 import { connect } from 'react-redux';
 import { bearerToken } from '../constants/utils';
 import client from '../constants/client';
-import Constants from "../constants/constant";
-import { SPECIAL_PRODUCT, CREATE_FAVOURITES_PRODUCT, ADD_TO_CART, GET_PRODUCT, GUEST_LOGIN, ADD_TO_CART_NULL } from '../constants/queries';
+import { SPECIAL_PRODUCT, CREATE_FAVOURITES_PRODUCT, ADD_TO_CART, GET_PRODUCT, GUEST_LOGIN, ADD_TO_CART_NULL, GET_SHOPPING_CART } from '../constants/queries';
 import SpecialCard from '../components/SpecialProduct';
 import SQLite from 'react-native-sqlite-storage';
 import moment from 'moment';
@@ -90,8 +88,8 @@ class HomeScreen extends Component {
         }
       }).catch(err => console.error('An error occurred', err));
     }
-    this.checkLogin();
-    this.getPayment();
+    // this.getPayment();
+    this.fetchToken()
   }
 
   componentWillUnmount() {
@@ -129,30 +127,6 @@ class HomeScreen extends Component {
       });
   };
 
-  async checkLogin() {
-    let token = await AsyncStorage.getItem('userToken');
-    let IsLogin = await AsyncStorage.getItem('IsLogin');
-    if (IsLogin === 'true') {
-      const { refered_by = '' } = this.props.state || {};
-      const paredRB = refered_by ? JSON.parse(refered_by) : {};
-      if (paredRB?.name) {
-        this.props.navigation.navigate(paredRB?.name, { refered_data: paredRB?.data });
-      }
-      this.fetchToken();
-      setInterval(() => {
-        this.checkConnectivity();
-      }, 5000);
-    } else {
-      if (token == '' || token == null) {
-        this.getQuestToken();
-      } else {
-        this.fetchToken();
-        setInterval(() => {
-          this.checkConnectivity();
-        }, 5000);
-      }
-    }
-  }
 
 
   async checkConnectivity() {
@@ -229,6 +203,20 @@ class HomeScreen extends Component {
     this.setState({
       loginToken: token
     });
+    
+     const cartResult = await client.mutate({
+      mutation: GET_SHOPPING_CART,
+      context: {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Length': 0,
+        },
+      },
+    })
+    if (cartResult.data.getPrdShoppingCart.success) {
+      this.props.addProductToCart(cartResult.data.getPrdShoppingCart.result.prdShoppingCartDto ?? [])
+    } 
+
     await Promise.all([
       this.fetchProducts(token),
       this.fetchSpecialProduct(token)
@@ -373,7 +361,6 @@ class HomeScreen extends Component {
     let IsLogin = await AsyncStorage.getItem('IsLogin');
     this.setState({ isCartLoading: true })
     this.setState({ isproductID: id })
-
     if (IsLogin !== 'true') {
       this.setState({ cartLoading: true });
       client
@@ -499,7 +486,7 @@ class HomeScreen extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <View style={{ paddingBottom: 30, flex: 1 }}>
+        <View style={{ flex: 1 }}>
           <ProductSearchInput 
             onChangeText={(value) => this.handleSearch(value)} 
             onPressFilterIcon={() => this.setState({ showCategorySelector : true})} />

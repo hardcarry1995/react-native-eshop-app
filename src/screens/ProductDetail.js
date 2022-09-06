@@ -154,7 +154,6 @@ class ProductDetail extends React.Component {
             this.setState({ cartLoading: false });
             this.props.navigation.navigate('CartStack')
           } else {
-            console.log(result.data.postPrdShoppingCartOptimized);
           }
         })
         .catch(err => {

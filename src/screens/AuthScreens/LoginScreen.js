@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { connect } from 'react-redux';
 import { gql } from '@apollo/client';
 import client from '../../constants/client';
-import { HANDLE_SIGNUP, CHECK_MAIL } from '../../constants/queries';
+import { HANDLE_SIGNUP, CHECK_MAIL, GET_SHOPPING_CART } from '../../constants/queries';
 import { decode } from 'base-64';
 import { LoginManager, Profile, AccessToken } from 'react-native-fbsdk-next';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
@@ -51,8 +51,8 @@ function LoginScreen(props) {
   };
 
   const HANDLE_LOGIN = gql`
-    query login($tokenData: String) {
-      sSOLogin(jti: $tokenData) {
+    query login($jti: String) {
+      sSOLogin(jti: $jti) {
         count
         currentPage
         message
@@ -197,12 +197,30 @@ function LoginScreen(props) {
     }
   };
 
+  const fetchCart = async (token) => {
+    try{
+      const cartResult = await client.mutate({
+        mutation: GET_SHOPPING_CART,
+        context: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Length': 0,
+          },
+        },
+      });
+
+      if(cartResult.data.getPrdShoppingCart.success){
+        props.addProductToCart(cartResult.data.getPrdShoppingCart.result.prdShoppingCartDto ?? [])
+      }
+    }catch(e){ 
+      console.log(e);
+    }
+  }
  
   const submit = async () => {
     let token = await AsyncStorage.getItem('userToken');
     let rjx = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     let isValid = rjx.test(email.trim());
-    // console.warn(isValid);
     if (email === '' || !isValid) {
       setEmailError('Enter valid email');
       return;
@@ -217,15 +235,15 @@ function LoginScreen(props) {
     client
       .query({
         query: HANDLE_LOGIN,
-        fetchPolicy: 'no-cache',
         context: {
           headers: {
             Authorization: `Basic ${encode(
               email.trim() + ':' + password.trim(),
             )}`,
+            'Content-Type': 'application/json'
           },
           variables: {
-            tokenData: decodedId.jti,
+            jti: decodedId.jti,
           },
         },
       })
@@ -246,6 +264,7 @@ function LoginScreen(props) {
           props.setUserToken(result.data.sSOLogin.result.token);
           props.setUserData(userInfo);
           props.setUserRole(decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']);
+          await fetchCart(result.data.sSOLogin.result.token);
           props.navigation.reset({
             index: 0,
             routes: [{ name : 'Main'}]
@@ -300,6 +319,7 @@ function LoginScreen(props) {
           props.setUserData(userInfo);
           props.setUserRole(decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']);
           props.setUserToken(result.data.oAuth.result.token);
+          await fetchCart(result.data.oAuth.result.token);
           props.navigation.reset({
             index: 0,
             routes: [{ name : 'Main'}]
@@ -501,6 +521,7 @@ function LoginScreen(props) {
             props.setUserData(userInfo);
             props.setUserRole(decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']);
             props.setUserToken(result.data.registerUser.result.token);
+            await fetchCart(result.data.registerUser.result.token);
             props.navigation.reset({
               index: 0,
               routes: [{ name : 'Main'}]
@@ -720,7 +741,11 @@ const mapDispatchToProps = dispatch => ({
       type : 'SET_USER_ROLE',
       payload: role
     })
-  }
+  },
+  addProductToCart : value => dispatch({
+    type: "GET_CARTS_ITEMS",
+    payload : value
+  })
 });
 
 export default connect(null, mapDispatchToProps)(LoginScreen);

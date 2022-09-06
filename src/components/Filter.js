@@ -87,7 +87,6 @@ export default class Filter extends React.Component {
           },
         })
         .then(result => {
-          console.log('result>>>>>',result)
           if (result.data.createMstFavourites.mstFavouriteId) {
             ToastAndroid.show('Product added to Favourites', ToastAndroid.SHORT);
           }
@@ -143,8 +142,6 @@ export default class Filter extends React.Component {
       // this.props.navigation.navigate('Auth');
       var userIdData = null;
       this.setState({ cartLoading: true });
-      console.log(">>>>>>>>>>>>>>>>>>>>>>id", id);
-      console.log(">>>>>>>>>>>>>>>>>>>>>>i", userInfo);
       client
         .mutate({
           mutation: ADD_TO_CART_NULL,
@@ -171,14 +168,9 @@ export default class Filter extends React.Component {
           console.log(err);
         });
     } else {
-      // console.log(">>>>>>>>>>>>>>>>>>>>>>id", id);
-      // this.setState({ cartLoading: true });
-      console.log(">>>>>>>>>>>>>>>>>>>>>>userID.id", id);
       let userToken1 = await AsyncStorage.getItem('userToken');
       let userInfo = await AsyncStorage.getItem('userInfo');
       let userID = JSON.parse(userInfo)
-  //     this.setState({ cartLoading: true });
-      console.log(">>>>>>>>>>>>>>>>>>>>>>i", userID.id);
       client
         .mutate({
           mutation: ADD_TO_CART,
@@ -216,7 +208,6 @@ export default class Filter extends React.Component {
     const { navigation } = this.props;
 
     const data = navigation.getParam('data');
-    //  console.log(">>>>>>>>>>>>>>>>>>", data); 
     const imagePath = `${imagePrefix}${data.imagePath || data.productImage}`;
     return (
       <ScrollView style={{ flex: 1, backgroundColor: '#fff' }}>

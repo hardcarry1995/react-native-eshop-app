@@ -197,7 +197,6 @@ const IncomingRequestChat = ({ navigation, route, userState }) => {
       })
       .then(async result => {
         if (result.data.getIncommingHierarchyResponseItems) {
-          console.log(result.data.getIncommingHierarchyResponseItems);
           setmsgData(prev => [...prev, ...result.data.getIncommingHierarchyResponseItems]);
         } else {
         }

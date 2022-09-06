@@ -22,7 +22,7 @@ import client from '../../constants/client';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import Modal from 'react-native-modal';
 import { LoginManager, Profile, AccessToken } from 'react-native-fbsdk-next';
-import { HANDLE_SIGNUP, CHECK_MAIL, HANDLE_SIGNUP_BUSINESS } from '../../constants/queries';
+import { HANDLE_SIGNUP, CHECK_MAIL, HANDLE_SIGNUP_BUSINESS, GET_SHOPPING_CART } from '../../constants/queries';
 import { appleAuth, AppleButton } from '@invertase/react-native-apple-authentication';
 import Geolocation from '@react-native-community/geolocation';
 import twitter, { TWLoginButton, decodeHTMLEntities, getRelativeTime } from 'react-native-simple-twitter';
@@ -131,6 +131,26 @@ class Signup extends React.Component {
     }
   }
 
+  fetchCart = async (token) => {
+    try{
+      const cartResult = await client.mutate({
+        mutation: GET_SHOPPING_CART,
+        context: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Length': 0,
+          },
+        },
+      });
+
+      if(cartResult.data.getPrdShoppingCart.success){
+        this.props.addProductToCart(cartResult.data.getPrdShoppingCart.result.prdShoppingCartDto ?? [])
+      }
+    }catch(e){ 
+      console.log(e);
+    }
+  }
+
   async handleSignUp() {
     if (this.state.showResultsNew == 'false') {
       this.props.navigation.push('SetSubscriptionPlan');
@@ -226,6 +246,7 @@ class Signup extends React.Component {
                   this.props.setUserData(userInfo);
                   this.props.setUserRole(decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']);
                   this.props.setUserToken(result.data.registerUser.result.token);
+                  await this.fetchCart(result.data.registerUser.result.token);
                   this.props.navigation.navigate('Main');
                 },
               },
@@ -295,7 +316,6 @@ class Signup extends React.Component {
         },
       })
       .then(async result => {
-        console.log('HANDLE_SIGNUP_BUSINESS>>>>', result);
         this.setState({ loading: false });
 
         if (result.data.registerBusiness.success) {
@@ -777,7 +797,11 @@ const mapDispatchToProps = dispatch => ({
       type : 'SET_USER_ROLE',
       payload: role
     })
-  }
+  },
+  addProductToCart : value => dispatch({
+    type: "GET_CARTS_ITEMS",
+    payload : value
+  })
 });
 
 export default connect(null, mapDispatchToProps)(Signup);

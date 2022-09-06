@@ -4,14 +4,14 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import messaging from "@react-native-firebase/messaging";
 import AsyncStorage from '@react-native-community/async-storage';
 import { getBrand, getManufacturer } from 'react-native-device-info';
-import { GUEST_LOGIN, SUB_CATEGORY } from '../constants/queries';
+import { GUEST_LOGIN, SUB_CATEGORY, GET_SHOPPING_CART } from '../constants/queries';
 import { mainCategoryId } from "../constants/categories";
 import client from '../constants/client';
 import { bearerToken } from '../constants/utils';
+import { connect } from 'react-redux';
 
 
-
-const SplashScreen = ({ navigation }) => {
+const SplashScreen = ({ navigation, addProductToCart }) => {
 
   const requestUserPermission = async () => {
     const authStatus = await messaging().requestPermission();
@@ -27,27 +27,33 @@ const SplashScreen = ({ navigation }) => {
   }
 
   const checkLogin = async () => {
-    let token = await AsyncStorage.getItem('userToken');
-    let IsLogin = await AsyncStorage.getItem('IsLogin');
-    if (token == '' || token == null) {
-      token = await getQuestToken();
-    } 
-
-    const categoryQueryResult = await client
-                                        .query({
-                                          query: SUB_CATEGORY,
-                                          context: {
-                                            headers: {
-                                              Authorization: `Bearer ${token}`,
-                                              'Content-Length': 0,
+    try{
+      let token = await AsyncStorage.getItem('userToken');
+      let IsLogin = await AsyncStorage.getItem('IsLogin');
+      console.log(token);
+      if (token == '' || token == null) {
+        token = await getQuestToken();
+      } 
+  
+      const categoryQueryResult = await client
+                                          .query({
+                                            query: SUB_CATEGORY,
+                                            context: {
+                                              headers: {
+                                                Authorization: `Bearer ${token}`,
+                                                'Content-Length': 0,
+                                              },
                                             },
-                                          },
-                                          variables: {
-                                            id: mainCategoryId,
-                                          },
-                                        });
-    const subCategoryIds = categoryQueryResult.data.getMstCategoryByParentId.result.map(category => category.categoryId);
-    await AsyncStorage.setItem("categories", subCategoryIds.join(","));
+                                            variables: {
+                                              id: mainCategoryId,
+                                            },
+                                          });
+      const subCategoryIds = categoryQueryResult.data.getMstCategoryByParentId.result.map(category => category.categoryId);
+      await AsyncStorage.setItem("categories", subCategoryIds.join(","));
+    } catch (e){
+      console.log(e);
+    }
+    
   }
 
   getQuestToken = async () => {
@@ -139,7 +145,14 @@ const SplashScreen = ({ navigation }) => {
   )
 }
 
-export default SplashScreen
+const mapDispatchToProps = dispatch => ({
+  addProductToCart : value => dispatch({
+    type: "GET_CARTS_ITEMS",
+    payload : value
+  })
+});
+
+export default connect(null, mapDispatchToProps)(SplashScreen);
 
 const styles = StyleSheet.create({
   container: {

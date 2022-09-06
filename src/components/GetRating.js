@@ -31,10 +31,8 @@ export class GetRating extends Component {
                 },
             })
             .then(async result => {
-                // console.log("rating", result.data.getMstRatingScoreList);
                 if (result.data.getMstRatingScoreList.success) {
                     this.props.onprogress(result.data.getMstRatingScoreList.count)
-                    //   onprogress={(k)=>{k}}
                 } else {
                     ToastAndroid.show(
                         result.data.getBusinessList.message,

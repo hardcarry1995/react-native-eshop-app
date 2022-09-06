@@ -44,8 +44,6 @@ class WeekSelector extends Component {
   }
 
   isEnabled(controlDate, weekStartDate, weekEndDate) {
-    console.log('weekStartDate', weekStartDate);
-    console.log('weekEndDate', weekEndDate);
     if (controlDate) {
       return !moment(controlDate).isBetween(
         weekStartDate,
