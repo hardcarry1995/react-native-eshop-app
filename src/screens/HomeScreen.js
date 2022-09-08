@@ -53,7 +53,7 @@ class HomeScreen extends Component {
       starImageCorner:
         'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png',
       showCategorySelector: false,
-      categoriesForSearch : [],
+      categoriesForSearch: [],
       refreshing: false
 
     };
@@ -62,10 +62,10 @@ class HomeScreen extends Component {
   }
 
   componentDidMount() {
+    this.props.setAnimation(true);
     const scheme1 = 'https://ezyfind.me/';
     DeepLinking.addScheme('https://sandbox.payfast.co.za/');
     DeepLinking.addScheme(scheme1);
-
     this.linkingUrlSub = Linking.addEventListener('url', this.handleUrl);
     DeepLinking.addRoute('eng/process?merchant_id=10001460&merchant_key=0j4uaurpqk87v&return_url=https%3a%2f%2fwww.LawyersEzyFind.co.za%2fLCPayFastReturn.html&cancel_url=https%3a%2f%2fwww.LawyersEzyFind.co.za%2fLCPayFastCancel.html&notify_url=http%3a%2f%2fmobileapiv2.ezyfind.co.za%2fapi%2fUser%2fNotify%3f&m_payment_id=13216&amount=1151.70&item_name=Company+33&item_description=Purchased+EzyFindMobileApi.Model.MstPackage+Package&subscription_type=1&recurring_amount=1151.70&frequency=4&cycles=0', (response) => {
       this.setState({ response });
@@ -93,6 +93,7 @@ class HomeScreen extends Component {
   }
 
   componentWillUnmount() {
+    this.props.setAnimation(false);
     if (this.linkingUrlSub) {
       this.linkingUrlSub.remove();
     }
@@ -162,7 +163,7 @@ class HomeScreen extends Component {
         console.log(err);
       });
   }
-  
+
   handleSearch = (text) => {
     this.setState({ textnew: text });
     let vdata = this.state.dataEMP.filter(i =>
@@ -176,12 +177,12 @@ class HomeScreen extends Component {
   EmptyListMessage = ({ item }) => {
     return (
       <Text style={styles.emptyListStyle}>
-        {this.state.loading ? "Loading" :  "No records found" }
+        {this.state.loading ? "Loading" : "No records found"}
       </Text>
     );
   };
   fetchMoreUsers = () => {
-    if(this.state.textnew == ""){
+    if (this.state.textnew == "") {
       this.setState(
         prevState => ({
           size: prevState.size + 10,
@@ -193,7 +194,7 @@ class HomeScreen extends Component {
     }
   };
 
-  fetchToken = async() => {
+  fetchToken = async () => {
     let token = await AsyncStorage.getItem('userToken');
     let userInfo = await AsyncStorage.getItem('userInfo');
     this.setState({
@@ -203,8 +204,8 @@ class HomeScreen extends Component {
     this.setState({
       loginToken: token
     });
-    
-     const cartResult = await client.mutate({
+
+    const cartResult = await client.mutate({
       mutation: GET_SHOPPING_CART,
       context: {
         headers: {
@@ -215,7 +216,7 @@ class HomeScreen extends Component {
     })
     if (cartResult.data.getPrdShoppingCart.success) {
       this.props.addProductToCart(cartResult.data.getPrdShoppingCart.result.prdShoppingCartDto ?? [])
-    } 
+    }
 
     await Promise.all([
       this.fetchProducts(token),
@@ -231,7 +232,7 @@ class HomeScreen extends Component {
         query: GET_PRODUCT,
         variables: {
           size: this.state.size,
-          categories : (categories == "" || categories == null ) ? categoryIdsJson : categories
+          categories: (categories == "" || categories == null) ? categoryIdsJson : categories
         },
         context: {
           headers: {
@@ -242,8 +243,8 @@ class HomeScreen extends Component {
       .then(result => {
         if (result.data.getPrdProductList.result.length > 0) {
           this.setState({ dataEMP: result.data.getPrdProductList.result });
-          let data = result.data.getPrdProductList.result ;
-          if(this.state.textnew !== ""){
+          let data = result.data.getPrdProductList.result;
+          if (this.state.textnew !== "") {
             data = data.filter(i => i.productName.toLowerCase().includes(this.state.textnew.toLowerCase()))
           }
           this.setState({ data: data });
@@ -343,16 +344,16 @@ class HomeScreen extends Component {
           if (result.data.createMstFavourites.mstFavouriteId) {
             Toast.show({
               type: "success",
-              text1 : "Success",
-              text2 : 'Special added to Favourites'
+              text1: "Success",
+              text2: 'Special added to Favourites'
             })
           }
         })
         .catch(err => {
           Toast.show({
             type: "error",
-            text1 : "Error",
-            text2 : 'Something went wrong!'
+            text1: "Error",
+            text2: 'Something went wrong!'
           })
         });
     }
@@ -378,12 +379,13 @@ class HomeScreen extends Component {
           },
         })
         .then(result => {
+          console.log('added to card => ', result)
           this.setState({ cartLoading: false });
           if (result.data.postPrdShoppingCartOptimized.success) {
             Toast.show({
               type: "success",
-              text1 : "Success",
-              text2 : 'Product added to cart'
+              text1: "Success",
+              text2: 'Product added to cart'
             })
             this.setState({ isCartLoading: false })
             this.props.addProductToCart(result.data.postPrdShoppingCartOptimized.result.prdShoppingCartDto)
@@ -391,8 +393,8 @@ class HomeScreen extends Component {
           } else {
             Toast.show({
               type: "error",
-              text1 : "Oop!",
-              text2 : result.data.postPrdShoppingCartOptimized.message
+              text1: "Oop!",
+              text2: result.data.postPrdShoppingCartOptimized.message
             })
           }
         })
@@ -422,8 +424,8 @@ class HomeScreen extends Component {
           if (result.data.postPrdShoppingCartOptimized.success) {
             Toast.show({
               type: "success",
-              text1 : "Success",
-              text2 : 'Product added to cart'
+              text1: "Success",
+              text2: 'Product added to cart'
             })
             this.setState({ isCartLoading: false })
             this.props.addProductToCart(result.data.postPrdShoppingCartOptimized.result.prdShoppingCartDto)
@@ -431,8 +433,8 @@ class HomeScreen extends Component {
           } else {
             Toast.show({
               type: "error",
-              text1 : "Oop!",
-              text2 : result.data.postPrdShoppingCartOptimized.message
+              text1: "Oop!",
+              text2: result.data.postPrdShoppingCartOptimized.message
             })
           }
         })
@@ -441,8 +443,8 @@ class HomeScreen extends Component {
           console.log(err);
           Toast.show({
             type: "error",
-            text1 : "Oop!",
-            text2 : "Something went wrong!"
+            text1: "Oop!",
+            text2: "Something went wrong!"
           })
         });
     }
@@ -458,18 +460,18 @@ class HomeScreen extends Component {
   );
 
   _onSelectCategoryDone = (categories) => {
-    this.setState({ categoriesForSearch: categories, showCategorySelector : false});
+    this.setState({ categoriesForSearch: categories, showCategorySelector: false });
     this._filterByCategory(categories);
-  } 
+  }
 
   _onPressSelectedCategory = (item) => {
     const items = this.state.categoriesForSearch.filter((cat) => cat.categoryId != item.categoryId);
-    this.setState({ categoriesForSearch: items});
+    this.setState({ categoriesForSearch: items });
     this._filterByCategory(items);
   }
 
   _filterByCategory = (categories) => {
-    if(categories.length > 0){
+    if (categories.length > 0) {
       const catIds = categories.map(cat => cat.categoryId).join(",");
       this.fetchProducts(this.state.loginToken, catIds);
     } else {
@@ -477,23 +479,23 @@ class HomeScreen extends Component {
     }
   }
 
-  refreshList = async  () => {
-    this.setState({ refreshing : true});
+  refreshList = async () => {
+    this.setState({ refreshing: true });
     await this.fetchToken();
-    this.setState({ refreshing : false});
+    this.setState({ refreshing: false });
   }
 
   render() {
     return (
       <View style={styles.container}>
         <View style={{ flex: 1 }}>
-          <ProductSearchInput 
-            onChangeText={(value) => this.handleSearch(value)} 
-            onPressFilterIcon={() => this.setState({ showCategorySelector : true})} />
+          <ProductSearchInput
+            onChangeText={(value) => this.handleSearch(value)}
+            onPressFilterIcon={() => this.setState({ showCategorySelector: true })} />
 
-          {this.state.categoriesForSearch.length > 0 && <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom : 20, paddingHorizontal : 10}}>
+          {this.state.categoriesForSearch.length > 0 && <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom: 20, paddingHorizontal: 10 }}>
             {this.state.categoriesForSearch.map(item => (
-              <Chip 
+              <Chip
                 title={item.categoryName}
                 icon={{
                   name: 'close',
@@ -504,11 +506,11 @@ class HomeScreen extends Component {
                 onPress={() => this._onPressSelectedCategory(item)}
                 iconRight
                 titleStyle={{ fontSize: 10 }}
-                buttonStyle={{ backgroundColor: '#F54D30', marginBottom: 5}}
+                buttonStyle={{ backgroundColor: '#F54D30', marginBottom: 5 }}
               />
             ))}
           </View>}
-          
+
           <FlatList
             ListEmptyComponent={this.EmptyListMessage('data')}
             numColumns={2}
@@ -520,12 +522,12 @@ class HomeScreen extends Component {
               )
             }}
             ListHeaderComponent={() => {
-              if(this.state.special_data.length === 0){
+              if (this.state.special_data.length === 0) {
                 return null;
               }
               return (
                 <View style={{ padding: 5, flex: 1 }}>
-                  <Text style={{...styles.sectionLabel, marginBottom : 5}}> SPECIAL PRODUCTS </Text>
+                  <Text style={{ ...styles.sectionLabel, marginBottom: 5 }}> SPECIAL PRODUCTS </Text>
                   <SpecialCard allData={this.state.special_data} navigation={this.props.navigation} />
                   <Text style={styles.sectionLabel}> ALL PRODUCTS </Text>
                 </View>
@@ -541,8 +543,8 @@ class HomeScreen extends Component {
 
           />
         </View>
-        <CategorySelector 
-          visible={this.state.showCategorySelector} 
+        <CategorySelector
+          visible={this.state.showCategorySelector}
           onDone={(values) => this._onSelectCategoryDone(values)}
         />
       </View>
@@ -561,9 +563,13 @@ const mapDispatchToProps = dispatch => ({
       payload: value,
     });
   },
-  addProductToCart : value => dispatch({
+  addProductToCart: value => dispatch({
     type: "GET_CARTS_ITEMS",
-    payload : value
+    payload: value
+  }),
+  setAnimation: flag => dispatch({
+    type: 'SET_SHOW_ANIMATION',
+    payload: flag
   })
 });
 

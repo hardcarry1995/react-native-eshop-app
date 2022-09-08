@@ -31,30 +31,30 @@ class Workout extends React.PureComponent {
     this.interval = null;
   }
 
-  async checkGuestCartItems() {
-    try {
-      const res = await AsyncStorage.getItem('guestCartItems')
-      const res2 = await AsyncStorage.getItem('guesCartAllDataAdd')
-      if (res && res2) {
-        const parsedCartItems = JSON.parse(res)
-        const parsedCartAllDataAdd = JSON.parse(res2)
-        this.setState({ data: parsedCartItems })
-        this.setState({ AllDAtaAdd: parsedCartAllDataAdd })
-        if (parsedCartItems.length > 0) {
-          this.setState({ setAllcartcount: parsedCartItems.length })
-          let totalVal = 0
-          parsedCartItems.map(el => totalVal += el.totalPrice)
-          this.setState({ setTotalValue: totalVal })
-        }
-        // await AsyncStorage.removeItem('guestCartItems')
-      }
-    } catch (e) {
-      console.log('Error getting async values ', e)
-    }
-  }
+  // async checkGuestCartItems() {
+  //   try {
+  //     const res = await AsyncStorage.getItem('guestCartItems')
+  //     const res2 = await AsyncStorage.getItem('guesCartAllDataAdd')
+  //     if (res && res2) {
+  //       const parsedCartItems = JSON.parse(res)
+  //       const parsedCartAllDataAdd = JSON.parse(res2)
+  //       this.setState({ data: parsedCartItems })
+  //       this.setState({ AllDAtaAdd: parsedCartAllDataAdd })
+  //       if (parsedCartItems.length > 0) {
+  //         this.setState({ setAllcartcount: parsedCartItems.length })
+  //         let totalVal = 0
+  //         parsedCartItems.map(el => totalVal += el.totalPrice)
+  //         this.setState({ setTotalValue: totalVal })
+  //       }
+  //       // await AsyncStorage.removeItem('guestCartItems')
+  //     }
+  //   } catch (e) {
+  //     console.log('Error getting async values ', e)
+  //   }
+  // }
 
   componentDidMount() {
-    this.checkGuestCartItems()
+    // this.checkGuestCartItems()
     this.setState({ firstcartLoading: true });
     this.fetchToken();
     this.interval = setInterval(() => {
@@ -150,6 +150,7 @@ class Workout extends React.PureComponent {
         },
       })
       .then(result => {
+        console.log('result here ', result)
         this.setState({ cartLoading: false });
         this.setState({ firstcartLoading: false });
         if (result?.data?.getPrdShoppingCart?.success && result?.data?.getPrdShoppingCart?.count > 0) {
@@ -186,8 +187,8 @@ class Workout extends React.PureComponent {
     if (IsLogin === 'true') {
       this.props.navigation.navigate('Checkout', { data: this.state.data, dataAll: this.state.AllDAtaAdd })
     } else {
-      await AsyncStorage.setItem('guestCartItems', JSON.stringify(this.state.data))
-      await AsyncStorage.setItem('guesCartAllDataAdd', JSON.stringify(this.state.AllDAtaAdd))
+      // await AsyncStorage.setItem('guestCartItems', JSON.stringify(this.state.data))
+      // await AsyncStorage.setItem('guesCartAllDataAdd', JSON.stringify(this.state.AllDAtaAdd))
       this.props.navigation.navigate('AuthStack');
     }
   }
