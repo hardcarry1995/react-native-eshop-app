@@ -299,11 +299,13 @@ class HomeScreen extends Component {
     }
   }
 
-  fetchSpecialProduct(token) {
+  fetchSpecialProduct = async (token) => {
+    let categoryIdsJson = await AsyncStorage.getItem('categories');
     client
       .query({
         query: SPECIAL_PRODUCT,
         variables: {
+          domainCategoryIds: categoryIdsJson,
           size: 10,
         },
         context: {

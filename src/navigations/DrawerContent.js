@@ -262,31 +262,35 @@ class DrawerContent extends Component {
       <View style={[styles.containerStyle]}>
         <View style={styles.avartaContainer} />
         <View style={{ paddingTop: 32 }}>
-          <Card style={{ flex: 0, backgroundColor: 'transparent', marginLeft: 54 }} transparent>
-            <CardItem style={{ backgroundColor: 'transparent' }} transparent>
-              <Left>
-                <Image source={this.props.user.image ? { uri: this.props.user.image } : require('../assets/menu/User.png')} style={styles.img_view} />
-                <Body>
-                  <Text style={[{ color: '#fff' }, styles.font_applied]}>
-                    {this.props.user.name}
-                  </Text>
-                  <Text
-                    note
-                    style={[{ color: '#fff', padding: 4, }, styles.font_applied]}>
-                    {this.props.user.email}
-                  </Text>
-                </Body>
-              </Left>
-            </CardItem>
-          </Card>
-          {Object.keys(this.props.user).length == 0 &&
-            <View>
-              <TouchableOpacity
-                onPress={this.navigateToScreen("AuthStack")}
-                activeOpacity={0.6}>
-                <Text style={styles.signupText}>Tap to Sign In/Sign Up Now</Text>
-              </TouchableOpacity>
-            </View>
+          {Object.keys(this.props.user).length == 0 ?
+            <TouchableOpacity
+              onPress={this.navigateToScreen("AuthStack")}
+              activeOpacity={0.6}>
+                <Card style={{ flex: 0, backgroundColor: 'transparent', marginLeft: 54 }} transparent>
+                  <CardItem style={{ backgroundColor: 'transparent', alignItems: 'center'}} transparent>
+                    <Image source={require('../assets/menu/User.png') } style={styles.img_view} />
+                  </CardItem>
+                </Card>
+              <Text style={styles.signupText}>Tap to Sign In/Sign Up Now</Text>
+            </TouchableOpacity>
+            : 
+            <Card style={{ flex: 0, backgroundColor: 'transparent', marginLeft: 54 }} transparent>
+              <CardItem style={{ backgroundColor: 'transparent' }} transparent>
+                <Left>
+                  <Image source={this.props.user.image ? { uri: this.props.user.image } : require('../assets/menu/User.png')} style={styles.img_view} />
+                  <Body>
+                    <Text style={[{ color: '#fff' }, styles.font_applied]}>
+                      {this.props.user.name}
+                    </Text>
+                    <Text
+                      note
+                      style={[{ color: '#fff', padding: 4, }, styles.font_applied]}>
+                      {this.props.user.email}
+                    </Text>
+                  </Body>
+                </Left>
+              </CardItem>
+            </Card>
           }
         </View>
         <ScrollView showsVerticalScrollIndicator={false}>
@@ -436,7 +440,7 @@ const styles = {
     marginBottom: -10,
   },
   signupText: {
-    fontSize: 10,
+    fontSize: 11,
     color: 'gray',
     marginLeft: 30
   },
