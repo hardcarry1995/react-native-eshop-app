@@ -35,7 +35,7 @@ const Tab = ({ title, activeImage, unactiveImage, onPress, isFocused, isShowBadg
 
 //large tab bar icon
 
-const Tablarge = ({ title, activeImage, unactiveImage, onPress, isFocused }) => {
+const Tablarge = ({ title, activeImage, unactiveImage, onPress, isFocused, showAnimation }) => {
   const offset = useSharedValue(0);
   const opacityOffset = useSharedValue(0)
   // const bottomOffset = useSharedValue(200)
@@ -75,19 +75,21 @@ const Tablarge = ({ title, activeImage, unactiveImage, onPress, isFocused }) => 
   }, [])
 
   const animatedStyles = useAnimatedStyle(() => {
-    return {
+    return showAnimation ? {
       transform: [{
         rotateY: `${offset.value}deg`,
       }]
-    };
+    } : {}
   });
 
   const animatedPopupStyle = useAnimatedStyle(() => {
-    return {
+    return showAnimation ? {
       opacity: opacityOffset.value,
-    };
+    } : {
+      opacity: 0
+    }
   });
-
+  console.log('show animation in bottom bar =. ', showAnimation)
   const InnerComp = () => <Animated.View style={[styles.largeButtonContainer, animatedStyles]}>
     <TouchableOpacity activeOpacity={0.8} onPress={onPress}>
       <Image style={styles.larginButtonImage} resizeMode="contain" source={isFocused ? activeImage : unactiveImage} />
@@ -125,7 +127,8 @@ class TabBar extends React.Component {
     super(props);
     this.state = {
       isVisible: true,
-      cartCount: 0
+      cartCount: 0,
+      showAnimation: true
     };
   }
   async componentDidMount() {
@@ -193,6 +196,7 @@ class TabBar extends React.Component {
                 activeImage={require('../assets/menu/home.png')}
                 unactiveImage={require('../assets/menu/home.png')}
                 onPress={() => {
+                  this.setState({ showAnimation: true })
                   navigation.navigate(route.name, {});
                 }}
                 isFocused={navigationState.index == index}
@@ -205,6 +209,7 @@ class TabBar extends React.Component {
                 activeImage={require('../assets/img/product.png')}
                 unactiveImage={require('../assets/img/product.png')}
                 onPress={() => {
+                  this.setState({ showAnimation: false })
                   navigation.navigate(route.name);
                 }}
                 isFocused={navigationState.index == index}
@@ -217,9 +222,11 @@ class TabBar extends React.Component {
                 activeImage={require('../assets/menu/request.png')}
                 unactiveImage={require('../assets/menu/request.png')}
                 onPress={() => {
+                  this.setState({ showAnimation: false })
                   navigation.navigate(route.name);
                 }}
                 isFocused={navigationState.index == index}
+                showAnimation={this.state.showAnimation}
               />
             );
           } else if (route.name === 'CartStack') {
@@ -230,6 +237,7 @@ class TabBar extends React.Component {
                 activeImage={require('../assets/menu/cart.png')}
                 unactiveImage={require('../assets/menu/cart.png')}
                 onPress={() => {
+                  this.setState({ showAnimation: false })
                   navigation.navigate(route.name);
                 }}
                 isShowBadge
@@ -244,6 +252,7 @@ class TabBar extends React.Component {
                 activeImage={require('../assets/menu/heart.png')}
                 unactiveImage={require('../assets/menu/heart.png')}
                 onPress={() => {
+                  this.setState({ showAnimation: false })
                   navigation.navigate(route.name);
                 }}
                 isFocused={navigationState.index == index}
@@ -281,7 +290,7 @@ const styles = StyleSheet.create({
   },
   largeButtonContainer: {
     alignItems: 'center',
-    elevation: 0.1,
+    // elevation: 0.1,
     marginTop: -10,
     width: 70,
     height: 70,
@@ -290,7 +299,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 35,
     shadowRadius: 1,
-    zIndex: 0
+    zIndex: 0,
+    // borderColor: '#DB3236',
+    // borderWidth: 0.5
   },
   larginButtonImage: {
     width: 55,
