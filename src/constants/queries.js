@@ -82,7 +82,7 @@ export const SPECIAL_PRODUCT = gql`
 }`;
 
 export const SPECIAL_PRODUCT_LIST_WITH_DISTANCE = gql`
- query GetSpecialProductList($distance: Decimal!)  {
+ query GetSpecialProductList($distance: Decimal!, $categories : String = null)  {
   getMstSpecialList(
     specialId: null,
     specialName: null,
@@ -90,7 +90,7 @@ export const SPECIAL_PRODUCT_LIST_WITH_DISTANCE = gql`
     statusIds: null,
     distance: $distance,
     companyIds: null,
-    categoryIds: null,
+    categoryIds: $categories,
     provinceIds: null,
     cityIds: null,
     suburbIds: null,
