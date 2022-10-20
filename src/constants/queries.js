@@ -765,6 +765,8 @@ export const REQUEST_ITEM = gql`
     $catId: Int
     $date:DateTime
     $suburbId: Int
+    $longitude: String
+    $latitude: String
     $files: [Upload!]
   ) {
     postMstItemRequest(mstItemRequest:{
@@ -777,6 +779,8 @@ export const REQUEST_ITEM = gql`
         createdBy: $userId
         createdDate: $date
         modifiedDate: $date
+        longitude: $longitude
+        latitude: $latitude
       },
       files: $files
     ) {
@@ -3374,3 +3378,40 @@ export const GET_PROVINCE_BY_COUNTRY_ID = gql`
       }
     }
   }`
+
+export const GET_ITEM_REQUEST_SERVICE_LIST = gql`
+ query getItemRequestServiceList($domainCategoryIds: String = null,  $category: Int = null, $subCategoryId: Int = null, $page: Int = 1, $size: Int = 10){
+  getItemRequestServiceList(
+    domainCategoryIds: $domainCategoryIds,
+    categoryId: $category,
+    subCategoryId: $subCategoryId,
+    page: $page,
+    size: $size
+  ){
+    count,
+    currentPage,
+    message,
+    nextPage,
+    prevPage, 
+    result {
+      itemRequestServiceTitle,
+      itemRequestServiceDescription,
+      itemRequestServiceStatusID,
+      uploadPath,
+      thumbNailPath,
+      categoryID,
+      subCategoryID,
+      domainCategoryID,
+      domainCategoryName{
+        categoryName
+      },
+      categoryName{
+        categoryName
+      },
+      subCategoryName{
+        categoryName
+      }
+    }
+  }
+ }
+`;

@@ -11,7 +11,7 @@ const Stack = createNativeStackNavigator();
 
 function RequestStack() {
   return (
-    <Stack.Navigator screenOptions={{ gestureHandler: false }}>
+    <Stack.Navigator screenOptions={{ gestureHandler: false }} initialRouteName="RequestItem">
       <Stack.Screen name="RequestItem" component={RequestItem} options={ScreenOptions} />
       <Stack.Screen name="CreateFeed" component={CreateFeed} options={ScreenOptionsWithBack}  />
       <Stack.Screen name="Request24" component={Request24} options={ScreenOptionsWithBack} />

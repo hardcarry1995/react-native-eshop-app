@@ -1,4 +1,4 @@
-package com.inno.ezyfind;
+package com.inno.ezyfind.brics;
 
 import com.facebook.react.ReactActivity;
 

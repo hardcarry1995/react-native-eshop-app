@@ -33,7 +33,7 @@
 		"project_id":"736430079244765181",
 		"app_id":"106621241",
 		"api_key":"CwEAAAAAF8MZbnJcZ/ZB9qQvpyonAAMuVcK5DquXtaGf6dOgOxcIcHu869/jSQfsmgOd1smws3FjrAsUIPPgm2OJSwkYVyr4OCE=",
-		"package_name":"com.inno.ezyfind"
+		"package_name":"com.inno.ezyfind.brics"
 	},
 	"oauth_client":{
 		"client_id":"106621241",
@@ -41,7 +41,7 @@
 	},
 	"app_info":{
 		"app_id":"106621241",
-		"package_name":"com.inno.ezyfind"
+		"package_name":"com.inno.ezyfind.brics"
 	},
 	"service":{
 		"analytics":{
@@ -75,12 +75,12 @@
 	"configuration_version":"3.0",
 	"appInfos":[
 		{
-			"package_name":"com.inno.ezyfind",
+			"package_name":"com.inno.ezyfind.brics",
 			"client":{
 				"app_id":"106621241"
 			},
 			"app_info":{
-				"package_name":"com.inno.ezyfind",
+				"package_name":"com.inno.ezyfind.brics",
 				"app_id":"106621241"
 			},
 			"oauth_client":{

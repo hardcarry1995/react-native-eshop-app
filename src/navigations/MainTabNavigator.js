@@ -162,7 +162,8 @@ const TabBarNavigator = () => (
   >
     <Tab.Screen name="HomeStack" component={HomeTabs} />
     <Tab.Screen name={Constants.my_request_stack} component={MyRequestStack}  />
-    <Tab.Screen name="CategoryStack" component={RequestStack}  />
+    <Tab.Screen name="RequestStack" component={RequestStack}  />
+    {/* <Tab.Screen name="CategoryStack" component={RequestStack}  /> */}
     <Tab.Screen name="CartStack" component={CartStack}  />
     <Tab.Screen name="WishStack" component={WishStack}  />
     <Tab.Screen name={Constants.feed} component={FeedStack}  />
@@ -178,7 +179,6 @@ const TabBarNavigator = () => (
     <Tab.Screen name={Constants.faq} component={FaqStack}  />
     <Tab.Screen name={Constants.logout} component={WorkInProgress} />
     <Tab.Screen name={Constants.share_app} component={WorkInProgress}  />
-    <Tab.Screen name="RequestStack" component={RequestStack}  />
     <Tab.Screen name="ContactStack" component={ContactStack}  />
     <Tab.Screen name={Constants.my_Favirity} component={FavoriteStack} />
     <Tab.Screen name="MyOrders" component={OrderStack}  />

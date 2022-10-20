@@ -1,11 +1,22 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, FlatList, ActivityIndicator, ToastAndroid, Linking } from 'react-native';
+import { StyleSheet, Text, View, FlatList, ActivityIndicator, ToastAndroid, Linking, TouchableOpacity, Image } from 'react-native';
 import NetInfo from "@react-native-community/netinfo";
 import AsyncStorage from '@react-native-community/async-storage';
 import { connect } from 'react-redux';
 import { bearerToken } from '../constants/utils';
 import client from '../constants/client';
-import { SPECIAL_PRODUCT, CREATE_FAVOURITES_PRODUCT, ADD_TO_CART, GET_PRODUCT, GUEST_LOGIN, ADD_TO_CART_NULL, GET_SHOPPING_CART } from '../constants/queries';
+import { imagePrefix } from '../constants/utils';
+import ImageWithPlaceholder from '../components/ImageWithPlaceholder';
+import { 
+  SPECIAL_PRODUCT, 
+  CREATE_FAVOURITES_PRODUCT, 
+  ADD_TO_CART, 
+  GET_PRODUCT, 
+  GUEST_LOGIN, 
+  ADD_TO_CART_NULL, 
+  GET_SHOPPING_CART,
+  GET_ITEM_REQUEST_SERVICE_LIST
+} from '../constants/queries';
 import SpecialCard from '../components/SpecialProduct';
 import SQLite from 'react-native-sqlite-storage';
 import moment from 'moment';
@@ -16,6 +27,7 @@ import ProductSearchInput from '../components/ProductSearchInput';
 import CategorySelector from "../components/CategorySelector";
 import { Chip } from "react-native-elements";
 import Toast from "react-native-toast-message";
+import { mainCategoryId } from "../constants/categories";
 
 
 class HomeScreen extends Component {
@@ -54,7 +66,8 @@ class HomeScreen extends Component {
         'https://raw.githubusercontent.com/AboutReact/sampleresource/master/star_corner.png',
       showCategorySelector: false,
       categoriesForSearch: [],
-      refreshing: false
+      refreshing: false,
+      serviceList: []
 
     };
     this.linkingUrlSub = null;
@@ -220,8 +233,32 @@ class HomeScreen extends Component {
 
     await Promise.all([
       this.fetchProducts(token),
-      this.fetchSpecialProduct(token)
+      this.fetchSpecialProduct(token),
+      this.fetchRequestServiceList(token, mainCategoryId)
     ])
+  }
+
+  fetchRequestServiceList = async (token, categoryId = null, subCategory = null) => {
+    client
+      .query({
+        query: GET_ITEM_REQUEST_SERVICE_LIST,
+        variables: {
+          domainCategoryIds: categoryId ? categoryId.toString() : null,
+          category: categoryId,
+          subCategoryId: subCategory ? subCategory.toString() : null
+        },
+        context: {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      })
+      .then(result => {
+        this.setState({ serviceList : result.data.getItemRequestServiceList.result});
+      })
+      .catch(error => {
+        console.log(error)
+      })
   }
 
   fetchProducts = async (token, categories = null) => {
@@ -487,6 +524,42 @@ class HomeScreen extends Component {
     this.setState({ refreshing: false });
   }
 
+  _onPressServiceItem = (item ) => {
+    this.props.navigation.reset({
+      index: 0,
+      routes: [
+        {
+          name: "RequestStack",
+          params: { 
+            screen : "RequestItem",
+            params: { 
+              title: item.itemRequestServiceTitle,
+              desc: item.itemRequestServiceDescription,
+              subCategoryId: item.subCategoryID,
+              categoryId : item.categoryID,
+              categoryName : item.categoryName.categoryName, 
+              subCategoryName: item.subCategoryName.categoryName
+            }
+          }
+        }
+      ]
+    })
+    // this.props.navigation.navigate(
+    //   "RequestStack",
+    //   {
+    //     screen: "RequestItem",
+    //     params : {
+    //       title: item.itemRequestServiceTitle,
+    //       desc: item.itemRequestServiceDescription,
+    //       subCategoryId: item.subCategoryID,
+    //       categoryId : item.categoryID,
+    //       categoryName : item.categoryName.categoryName, 
+    //       subCategoryName: item.subCategoryName.categoryName
+    //     }
+    //   }
+    // )
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -512,7 +585,6 @@ class HomeScreen extends Component {
               />
             ))}
           </View>}
-
           <FlatList
             ListEmptyComponent={this.EmptyListMessage('data')}
             numColumns={2}
@@ -529,6 +601,29 @@ class HomeScreen extends Component {
               }
               return (
                 <View style={{ padding: 5, flex: 1 }}>
+                  {this.state.serviceList.length > 0 &&<View style={{ marginBottom: 10 }}>
+                    <Text style={{ ...styles.sectionLabel, marginBottom: 5, textTransform: 'uppercase' }}> Request </Text>
+                    <FlatList  
+                      data={this.state.serviceList}
+                      keyExtractor={(item, index) => index.toString()}
+                      renderItem={({ item ,index}) => (
+                        <TouchableOpacity style={{borderWidth: 1, borderColor: "#888", marginRight: 5, borderRadius : 5}} onPress={() => this._onPressServiceItem(item)}>
+                          <ImageWithPlaceholder 
+                            style={{ width : 200, height : 200,   borderRightWidth : 2, borderRightColor : "#888"}} 
+                            source={item.thumbNailPath ? { uri: `${imagePrefix}${item.thumbNailPath}`} : require('../assets/NoImage.jpeg')} 
+                            resizeMode="contain"
+                          />
+                          <Text style={{ color: "#333", width: 200, }}>{item.itemRequestServiceTitle}</Text>
+                          <Image  
+                            source={require('../assets/menu/request.png')}
+                            style={{ width : 40, height : 30 }}
+                            resizeMode="contain"
+                          />
+                        </TouchableOpacity>
+                      )}
+                      horizontal
+                    />
+                  </View>}
                   <Text style={{ ...styles.sectionLabel, marginBottom: 5 }}> SPECIAL PRODUCTS </Text>
                   <SpecialCard allData={this.state.special_data} navigation={this.props.navigation} />
                   <Text style={styles.sectionLabel}> ALL PRODUCTS </Text>

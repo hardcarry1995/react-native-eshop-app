@@ -483,7 +483,8 @@ class Signup extends React.Component {
   }
 
   onPressTerms = () => {
-    Linking.openURL("https://brics.ezyfind.co.za/manufacturing/CompanyPDF/BRICS-Privacy-Policy.pdf");
+    // Linking.openURL("https://brics.ezyfind.co.za/manufacturing/CompanyPDF/BRICS-Privacy-Policy.pdf");
+    Linking.openURL("https://www.brics-online.org/brics/CompanyPDF/BRICS-Privacy-Policy.pdf")
   }
 
   render() {

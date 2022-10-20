@@ -212,7 +212,7 @@ export default class ProductScreen extends React.PureComponent {
   );
 
   _onPressFilterIcon = () => {
-    this.props.navigation.navigate('CategoryStack');
+    this.props.navigation.navigate('RequestStack');
   }
 
   refreshList = async () => {
@@ -224,7 +224,10 @@ export default class ProductScreen extends React.PureComponent {
   render() {
     return (
       <View style={styles.container}>
-        <ProductSearchInput onChangeText={(value) => this.handleSearch(value)} onPressFilterIcon={() => this.props.navigation.navigate('CategoryStack')} />
+        <ProductSearchInput 
+          onChangeText={(value) => this.handleSearch(value)} 
+          onPressFilterIcon={() => this.props.navigation.navigate('RequestStack')} 
+        />
         <View style={styles.productListContainer}>
           <FlatList
             numColumns={2}

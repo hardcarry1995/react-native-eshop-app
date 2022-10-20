@@ -12,6 +12,7 @@ const screenOptions = ({ navigation }) => ({
   headerTitle: () => (
     <Image
       source={require('../assets/img/LoginIcon.png')}
+      // source={require("../assets/logos/brics-logo.png")}
       style={{ width: 100, height: 45 }}
       resizeMode ='contain'
     />

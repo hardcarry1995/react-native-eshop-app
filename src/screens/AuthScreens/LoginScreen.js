@@ -546,7 +546,8 @@ function LoginScreen(props) {
         />
         <View style={{ flex: 1, padding: 21 }}>
           <Image
-            source={require('../../assets/logo.jpg')}
+            // source={require('../../assets/logo.jpg')}
+            source={require("../../assets/logos/brics-logo.png")}
             resizeMode="contain"
             style={{ width: 210, height: 170, marginBottom: 10, alignSelf: 'center' }}
           />

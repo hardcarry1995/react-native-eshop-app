@@ -89,7 +89,6 @@ const Tablarge = ({ title, activeImage, unactiveImage, onPress, isFocused, showA
       opacity: 0
     }
   });
-  console.log('show animation in bottom bar =. ', showAnimation)
   const InnerComp = () => <Animated.View style={[styles.largeButtonContainer, animatedStyles]}>
     <TouchableOpacity activeOpacity={0.8} onPress={onPress}>
       <Image style={styles.larginButtonImage} resizeMode="contain" source={isFocused ? activeImage : unactiveImage} />
@@ -97,7 +96,7 @@ const Tablarge = ({ title, activeImage, unactiveImage, onPress, isFocused, showA
   </Animated.View>
   return (
     <View>
-      <Animated.View style={[
+      {showAnimation && <Animated.View style={[
         {
           backgroundColor: '#db3236',
           borderRadius: 15,
@@ -115,7 +114,7 @@ const Tablarge = ({ title, activeImage, unactiveImage, onPress, isFocused, showA
             fontSize: 14,
             textAlign: 'center'
           }}>Request Here!</Text>
-      </Animated.View>
+      </Animated.View> }
       <InnerComp />
     </View>
   );
@@ -159,7 +158,6 @@ class TabBar extends React.Component {
       .then(result => {
         if (result?.data?.getPrdShoppingCart?.success && result?.data?.getPrdShoppingCart?.count > 0) {
           // this.setState({ cartCount :  result?.data?.getPrdShoppingCart?.count })
-          console.log("Cart Data:", result?.data?.getPrdShoppingCart);
           this.props.setCartItems(result?.data?.getPrdShoppingCart.result.prdShoppingCartDto);
         }
       })
@@ -197,7 +195,11 @@ class TabBar extends React.Component {
                 unactiveImage={require('../assets/menu/home.png')}
                 onPress={() => {
                   this.setState({ showAnimation: true })
-                  navigation.navigate(route.name, {});
+                  // navigation.reset({
+                  //   index: 0,
+                  //   routes: [{ name : route.name }]
+                  // });
+                  navigation.navigate(route.name);
                 }}
                 isFocused={navigationState.index == index}
               />
@@ -210,12 +212,15 @@ class TabBar extends React.Component {
                 unactiveImage={require('../assets/img/product.png')}
                 onPress={() => {
                   this.setState({ showAnimation: false })
-                  navigation.navigate(route.name);
+                  navigation.reset({
+                    index: 0,
+                    routes: [{ name : route.name }]
+                  });
                 }}
                 isFocused={navigationState.index == index}
               />
             );
-          } else if (route.name === 'CategoryStack') {
+          } else if (route.name === 'RequestStack') {
             return (
               <Tablarge
                 title={''}
@@ -223,10 +228,13 @@ class TabBar extends React.Component {
                 unactiveImage={require('../assets/menu/request.png')}
                 onPress={() => {
                   this.setState({ showAnimation: false })
-                  navigation.navigate(route.name);
+                  navigation.reset({
+                    index: 0,
+                    routes: [{ name : route.name }]
+                  });
                 }}
                 isFocused={navigationState.index == index}
-                showAnimation={this.state.showAnimation}
+                showAnimation={navigationState.index == 0}
               />
             );
           } else if (route.name === 'CartStack') {
@@ -253,7 +261,10 @@ class TabBar extends React.Component {
                 unactiveImage={require('../assets/menu/heart.png')}
                 onPress={() => {
                   this.setState({ showAnimation: false })
-                  navigation.navigate(route.name);
+                  navigation.reset({
+                    index: 0,
+                    routes: [{ name : route.name }]
+                  });
                 }}
                 isFocused={navigationState.index == index}
               />

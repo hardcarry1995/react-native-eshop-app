@@ -1,12 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.inno.ezyfind">
+  package="com.inno.ezyfind.brics">
 
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACTION_OPEN_DOCUMENT" />
-    <uses-permission android:name="android.permission.MANAGE_DOCUMENTS" />
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="com.huawei.appmarket.service.commondata.permission.GET_COMMON_DATA"/>
@@ -48,7 +47,7 @@
         android:name="com.facebook.react.devsupport.DevSettingsActivity" 
         android:exported="true"
       />
-      <meta-data android:name="com.huawei.hms.client.appid" android:value="appid=com.inno.ezyfind" />
+      <meta-data android:name="com.huawei.hms.client.appid" android:value="appid=com.inno.ezyfind.brics" />
       <meta-data android:name="com.google.android.geo.API_KEY" android:value="@string/geo_api_key"/>
       <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
       <meta-data android:name="com.facebook.sdk.ClientToken" android:value="@string/fb_client_token"/>

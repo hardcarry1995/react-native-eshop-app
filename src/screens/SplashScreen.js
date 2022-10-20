@@ -138,6 +138,7 @@ const SplashScreen = ({ navigation, addProductToCart }) => {
     <View style={styles.container}>
       <Image  
         source={require("../assets/logos/2.gif")}
+        // source={require("../assets/logos/brics-splash.gif")}
         style={{ width : 350, height : 200 }}
         resizeMode="contain"
       />

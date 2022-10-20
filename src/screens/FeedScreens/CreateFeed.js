@@ -16,6 +16,8 @@ import RBSheet from "react-native-raw-bottom-sheet";
 import { imagePrefix } from '../../constants/utils';
 import moment from 'moment';
 import Toast from "react-native-toast-message";
+import Geolocation from '@react-native-community/geolocation';
+
 
 export const REQUEST_ITEMS = gql
 {
@@ -104,6 +106,8 @@ const Request = (props) => {
   const refRBSheet = useRef();
   const [addRequestItem, setAddRequestItem] = useState(false);
   const [mapSpecialUploads, setMapSpecialUploads] = useState(mapSpecialUpload);
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
   const acceptedImageArray = ["image/gif", "image/jpg", "image/jpeg", "image/png"];
 
   const scanner = useRef(0);
@@ -123,6 +127,23 @@ const Request = (props) => {
   useEffect(() => {
     ShowCurrentDate();
   });
+
+  useEffect(() => {
+    Geolocation.getCurrentPosition((position) => {
+      console.log('position', position);
+      let _latitude = position.coords.latitude;
+      let _longitude = position.coords.longitude;
+      setLatitude(_latitude);
+      setLongitude(_longitude);
+    }, (error) => {
+      console.log(error.code, error.message);
+    },
+      {
+        enableHighAccuracy: false,
+        timeout: 10000,
+        maximumAge: 100000
+      });
+  }, [])
 
 
   const removeImage = (e) => {
@@ -243,7 +264,9 @@ const Request = (props) => {
             date: new Date().toISOString(),
             catId: categoryId,
             userId: Number(jsondata.id),
-            files: [...allFilesData]
+            files: [...allFilesData],
+            longitude : longitude.toString(),
+            latitude : latitude.toString(),
           }
           client
             .mutate({
@@ -356,7 +379,7 @@ const Request = (props) => {
   const changeTheDescription = (value) => {
     const words = value
     let dataofvehicle = 'Engine Number - ' + words.engineNumber + '\nVehicle Reg Number - ' + words.registrationNumber + '\nMake -  ' + words.make + '\nVIN - ' + words.vIN + '\nDescription - ' + words.description + '\nDate Of expiry - ' + words.dateOfExpiry + ''
-    setDesc(dataofvehicle)
+    setDesc(R_desc + "\n" + dataofvehicle)
   }
   const saveVehicleDetail = async () => {
     if (vehicleData[14] == undefined) {

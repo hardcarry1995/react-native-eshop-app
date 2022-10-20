@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, View, Text, Switch, TouchableOpacity, ScrollView, ToastAndroid, Alert } from 'react-native';
-import { GET_PROVINCE, GET_CITY, GET_SUBURB, GET_ALL_STATE, GET_ALL_CITY_NEW, GET_ALL_SUBURB, GET_COUNTRIES, GET_PROVINCE_BY_COUNTRY_ID } from '../constants/queries';
+import { GET_PROVINCE, GET_CITY, GET_SUBURB, SUB_CATEGORY, GET_ALL_CITY_NEW, GET_ALL_SUBURB, GET_COUNTRIES, GET_PROVINCE_BY_COUNTRY_ID } from '../constants/queries';
 import client from '../constants/client';
 import AsyncStorage from '@react-native-community/async-storage';
 import Geolocation from '@react-native-community/geolocation';
@@ -15,6 +15,12 @@ import HMSLocation from "@hmscore/react-native-hms-location";
 import VersionNumber from 'react-native-version-number';
 
 const RequestItem = ({ navigation, route }) => {
+  const { 
+      subCategoryId : subCategoryIdFomParam, 
+      categoryId: categoryIdFromParam, 
+      categoryName: categoryNameFromParam, 
+      subCategoryName: subCategoryNameFromParam 
+  } = route.params ?? {};
   const [switchValue, setSwitchValue] = useState(false);
   const [province, setProvince] = useState([]);
   const [allCities, setAllCities] = useState([]);
@@ -30,15 +36,13 @@ const RequestItem = ({ navigation, route }) => {
   const [mapstate, setMapState] = useState('');
   const [initialRegion, setinitialRegion] = useState();
   const [showCategorySelector, setShowCategorySelector] = useState(false);
-  const [categoryId, setCategoryId] = useState('');
-  const [subCategoryId, setSubCategoryId] = useState('');
-  const [subCategoryName, setSubCategoryName] = useState('');
+  const [categoryId, setCategoryId] = useState(categoryIdFromParam ?? '');
+  const [subCategoryId, setSubCategoryId] = useState(subCategoryIdFomParam ?? '');
+  const [subCategoryName, setSubCategoryName] = useState(subCategoryNameFromParam ?? '');
   const [mapRegion, setMapReson] = useState();
   const [countries, setCountries] = useState([]);
   const [country, setCountry] = useState(null);
 
-  const title = "";
-  const desc = "";
   const startdate = "";
   const mapSpecialUpload = "";
   const mapRef = useRef(null);
@@ -74,6 +78,42 @@ const RequestItem = ({ navigation, route }) => {
     fetchAllSub();
     setTheAllData();
   }, []);
+
+  // useEffect(() => {
+  //   if(route.params && route.params.categoryId){
+  //     getCategoryFromParam();
+  //   }
+  // }, [route.params]);
+
+  // const getCategoryFromParam = async () => {
+  //     let token = await AsyncStorage.getItem('userToken');
+  //     client
+  //       .query({
+  //         query: SUB_CATEGORY,
+  //         context: {
+  //           headers: {
+  //             Authorization: `Bearer ${token}`,
+  //           },
+  //         },
+  //         variables: {
+  //           id: route.params.categoryId,
+  //         },
+  //       })
+  //       .then(async result => {
+  //         if(result.data.getMstCategoryByParentId.success){
+  //           const categoryFromParams = result.data.getMstCategoryByParentId.result.find(item => item.categoryId == route.params.subCategoryId);
+  //           if(categoryFromParams){
+  //             setSubCategoryName(categoryFromParams.categoryName);
+  //             setCategoryId(categoryFromParams.parentCategoryId);
+  //             setSubCategoryId(categoryFromParams.categoryId);
+  //           }
+  //         }
+  //       })
+  //       .catch(err => {
+  //         console.log(err);
+  //         // this.setState({ loading: '' });
+  //       });
+  // }
 
   const fetchAllCountry = async () => {
     let token = await AsyncStorage.getItem('userToken');
@@ -120,6 +160,7 @@ const RequestItem = ({ navigation, route }) => {
   }
 
   const AddCreateFeed = () => {
+    console.log(categoryId);
     if(categoryId === '' || subCategoryId === ''){
       Alert.alert("Error", 'Please select the category!');
       return;
@@ -135,6 +176,7 @@ const RequestItem = ({ navigation, route }) => {
       Alert.alert('Error','Select Saburb');
       return;
     }else{
+      
     navigation.navigate('CreateFeed', {
       categoryId: categoryId,
       subCategoryId: subCategoryId,
@@ -142,8 +184,8 @@ const RequestItem = ({ navigation, route }) => {
       province: selectProvince,
       city: selectCity,
       suburb: selectSub,
-      title: title,
-      desc: desc,
+      title: route.params ? route.params.title : "",
+      desc: route.params ? route.params.desc : "",
       startdate:startdate,
       mapSpecialUpload:mapSpecialUpload,
     });
@@ -602,7 +644,7 @@ const RequestItem = ({ navigation, route }) => {
           />
         </View>
         <TouchableOpacity
-          style={{ height: 40, width: 150, backgroundColor: '#DE5246', justifyContent: 'center', alignItems: 'center', borderRadius: 5, marginTop: 10, alignSelf: 'center', marginBottom: 40 }}
+          style={{ zIndex: 10, height: 40, width: 150, backgroundColor: '#DE5246', justifyContent: 'center', alignItems: 'center', borderRadius: 5, marginTop: 10, alignSelf: 'center', marginBottom: 40 }}
           onPress={() => AddCreateFeed() }>
           <Text style={{ color: '#FAFAFA' }}> PROCEED </Text>
         </TouchableOpacity>

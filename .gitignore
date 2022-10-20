@@ -116,6 +116,7 @@ android/gradle/*.jks
 android/app/src/main/assets/*
 android/build/*
 android/apks/*.*
+android/app/src/main/res/*
 *.xcuserstate
 .DS_Store
 *.xcbkptlist

@@ -14,12 +14,12 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		20C29B51009C25C1C7B5E4E0 /* libPods-InnovolvedUpdated-InnovolvedUpdatedTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 678757D26E73F86D3692D087 /* libPods-InnovolvedUpdated-InnovolvedUpdatedTests.a */; };
 		2206FD8427C70EA800B9028F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2206FD8327C70EA800B9028F /* GoogleService-Info.plist */; };
+		2236053B28D2402C008808B2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		2257DA8D27D5966200AF3401 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2257DA8C27D5966200AF3401 /* File.swift */; };
 		33D0E33F24FF4883B3793DDC /* tt0142m_1.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 94657839BBE8481E84B1DA77 /* tt0142m_1.ttf */; };
 		3827B7FB2D4A40F9A4BC18E4 /* tt0140m_1.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 91FC0C2848254FC68D15D3B5 /* tt0140m_1.ttf */; };
 		5145474CE2584405AF8CB6E6 /* FutuLt.ttf in Resources */ = {isa = PBXBuildFile; fileRef = EF0E708DCE7A4B3EA230239E /* FutuLt.ttf */; };
 		7D589E5BA1064F31BE99CA2F /* tt0144m_1.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6FB0233EA23546CB88C99432 /* tt0144m_1.ttf */; };
-		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		921228DB7801223191C9FF74 /* libPods-InnovolvedUpdated.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 09A40B9E467C864354F54899 /* libPods-InnovolvedUpdated.a */; };
 		93629048134A4C4BA8710E03 /* tt0205m_.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7C6E36CCBD43454DB2B196FA /* tt0205m_.ttf */; };
 		9E8312F5625A417496976E6C /* FUTURAH.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 82AE15A8CE474E91BBE6822E /* FUTURAH.ttf */; };
@@ -340,7 +340,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
+				2236053B28D2402C008808B2 /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				5145474CE2584405AF8CB6E6 /* FutuLt.ttf in Resources */,
 				FB461D92A7204F3096040347 /* futur.ttf in Resources */,
@@ -628,7 +628,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = InnovolvedUpdated/InnovolvedUpdated.entitlements;
-				CURRENT_PROJECT_VERSION = 55;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 64;
 				DEVELOPMENT_TEAM = TT5588X6TM;
 				ENABLE_BITCODE = NO;
 				HEADER_SEARCH_PATHS = (
@@ -636,18 +638,23 @@
 					"$(SRCROOT)/../node_modules/react-native-app-info/RNAppInfo",
 				);
 				INFOPLIST_FILE = InnovolvedUpdated/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Manufacturing EzyFind";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.2;
+				MARKETING_VERSION = 0.9.5;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.inno.ezyfind;
+				PRODUCT_BUNDLE_IDENTIFIER = com.inno.ezyfind.manufacturing;
 				PRODUCT_NAME = InnovolvedUpdated;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_OBJC_BRIDGING_HEADER = "InnovolvedUpdated-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -663,25 +670,32 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = InnovolvedUpdated/InnovolvedUpdated.entitlements;
-				CURRENT_PROJECT_VERSION = 55;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 64;
 				DEVELOPMENT_TEAM = TT5588X6TM;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-app-info/RNAppInfo",
 				);
 				INFOPLIST_FILE = InnovolvedUpdated/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Manufacturing EzyFind";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.2;
+				MARKETING_VERSION = 0.9.5;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.inno.ezyfind;
+				PRODUCT_BUNDLE_IDENTIFIER = com.inno.ezyfind.manufacturing;
 				PRODUCT_NAME = InnovolvedUpdated;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_OBJC_BRIDGING_HEADER = "InnovolvedUpdated-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
